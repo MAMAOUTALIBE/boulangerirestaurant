@@ -3,13 +3,16 @@
 import { z } from "zod";
 import type { OrderLine } from "@/types";
 import {
+  antiWasteSchema,
   cateringSchema,
   contactSchema,
+  customCakeSchema,
   dishSchema,
   newsletterSchema,
   orderSchema,
   reservationSchema,
   reviewSchema,
+  seasonalPreorderSchema,
 } from "@/lib/validation";
 import { prisma } from "@/lib/prisma";
 import {
@@ -272,6 +275,219 @@ export async function requestCatering(
     ok: true,
     message: "Demande de devis envoyée ! Nous revenons vers vous rapidement.",
   };
+}
+
+/** Demande de gâteau personnalisé (sur-mesure). */
+export async function requestCustomCake(
+  _prev: ActionState | null,
+  formData: FormData,
+): Promise<ActionState> {
+  if (isBot(formData)) return { ok: true, message: "Demande envoyée !" };
+  if (!(await rateLimit(`cake:${await clientIp()}`, 5, 60_000)))
+    return TOO_MANY;
+
+  const parsed = customCakeSchema.safeParse({
+    name: formData.get("name"),
+    email: formData.get("email"),
+    phone: formData.get("phone"),
+    occasion: formData.get("occasion"),
+    servings: formData.get("servings"),
+    flavor: formData.get("flavor"),
+    messageOnCake: formData.get("messageOnCake") || undefined,
+    pickupDate: formData.get("pickupDate"),
+    pickupTime: formData.get("pickupTime") || undefined,
+    inspirationUrl: formData.get("inspirationUrl") || undefined,
+    budget: formData.get("budget") || undefined,
+    allergies: formData.get("allergies") || undefined,
+    details: formData.get("details"),
+  });
+  if (!parsed.success) {
+    return {
+      ok: false,
+      message: "Vérifiez votre saisie.",
+      errors: fieldErrors(parsed.error),
+    };
+  }
+
+  const ref = `CC-${Date.now().toString(36).toUpperCase()}`;
+  await prisma.customCakeRequest.create({
+    data: { reference: ref, ...parsed.data },
+  });
+  await upsertCustomer(parsed.data.email, {
+    name: parsed.data.name,
+    phone: parsed.data.phone,
+  });
+
+  await sendEmail({
+    to: siteConfig.contact.email,
+    subject: `Nouvelle demande de gâteau de ${parsed.data.name} (${ref})`,
+    html: `<p><strong>${parsed.data.name}</strong> (${parsed.data.email}, ${parsed.data.phone})</p>
+      <ul>
+        <li>Occasion : ${parsed.data.occasion}</li>
+        <li>Parts : ${parsed.data.servings}</li>
+        <li>Parfum / base : ${parsed.data.flavor}</li>
+        <li>Retrait : ${parsed.data.pickupDate}${parsed.data.pickupTime ? ` à ${parsed.data.pickupTime}` : ""}</li>
+        ${parsed.data.messageOnCake ? `<li>Message sur le gâteau : ${parsed.data.messageOnCake}</li>` : ""}
+        ${parsed.data.budget ? `<li>Budget indicatif : ${parsed.data.budget}</li>` : ""}
+        ${parsed.data.allergies ? `<li>Allergies : ${parsed.data.allergies}</li>` : ""}
+        ${parsed.data.inspirationUrl ? `<li>Inspiration : <a href="${parsed.data.inspirationUrl}">${parsed.data.inspirationUrl}</a></li>` : ""}
+      </ul>
+      <p>${parsed.data.details}</p>`,
+  });
+  await sendEmail({
+    to: parsed.data.email,
+    subject: `Votre demande de gâteau ${ref}`,
+    html: `<h1>Merci ${parsed.data.name} !</h1>
+      <p>Votre demande de gâteau personnalisé pour le ${parsed.data.pickupDate}
+      (réf. ${ref}) a bien été reçue. Nous revenons vers vous avec un devis
+      sur mesure.</p>`,
+  });
+
+  return {
+    ok: true,
+    message: `Demande envoyée (réf. ${ref}) ! Nous revenons vers vous avec un devis personnalisé.`,
+  };
+}
+
+/** Précommande d'un produit de saison (paiement au retrait). */
+export async function reserveSeasonal(
+  _prev: ActionState | null,
+  formData: FormData,
+): Promise<ActionState> {
+  if (isBot(formData)) return { ok: true, message: "Précommande envoyée !" };
+  if (!(await rateLimit(`seasonal:${await clientIp()}`, 5, 60_000)))
+    return TOO_MANY;
+
+  const parsed = seasonalPreorderSchema.safeParse({
+    slug: formData.get("slug"),
+    quantity: formData.get("quantity"),
+    name: formData.get("name"),
+    email: formData.get("email"),
+    phone: formData.get("phone"),
+    pickupDate: formData.get("pickupDate"),
+    notes: formData.get("notes") || undefined,
+  });
+  if (!parsed.success) {
+    return {
+      ok: false,
+      message: "Vérifiez votre saisie.",
+      errors: fieldErrors(parsed.error),
+    };
+  }
+
+  const { createSeasonalPreorder, SeasonalError } =
+    await import("@/lib/seasonal");
+  try {
+    const { preorder, product } = await createSeasonalPreorder({
+      slug: parsed.data.slug,
+      quantity: parsed.data.quantity,
+      customer: {
+        name: parsed.data.name,
+        email: parsed.data.email,
+        phone: parsed.data.phone,
+      },
+      pickupDate: parsed.data.pickupDate,
+      notes: parsed.data.notes,
+    });
+    await upsertCustomer(parsed.data.email, {
+      name: parsed.data.name,
+      phone: parsed.data.phone,
+    });
+
+    await sendEmail({
+      to: parsed.data.email,
+      subject: `Votre précommande ${preorder.reference} — ${product.name}`,
+      html: `<h1>Merci ${parsed.data.name} !</h1>
+        <p>Votre précommande de ${preorder.quantity} × ${product.name}
+        (réf. ${preorder.reference}) est confirmée, à retirer le
+        ${parsed.data.pickupDate}. Paiement au retrait en boutique.</p>`,
+    });
+    await sendEmail({
+      to: siteConfig.contact.email,
+      subject: `Nouvelle précommande ${product.name} (${preorder.reference})`,
+      html: `<p>${parsed.data.name} (${parsed.data.email}, ${parsed.data.phone})
+        a précommandé ${preorder.quantity} × ${product.name} pour le
+        ${parsed.data.pickupDate}.</p>`,
+    });
+
+    revalidatePath("/boutique-de-saison");
+    return {
+      ok: true,
+      message: `Précommande confirmée (réf. ${preorder.reference}) ! Paiement au retrait le ${parsed.data.pickupDate}.`,
+    };
+  } catch (error) {
+    if (error instanceof SeasonalError) {
+      return { ok: false, message: error.message };
+    }
+    throw error;
+  }
+}
+
+/** Réservation d'un panier anti-gaspi du jour (paiement au retrait). */
+export async function reserveAntiWaste(
+  _prev: ActionState | null,
+  formData: FormData,
+): Promise<ActionState> {
+  if (isBot(formData)) return { ok: true, message: "Réservation envoyée !" };
+  if (!(await rateLimit(`antigaspi:${await clientIp()}`, 5, 60_000)))
+    return TOO_MANY;
+
+  const parsed = antiWasteSchema.safeParse({
+    quantity: formData.get("quantity"),
+    name: formData.get("name"),
+    email: formData.get("email"),
+    phone: formData.get("phone"),
+  });
+  if (!parsed.success) {
+    return {
+      ok: false,
+      message: "Vérifiez votre saisie.",
+      errors: fieldErrors(parsed.error),
+    };
+  }
+
+  const { createAntiWasteReservation, AntiWasteError } =
+    await import("@/lib/antiwaste");
+  try {
+    const { reservation, offer } = await createAntiWasteReservation({
+      quantity: parsed.data.quantity,
+      customer: {
+        name: parsed.data.name,
+        email: parsed.data.email,
+        phone: parsed.data.phone,
+      },
+    });
+    await upsertCustomer(parsed.data.email, {
+      name: parsed.data.name,
+      phone: parsed.data.phone,
+    });
+
+    await sendEmail({
+      to: parsed.data.email,
+      subject: `Votre panier anti-gaspi ${reservation.reference}`,
+      html: `<h1>Merci ${parsed.data.name} !</h1>
+        <p>Vous avez réservé ${reservation.quantity} panier(s) anti-gaspi
+        (réf. ${reservation.reference}). Retrait ce soir entre
+        ${offer.pickupStart} et ${offer.pickupEnd}. Paiement sur place.</p>`,
+    });
+    await sendEmail({
+      to: siteConfig.contact.email,
+      subject: `Nouvelle réservation anti-gaspi (${reservation.reference})`,
+      html: `<p>${parsed.data.name} (${parsed.data.email}, ${parsed.data.phone})
+        a réservé ${reservation.quantity} panier(s) pour ce soir.</p>`,
+    });
+
+    revalidatePath("/anti-gaspi");
+    return {
+      ok: true,
+      message: `Réservé (réf. ${reservation.reference}) ! Retrait ce soir entre ${offer.pickupStart} et ${offer.pickupEnd}, paiement sur place.`,
+    };
+  } catch (error) {
+    if (error instanceof AntiWasteError) {
+      return { ok: false, message: error.message };
+    }
+    throw error;
+  }
 }
 
 export interface OrderActionState extends ActionState {
@@ -632,6 +848,22 @@ export async function advanceOrderStatus(formData: FormData): Promise<void> {
 
 const RESERVATION_STATUSES = ["en attente", "confirmée", "annulée"];
 const CATERING_STATUSES = ["nouveau", "devis envoyé", "gagné", "perdu"];
+const CAKE_STATUSES = [
+  "nouveau",
+  "devis envoyé",
+  "confirmé",
+  "prêt",
+  "récupéré",
+  "annulé",
+];
+const SEASONAL_PREORDER_STATUSES = [
+  "réservé",
+  "confirmé",
+  "prêt",
+  "récupéré",
+  "annulé",
+];
+const ANTIWASTE_STATUSES = ["réservé", "récupéré", "annulé"];
 
 /** Back-office : change le statut d'une réservation. */
 export async function adminSetReservationStatus(
@@ -659,6 +891,219 @@ export async function adminSetCateringStatus(
     revalidatePath("/admin/traiteur");
   }
   redirect("/admin/traiteur");
+}
+
+/** Back-office : change le statut d'une demande de gâteau personnalisé. */
+export async function adminSetCustomCakeStatus(
+  formData: FormData,
+): Promise<void> {
+  if (!isAdminEmail(await getSessionEmail())) redirect("/compte");
+  const id = String(formData.get("id") ?? "");
+  const status = String(formData.get("status") ?? "");
+  if (id && CAKE_STATUSES.includes(status)) {
+    await prisma.customCakeRequest.update({ where: { id }, data: { status } });
+    revalidatePath("/admin/gateaux");
+  }
+  redirect("/admin/gateaux");
+}
+
+/** Back-office : crée une offre de saison (précommandes). */
+export async function adminCreateSeasonalProduct(
+  formData: FormData,
+): Promise<void> {
+  if (!isAdminEmail(await getSessionEmail())) redirect("/compte");
+  const name = String(formData.get("name") ?? "").trim();
+  const description = String(formData.get("description") ?? "").trim();
+  const image = String(formData.get("image") ?? "").trim();
+  const price = Number(formData.get("price") ?? 0);
+  const salesStart = String(formData.get("salesStart") ?? "");
+  const salesEnd = String(formData.get("salesEnd") ?? "");
+  const pickupStart = String(formData.get("pickupStart") ?? "");
+  const pickupEnd = String(formData.get("pickupEnd") ?? "");
+  const quota = Math.max(0, Number(formData.get("quota") ?? 0) || 0);
+  const sortOrder = Number(formData.get("sortOrder") ?? 0) || 0;
+
+  if (!name || !salesStart || !salesEnd || !pickupStart || !pickupEnd) {
+    redirect("/admin/saison?error=1");
+  }
+
+  const base = slugify(name) || `saison-${Date.now()}`;
+  let slug = base;
+  let n = 1;
+  while (await prisma.seasonalProduct.findUnique({ where: { slug } })) {
+    slug = `${base}-${++n}`;
+  }
+
+  await prisma.seasonalProduct.create({
+    data: {
+      slug,
+      name,
+      description,
+      image: image || "/images/boulangerie-patisseries.png",
+      price,
+      salesStart: new Date(salesStart),
+      salesEnd: new Date(salesEnd),
+      pickupStart,
+      pickupEnd,
+      quota,
+      sortOrder,
+    },
+  });
+  revalidatePath("/admin/saison");
+  redirect("/admin/saison");
+}
+
+/** Back-office : met à jour une offre de saison. */
+export async function adminUpdateSeasonalProduct(
+  formData: FormData,
+): Promise<void> {
+  if (!isAdminEmail(await getSessionEmail())) redirect("/compte");
+  const id = String(formData.get("id") ?? "");
+  if (!id) redirect("/admin/saison?error=1");
+  await prisma.seasonalProduct.update({
+    where: { id },
+    data: {
+      name: String(formData.get("name") ?? "").trim(),
+      description: String(formData.get("description") ?? "").trim(),
+      image:
+        String(formData.get("image") ?? "").trim() ||
+        "/images/boulangerie-patisseries.png",
+      price: Number(formData.get("price") ?? 0),
+      salesStart: new Date(String(formData.get("salesStart") ?? "")),
+      salesEnd: new Date(String(formData.get("salesEnd") ?? "")),
+      pickupStart: String(formData.get("pickupStart") ?? ""),
+      pickupEnd: String(formData.get("pickupEnd") ?? ""),
+      quota: Math.max(0, Number(formData.get("quota") ?? 0) || 0),
+      sortOrder: Number(formData.get("sortOrder") ?? 0) || 0,
+      active: formData.get("active") === "on",
+    },
+  });
+  revalidatePath("/admin/saison");
+  redirect("/admin/saison");
+}
+
+/** Back-office : supprime une offre de saison (et ses précommandes). */
+export async function adminDeleteSeasonalProduct(
+  formData: FormData,
+): Promise<void> {
+  if (!isAdminEmail(await getSessionEmail())) redirect("/compte");
+  const id = String(formData.get("id") ?? "");
+  if (id) {
+    await prisma.seasonalProduct.delete({ where: { id } }).catch(() => {});
+    revalidatePath("/admin/saison");
+  }
+  redirect("/admin/saison");
+}
+
+/** Back-office : change le statut d'une précommande de saison. */
+export async function adminSetSeasonalPreorderStatus(
+  formData: FormData,
+): Promise<void> {
+  if (!isAdminEmail(await getSessionEmail())) redirect("/compte");
+  const id = String(formData.get("id") ?? "");
+  const status = String(formData.get("status") ?? "");
+  if (id && SEASONAL_PREORDER_STATUSES.includes(status)) {
+    await prisma.seasonalPreorder.update({ where: { id }, data: { status } });
+    revalidatePath("/admin/saison");
+  }
+  redirect("/admin/saison");
+}
+
+/** Back-office : marque une précommande de saison comme payée (ou non). */
+export async function adminToggleSeasonalPreorderPaid(
+  formData: FormData,
+): Promise<void> {
+  if (!isAdminEmail(await getSessionEmail())) redirect("/compte");
+  const id = String(formData.get("id") ?? "");
+  const paid = formData.get("paid") === "true";
+  if (id) {
+    await prisma.seasonalPreorder.update({ where: { id }, data: { paid } });
+    revalidatePath("/admin/saison");
+  }
+  redirect("/admin/saison");
+}
+
+/** Back-office : crée/met à jour l'offre anti-gaspi d'un jour (clé = date). */
+export async function adminUpsertAntiWasteOffer(
+  formData: FormData,
+): Promise<void> {
+  if (!isAdminEmail(await getSessionEmail())) redirect("/compte");
+  const date = String(formData.get("date") ?? "").trim();
+  if (!date) redirect("/admin/anti-gaspi?error=1");
+  const title = String(formData.get("title") ?? "").trim() || "Panier surprise";
+  const description = String(formData.get("description") ?? "").trim();
+  const price = Number(formData.get("price") ?? 0);
+  const originalValueRaw = String(formData.get("originalValue") ?? "").trim();
+  const originalValue = originalValueRaw ? Number(originalValueRaw) : null;
+  const quantity = Math.max(0, Number(formData.get("quantity") ?? 0) || 0);
+  const pickupStart = String(formData.get("pickupStart") ?? "18:00") || "18:00";
+  const pickupEnd = String(formData.get("pickupEnd") ?? "19:30") || "19:30";
+  const active = formData.get("active") === "on";
+
+  const data = {
+    title,
+    description,
+    price,
+    originalValue,
+    quantity,
+    pickupStart,
+    pickupEnd,
+    active,
+  };
+  await prisma.antiWasteOffer.upsert({
+    where: { date },
+    update: data,
+    create: { date, ...data },
+  });
+  revalidatePath("/admin/anti-gaspi");
+  redirect("/admin/anti-gaspi");
+}
+
+/** Back-office : supprime une offre anti-gaspi (et ses réservations). */
+export async function adminDeleteAntiWasteOffer(
+  formData: FormData,
+): Promise<void> {
+  if (!isAdminEmail(await getSessionEmail())) redirect("/compte");
+  const id = String(formData.get("id") ?? "");
+  if (id) {
+    await prisma.antiWasteOffer.delete({ where: { id } }).catch(() => {});
+    revalidatePath("/admin/anti-gaspi");
+  }
+  redirect("/admin/anti-gaspi");
+}
+
+/** Back-office : change le statut d'une réservation anti-gaspi. */
+export async function adminSetAntiWasteReservationStatus(
+  formData: FormData,
+): Promise<void> {
+  if (!isAdminEmail(await getSessionEmail())) redirect("/compte");
+  const id = String(formData.get("id") ?? "");
+  const status = String(formData.get("status") ?? "");
+  if (id && ANTIWASTE_STATUSES.includes(status)) {
+    await prisma.antiWasteReservation.update({
+      where: { id },
+      data: { status },
+    });
+    revalidatePath("/admin/anti-gaspi");
+  }
+  redirect("/admin/anti-gaspi");
+}
+
+/** Back-office : marque une réservation anti-gaspi comme payée (ou non). */
+export async function adminToggleAntiWasteReservationPaid(
+  formData: FormData,
+): Promise<void> {
+  if (!isAdminEmail(await getSessionEmail())) redirect("/compte");
+  const id = String(formData.get("id") ?? "");
+  const paid = formData.get("paid") === "true";
+  if (id) {
+    await prisma.antiWasteReservation.update({
+      where: { id },
+      data: { paid },
+    });
+    revalidatePath("/admin/anti-gaspi");
+  }
+  redirect("/admin/anti-gaspi");
 }
 
 /** Back-office : marque un message de contact comme traité (ou non). */
@@ -789,6 +1234,14 @@ function slugify(input: string): string {
     .replace(/(^-|-$)/g, "");
 }
 
+/** Lit le champ « stock du jour » : vide = illimité (null), sinon entier ≥ 0. */
+function parseDailyStock(raw: FormDataEntryValue | null): number | null {
+  const value = String(raw ?? "").trim();
+  if (value === "") return null;
+  const n = Math.floor(Number(value));
+  return Number.isFinite(n) && n >= 0 ? n : null;
+}
+
 /** Back-office : crée un plat. */
 export async function adminCreateDish(formData: FormData): Promise<void> {
   if (!isAdminEmail(await getSessionEmail())) redirect("/compte");
@@ -812,6 +1265,7 @@ export async function adminCreateDish(formData: FormData): Promise<void> {
   }
   const categoryId = String(formData.get("categoryId") ?? "") || null;
   const prepMinutes = Number(formData.get("prepMinutes") ?? 15) || 15;
+  const dailyStock = parseDailyStock(formData.get("dailyStock"));
   await prisma.dish.create({
     data: {
       slug,
@@ -819,6 +1273,7 @@ export async function adminCreateDish(formData: FormData): Promise<void> {
       tag: parsed.data.tag ?? null,
       categoryId,
       prepMinutes,
+      dailyStock,
     },
   });
   revalidatePath("/admin/menu");
@@ -842,6 +1297,7 @@ export async function adminUpdateDish(formData: FormData): Promise<void> {
 
   const categoryId = String(formData.get("categoryId") ?? "") || null;
   const prepMinutes = Number(formData.get("prepMinutes") ?? 15) || 15;
+  const dailyStock = parseDailyStock(formData.get("dailyStock"));
   await prisma.dish.update({
     where: { id },
     data: {
@@ -849,6 +1305,7 @@ export async function adminUpdateDish(formData: FormData): Promise<void> {
       tag: parsed.data.tag ?? null,
       categoryId,
       prepMinutes,
+      dailyStock,
     },
   });
   revalidatePath("/admin/menu");

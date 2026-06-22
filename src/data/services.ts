@@ -14,6 +14,9 @@ export const navLinks: NavLink[] = [
   { label: "Menu", href: "/menu" },
   { label: "Commander", href: "/commander" },
   { label: "Réservation", href: "/reservation" },
+  { label: "Sur-mesure", href: "/sur-mesure" },
+  { label: "Boutique de saison", href: "/boutique-de-saison" },
+  { label: "Anti-gaspi", href: "/anti-gaspi" },
   { label: "Traiteur", href: "/traiteur" },
   { label: "Contact", href: "/contact" },
 ];

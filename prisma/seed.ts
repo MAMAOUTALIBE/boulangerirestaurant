@@ -275,6 +275,64 @@ async function main() {
       active: true,
     },
   });
+  // Stock du jour de démonstration (limité, pour illustrer les ruptures).
+  const demoStock: Record<string, number> = {
+    "paris-brest": 6,
+    "tartelette-fruits": 8,
+    "eclair-chocolat": 10,
+    "baguette-tradition": 40,
+  };
+  for (const [slug, dailyStock] of Object.entries(demoStock)) {
+    await prisma.dish.updateMany({ where: { slug }, data: { dailyStock } });
+  }
+
+  // Offre de saison de démonstration (fenêtre de vente ouverte autour du seed).
+  const dayMs = 86400000;
+  const seedNow = new Date();
+  const isoDay = (offset: number) =>
+    new Date(seedNow.getTime() + offset * dayMs).toISOString().slice(0, 10);
+  const seasonalWindow = {
+    salesStart: new Date(seedNow.getTime() - 5 * dayMs),
+    salesEnd: new Date(seedNow.getTime() + 30 * dayMs),
+    pickupStart: isoDay(2),
+    pickupEnd: isoDay(30),
+    active: true,
+  };
+  await prisma.seasonalProduct.upsert({
+    where: { slug: "galette-des-rois" },
+    update: seasonalWindow,
+    create: {
+      slug: "galette-des-rois",
+      name: "Galette des Rois (frangipane)",
+      description:
+        "Galette pur beurre à la frangipane, fève incluse. En précommande, quantités limitées.",
+      image: "/images/boulangerie-patisseries.png",
+      price: 18.5,
+      quota: 50,
+      ...seasonalWindow,
+    },
+  });
+
+  // Panier anti-gaspi de démonstration pour aujourd'hui (fuseau Europe/Paris).
+  const todayParis = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Europe/Paris",
+  }).format(seedNow);
+  await prisma.antiWasteOffer.upsert({
+    where: { date: todayParis },
+    update: { quantity: 8, active: true },
+    create: {
+      date: todayParis,
+      title: "Panier surprise du soir",
+      description:
+        "Assortiment d'invendus du jour : pains, viennoiseries et pâtisseries.",
+      price: 5,
+      originalValue: 15,
+      quantity: 8,
+      pickupStart: "18:00",
+      pickupEnd: "19:30",
+    },
+  });
+
   const dishes = await prisma.dish.count();
   const zones = await prisma.deliveryZone.count();
   console.log(

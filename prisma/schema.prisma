@@ -148,6 +148,12 @@ model Dish {
   image       String
   tag         String?
   available   Boolean       @default(true)
+  /// Stock du jour (null = illimité). Limite les ventes et affiche « épuisé ».
+  dailyStock  Int?
+  /// Unités déjà vendues pour la date `stockDate` (compteur quotidien).
+  soldToday   Int           @default(0)
+  /// Date (AAAA-MM-JJ) à laquelle se rapporte `soldToday` (reset paresseux).
+  stockDate   String?
   sortOrder   Int           @default(0)
   /// Temps de préparation estimé du plat (minutes) — sert au calcul d'ETA.
   prepMinutes Int           @default(15)
@@ -295,6 +301,118 @@ model CateringRequest {
   guests    Int
   message   String
 
+  @@index([email])
+}
+
+/// Demande de gâteau personnalisé (sur-mesure).
+model CustomCakeRequest {
+  id             String   @id @default(cuid())
+  reference      String   @unique
+  createdAt      DateTime @default(now())
+  /// nouveau | devis envoyé | confirmé | prêt | récupéré | annulé
+  status         String   @default("nouveau")
+
+  name           String
+  email          String
+  phone          String
+  occasion       String
+  servings       Int
+  flavor         String
+  messageOnCake  String?
+  pickupDate     String
+  pickupTime     String?
+  inspirationUrl String?
+  budget         String?
+  allergies      String?
+  details        String
+
+  @@index([email])
+}
+
+/// Produit de saison vendu sur précommande (galette, bûche, pièce de fête…).
+model SeasonalProduct {
+  id          String             @id @default(cuid())
+  slug        String             @unique
+  name        String
+  description String
+  image       String
+  price       Float
+  /// Fenêtre de vente des précommandes.
+  salesStart  DateTime
+  salesEnd    DateTime
+  /// Fenêtre de retrait possible (dates AAAA-MM-JJ incluses).
+  pickupStart String
+  pickupEnd   String
+  /// Quota total de précommandes et compteur déjà réservé.
+  quota       Int
+  sold        Int                @default(0)
+  active      Boolean            @default(true)
+  sortOrder   Int                @default(0)
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+  preorders   SeasonalPreorder[]
+
+  @@index([active])
+}
+
+/// Précommande d'un produit de saison (paiement au retrait).
+model SeasonalPreorder {
+  id         String          @id @default(cuid())
+  reference  String          @unique
+  createdAt  DateTime        @default(now())
+  /// réservé | confirmé | prêt | récupéré | annulé
+  status     String          @default("réservé")
+  product    SeasonalProduct @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId  String
+  quantity   Int
+  name       String
+  email      String
+  phone      String
+  pickupDate String
+  notes      String?
+  paid       Boolean         @default(false)
+
+  @@index([productId])
+  @@index([email])
+}
+
+/// Offre anti-gaspi du jour (paniers surprise à prix réduit).
+model AntiWasteOffer {
+  id            String                 @id @default(cuid())
+  /// Jour de l'offre (AAAA-MM-JJ) — une offre par jour.
+  date          String                 @unique
+  title         String                 @default("Panier surprise")
+  description   String                 @default("")
+  price         Float
+  originalValue Float?
+  quantity      Int
+  sold          Int                    @default(0)
+  pickupStart   String                 @default("18:00")
+  pickupEnd     String                 @default("19:30")
+  active        Boolean                @default(true)
+  createdAt     DateTime               @default(now())
+  updatedAt     DateTime               @updatedAt
+  reservations  AntiWasteReservation[]
+
+  @@index([active])
+}
+
+/// Réservation d'un panier anti-gaspi (paiement au retrait).
+model AntiWasteReservation {
+  id        String         @id @default(cuid())
+  reference String         @unique
+  createdAt DateTime       @default(now())
+  /// réservé | récupéré | annulé
+  status    String         @default("réservé")
+  offer     AntiWasteOffer @relation(fields: [offerId], references: [id], onDelete: Cascade)
+  offerId   String
+  quantity  Int
+  name      String
+  email     String
+  phone     String
+  paid      Boolean        @default(false)
+
+  @@index([offerId])
   @@index([email])
 }
 

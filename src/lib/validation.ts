@@ -71,6 +71,60 @@ export const cateringSchema = z.object({
   message: z.string().min(10, "Décrivez votre projet (10 caractères min)."),
 });
 
+/** Validation d'une demande de gâteau personnalisé (sur-mesure). */
+export const customCakeSchema = z.object({
+  name: z.string().min(2, "Nom trop court."),
+  email: z.string().email("Adresse email invalide."),
+  phone: z.string().min(6, "Numéro de téléphone invalide."),
+  occasion: z.string().min(2, "Occasion requise."),
+  servings: z.coerce
+    .number()
+    .int()
+    .min(1, "Au moins 1 part.")
+    .max(500, "Nombre de parts trop élevé."),
+  flavor: z.string().min(2, "Indiquez un parfum / une base."),
+  messageOnCake: z
+    .string()
+    .max(120, "Message trop long (120 caractères max).")
+    .optional(),
+  pickupDate: z.string().min(1, "Date de retrait requise."),
+  pickupTime: z.string().optional(),
+  inspirationUrl: z
+    .string()
+    .url("Lien d'inspiration invalide (URL complète attendue).")
+    .optional(),
+  budget: z.string().optional(),
+  allergies: z.string().optional(),
+  details: z.string().min(10, "Décrivez votre gâteau (10 caractères min)."),
+});
+
+/** Validation d'une précommande de produit de saison. */
+export const seasonalPreorderSchema = z.object({
+  slug: z.string().min(1),
+  quantity: z.coerce
+    .number()
+    .int()
+    .min(1, "Au moins 1.")
+    .max(50, "Quantité trop élevée."),
+  name: z.string().min(2, "Nom trop court."),
+  email: z.string().email("Adresse email invalide."),
+  phone: z.string().min(6, "Numéro de téléphone invalide."),
+  pickupDate: z.string().min(1, "Date de retrait requise."),
+  notes: z.string().optional(),
+});
+
+/** Validation d'une réservation de panier anti-gaspi. */
+export const antiWasteSchema = z.object({
+  quantity: z.coerce
+    .number()
+    .int()
+    .min(1, "Au moins 1.")
+    .max(10, "Maximum 10 paniers."),
+  name: z.string().min(2, "Nom trop court."),
+  email: z.string().email("Adresse email invalide."),
+  phone: z.string().min(6, "Numéro de téléphone invalide."),
+});
+
 /** Validation d'un plat (back-office menu). */
 export const dishSchema = z.object({
   name: z.string().min(2, "Nom requis."),
@@ -94,3 +148,6 @@ export type ContactInput = z.infer<typeof contactSchema>;
 export type OrderInput = z.infer<typeof orderSchema>;
 export type ReservationInput = z.infer<typeof reservationSchema>;
 export type CateringInput = z.infer<typeof cateringSchema>;
+export type CustomCakeInput = z.infer<typeof customCakeSchema>;
+export type SeasonalPreorderInput = z.infer<typeof seasonalPreorderSchema>;
+export type AntiWasteInput = z.infer<typeof antiWasteSchema>;

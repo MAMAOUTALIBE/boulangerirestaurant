@@ -58,9 +58,10 @@ export default async function DishPage({
       "@type": "Offer",
       price: dish.price.toFixed(2),
       priceCurrency: "EUR",
-      availability: dish.available
-        ? "https://schema.org/InStock"
-        : "https://schema.org/OutOfStock",
+      availability:
+        dish.available && !dish.soldOut
+          ? "https://schema.org/InStock"
+          : "https://schema.org/OutOfStock",
       url: `${siteConfig.url}/menu/${dish.slug}`,
     },
   };
@@ -114,7 +115,7 @@ export default async function DishPage({
                 {formatPrice(dish.price)}
               </p>
 
-              {!dish.available ? (
+              {!dish.available || dish.soldOut ? (
                 <p className="mt-6 rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-red-300">
                   Ce produit est actuellement épuisé.
                 </p>

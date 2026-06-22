@@ -17,6 +17,7 @@ import { sendEmail } from "@/lib/email";
 import { sendSms } from "@/lib/sms";
 import { getDefaultRestaurant } from "@/lib/restaurants";
 import { siteConfig } from "@/lib/config";
+import { remainingStock, stockToday } from "@/lib/stock";
 
 interface CreateOrderInput {
   customer: Order["customer"];
@@ -238,40 +239,77 @@ export async function createOrder({
     ? Math.max(...dishes.map((d) => d.prepMinutes))
     : 20;
 
-  const row = await prisma.order.create({
-    data: {
-      reference: ref,
-      status: "en attente",
-      customerName: customer.name,
-      customerEmail: customer.email.toLowerCase(),
-      customerPhone: customer.phone,
-      restaurantId: restaurant?.id,
-      customerAddress: customer.address,
-      customerNotes: customer.notes,
-      subtotal,
-      discount,
-      promoCode: appliedCode,
-      fulfillment,
-      deliveryFee,
-      tip: safeTip,
-      scheduledAt: scheduledAt ? new Date(scheduledAt) : null,
-      prepTimeMin,
-      total,
-      events: { create: { status: "en attente", actor: "client" } },
-      items: {
-        create: normalizedItems.map((i) => ({
-          dishId: i.id,
-          name: i.name,
-          price: i.price,
-          quantity: i.quantity,
-          options: i.options
-            ? (i.options as unknown as Prisma.InputJsonValue)
-            : undefined,
-          note: i.note,
-        })),
+  // Quantité demandée par produit (un même produit peut être sur plusieurs lignes).
+  const qtyBySlug = new Map<string, number>();
+  for (const i of normalizedItems) {
+    qtyBySlug.set(i.id, (qtyBySlug.get(i.id) ?? 0) + i.quantity);
+  }
+
+  // Décrémente le stock du jour PUIS crée la commande, de façon atomique
+  // (anti-survente). Un `dailyStock` null = stock illimité → ignoré.
+  const row = await prisma.$transaction(async (tx) => {
+    const day = stockToday();
+    for (const [slug, qty] of qtyBySlug) {
+      const dish = await tx.dish.findUnique({
+        where: { slug },
+        select: {
+          name: true,
+          dailyStock: true,
+          soldToday: true,
+          stockDate: true,
+        },
+      });
+      if (!dish || dish.dailyStock == null) continue;
+      const remaining = remainingStock(dish) ?? 0;
+      if (qty > remaining) {
+        throw new OrderCreationError(
+          remaining <= 0
+            ? `${dish.name} est épuisé pour aujourd'hui.`
+            : `Il ne reste que ${remaining} × ${dish.name} aujourd'hui.`,
+        );
+      }
+      const soldBase = dish.stockDate === day ? dish.soldToday : 0;
+      await tx.dish.update({
+        where: { slug },
+        data: { soldToday: soldBase + qty, stockDate: day },
+      });
+    }
+
+    return tx.order.create({
+      data: {
+        reference: ref,
+        status: "en attente",
+        customerName: customer.name,
+        customerEmail: customer.email.toLowerCase(),
+        customerPhone: customer.phone,
+        restaurantId: restaurant?.id,
+        customerAddress: customer.address,
+        customerNotes: customer.notes,
+        subtotal,
+        discount,
+        promoCode: appliedCode,
+        fulfillment,
+        deliveryFee,
+        tip: safeTip,
+        scheduledAt: scheduledAt ? new Date(scheduledAt) : null,
+        prepTimeMin,
+        total,
+        events: { create: { status: "en attente", actor: "client" } },
+        items: {
+          create: normalizedItems.map((i) => ({
+            dishId: i.id,
+            name: i.name,
+            price: i.price,
+            quantity: i.quantity,
+            options: i.options
+              ? (i.options as unknown as Prisma.InputJsonValue)
+              : undefined,
+            note: i.note,
+          })),
+        },
       },
-    },
-    include: { items: true },
+      include: { items: true },
+    });
   });
 
   if (appliedCode) await consumePromo(appliedCode);

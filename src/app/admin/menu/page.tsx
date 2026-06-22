@@ -1,4 +1,5 @@
 import { getAdminMenuData } from "@/lib/dishes";
+import { remainingStock } from "@/lib/stock";
 import {
   adminCreateDish,
   adminUpdateDish,
@@ -123,6 +124,13 @@ export default async function AdminMenuPage() {
             defaultValue={15}
             className={inputClass}
           />
+          <input
+            name="dailyStock"
+            type="number"
+            min={0}
+            placeholder="Stock/jour (vide = illimité)"
+            className={inputClass}
+          />
           <label className="flex items-center gap-2 text-sm text-cream/80">
             <input
               type="checkbox"
@@ -204,6 +212,15 @@ export default async function AdminMenuPage() {
                 className={inputClass}
                 title="Temps de préparation (min)"
               />
+              <input
+                name="dailyStock"
+                type="number"
+                min={0}
+                defaultValue={d.dailyStock ?? ""}
+                placeholder="Stock/jour (illimité)"
+                className={inputClass}
+                title="Stock du jour (vide = illimité)"
+              />
               <label className="flex items-center gap-2 text-sm text-cream/80">
                 <input
                   type="checkbox"
@@ -221,7 +238,10 @@ export default async function AdminMenuPage() {
                   Enregistrer
                 </button>
                 <span className="text-xs text-muted">
-                  slug : {d.slug} · {d.category?.name ?? "sans catégorie"}
+                  slug : {d.slug} · {d.category?.name ?? "sans catégorie"} ·{" "}
+                  {d.dailyStock == null
+                    ? "stock illimité"
+                    : `${remainingStock(d)} restant·s aujourd'hui`}
                 </span>
               </div>
             </form>

@@ -18,6 +18,8 @@ import type { Dish } from "@/types";
 export interface BrowserDish extends Dish {
   available: boolean;
   hasOptions: boolean;
+  remaining: number | null;
+  soldOut: boolean;
   categoryId: string;
 }
 export interface BrowserCategory {
@@ -96,7 +98,7 @@ export function MenuBrowser({
     let list = dishes.filter((d) => {
       const category = categoryById.get(d.categoryId);
       if (!matchesQuickFilter(d, category?.slug, filter)) return false;
-      if (onlyAvailable && !d.available) return false;
+      if (onlyAvailable && (!d.available || d.soldOut)) return false;
       if (q.trim()) {
         const n = q.toLowerCase();
         return (
@@ -209,7 +211,8 @@ export function MenuBrowser({
                     badges={getDishBadges(dish)}
                     details={getDishDetails(dish)}
                     priority={gi === 0 && i < 3}
-                    unavailable={!dish.available}
+                    unavailable={!dish.available || dish.soldOut}
+                    lowStock={dish.remaining}
                     href={dish.hasOptions ? `/menu/${dish.id}` : undefined}
                   />
                 </Reveal>
@@ -226,7 +229,8 @@ export function MenuBrowser({
                 badges={getDishBadges(dish)}
                 details={getDishDetails(dish)}
                 priority={i < 3}
-                unavailable={!dish.available}
+                unavailable={!dish.available || dish.soldOut}
+                lowStock={dish.remaining}
                 href={dish.hasOptions ? `/menu/${dish.id}` : undefined}
               />
             </Reveal>

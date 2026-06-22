@@ -18,6 +18,8 @@ interface DishCardProps {
   badges?: string[];
   /** Infos courtes : options, sauces, allergènes. */
   details?: string[];
+  /** Stock restant aujourd'hui : affiche « plus que X » si bas. null = illimité. */
+  lowStock?: number | null;
   /** Charge l'image immédiatement pour les premières cartes visibles. */
   priority?: boolean;
 }
@@ -27,6 +29,7 @@ export function DishCard({
   dish,
   href,
   unavailable,
+  lowStock,
   badges = [],
   details = [],
   priority = false,
@@ -94,6 +97,11 @@ export function DishCard({
         {unavailable && (
           <span className="absolute left-3 top-3 rounded-full bg-ink/85 px-3 py-1 text-[11px] font-semibold uppercase tracking-wider text-red-300 backdrop-blur">
             Épuisé
+          </span>
+        )}
+        {!unavailable && lowStock != null && lowStock > 0 && lowStock <= 5 && (
+          <span className="absolute right-3 top-3 rounded-full bg-gold/90 px-3 py-1 text-[11px] font-semibold uppercase tracking-wider text-ink backdrop-blur">
+            Plus que {lowStock}
           </span>
         )}
         <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-ink/80 to-transparent" />

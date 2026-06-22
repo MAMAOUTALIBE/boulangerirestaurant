@@ -2,6 +2,7 @@ import "server-only";
 import type { Dish as DishRow } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import type { Dish } from "@/types";
+import { remainingStock, isSoldOut } from "@/lib/stock";
 
 const dishImageOverrides: Record<string, string> = {
   "baguette-tradition": "/images/boulangerie-pains.png",
@@ -85,7 +86,7 @@ export async function getDishes(): Promise<Dish[]> {
     orderBy: [{ sortOrder: "asc" }, { id: "asc" }],
     distinct: ["slug"],
   });
-  return rows.map(toDish);
+  return rows.filter((row) => !isSoldOut(row)).map(toDish);
 }
 
 /** Données back-office du menu : catégories + produits (avec catégorie & options). */
@@ -113,6 +114,10 @@ export async function getAdminMenuData() {
 export interface MenuDish extends Dish {
   available: boolean;
   hasOptions: boolean;
+  /** Unités restantes aujourd'hui (null = illimité). */
+  remaining: number | null;
+  /** Stock limité tombé à zéro. */
+  soldOut: boolean;
 }
 export interface MenuCategory {
   id: string;
@@ -145,6 +150,8 @@ export async function getMenu(): Promise<MenuCategory[]> {
         ...toDish(d),
         available: d.available,
         hasOptions: d._count.optionGroups > 0,
+        remaining: remainingStock(d),
+        soldOut: isSoldOut(d),
       })),
     }))
     .filter((c) => c.dishes.length > 0);
@@ -181,6 +188,8 @@ export async function getMenuForBrowser() {
         ...toDish(d),
         available: d.available,
         hasOptions: d._count.optionGroups > 0,
+        remaining: remainingStock(d),
+        soldOut: isSoldOut(d),
         categoryId: d.categoryId as string,
       })),
   };
@@ -204,5 +213,11 @@ export async function getDishWithOptions(slug: string) {
       },
     },
   });
-  return dish ? withDishPresentation(dish) : null;
+  return dish
+    ? {
+        ...withDishPresentation(dish),
+        remaining: remainingStock(dish),
+        soldOut: isSoldOut(dish),
+      }
+    : null;
 }

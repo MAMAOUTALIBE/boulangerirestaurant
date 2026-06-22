@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import {
+  CakeSlice,
   CalendarDays,
   Croissant,
   Menu,
@@ -22,7 +23,13 @@ import { useLang } from "@/context/LangContext";
 import { siteConfig } from "@/lib/config";
 
 /** Liens masqués dans l'en-tête pour l'aérer (restent accessibles via footer). */
-const HEADER_HIDDEN_HREFS = ["/commander", "/traiteur", "/contact"];
+const HEADER_HIDDEN_HREFS = [
+  "/commander",
+  "/traiteur",
+  "/contact",
+  "/boutique-de-saison",
+  "/anti-gaspi",
+];
 const headerLinks = navLinks.filter(
   (link) => !HEADER_HIDDEN_HREFS.includes(link.href),
 );
@@ -72,6 +79,8 @@ export function Header() {
             >
               {link.href === "/reservation" ? (
                 <CalendarDays className="h-[1.125rem] w-[1.125rem] text-[#D89A1C] 2xl:h-5 2xl:w-5" />
+              ) : link.href === "/sur-mesure" ? (
+                <CakeSlice className="h-[1.125rem] w-[1.125rem] text-[#D89A1C] 2xl:h-5 2xl:w-5" />
               ) : (
                 <Croissant className="h-[1.125rem] w-[1.125rem] text-[#D89A1C] 2xl:h-5 2xl:w-5" />
               )}
