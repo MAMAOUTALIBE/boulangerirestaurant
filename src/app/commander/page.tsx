@@ -41,19 +41,19 @@ const starterLinks = [
     href: "/menu/baguette-tradition",
     name: "Baguette tradition",
     text: "Signature",
-    image: "/images/boulangerie-pains.png",
+    image: "/images/boulangerie-pains.webp",
   },
   {
     href: "/menu/croissant-beurre",
     name: "Croissant pur beurre",
     text: "Populaire",
-    image: "/images/boulangerie-viennoiseries.png",
+    image: "/images/boulangerie-viennoiseries.webp",
   },
   {
     href: "/menu/tartelette-fruits",
     name: "Tartelette aux fruits",
     text: "Pâtisserie",
-    image: "/images/boulangerie-patisseries.png",
+    image: "/images/boulangerie-patisseries.webp",
   },
 ];
 const checkoutHighlights: {

@@ -1,5 +1,6 @@
 import { Header } from "@/components/Header";
 import { Hero } from "@/components/Hero";
+import { HomeShortcuts } from "@/components/HomeShortcuts";
 import { FeaturedDishes } from "@/components/FeaturedDishes";
 import { PremiumEngagementSection } from "@/components/PremiumEngagementSection";
 
@@ -12,6 +13,7 @@ export default function Home() {
       <Header />
       <main>
         <Hero />
+        <HomeShortcuts />
         <FeaturedDishes />
         <PremiumEngagementSection />
       </main>

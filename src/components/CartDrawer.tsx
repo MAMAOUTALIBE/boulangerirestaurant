@@ -123,7 +123,7 @@ export function CartDrawer() {
                           <button
                             onClick={() => removeItem(item.lineId)}
                             aria-label={`Retirer ${item.name} du panier`}
-                            className="text-muted transition hover:text-red-400"
+                            className="-mr-2 -mt-2 grid h-10 w-10 shrink-0 place-items-center rounded-full text-muted transition hover:bg-white/5 hover:text-red-400"
                           >
                             <Trash2 className="h-4 w-4" />
                           </button>
@@ -148,11 +148,11 @@ export function CartDrawer() {
                                 updateQuantity(item.lineId, item.quantity - 1)
                               }
                               aria-label={`Diminuer la quantité de ${item.name}`}
-                              className="grid h-7 w-7 place-items-center rounded-full border border-white/10 text-cream transition hover:border-gold/60 hover:text-gold"
+                              className="grid h-10 w-10 place-items-center rounded-full border border-white/10 text-cream transition hover:border-gold/60 hover:text-gold"
                             >
-                              <Minus className="h-3.5 w-3.5" />
+                              <Minus className="h-4 w-4" />
                             </button>
-                            <span className="w-6 text-center text-sm font-semibold text-cream">
+                            <span className="w-7 text-center text-sm font-semibold text-cream">
                               {item.quantity}
                             </span>
                             <button
@@ -160,9 +160,9 @@ export function CartDrawer() {
                                 updateQuantity(item.lineId, item.quantity + 1)
                               }
                               aria-label={`Augmenter la quantité de ${item.name}`}
-                              className="grid h-7 w-7 place-items-center rounded-full border border-white/10 text-cream transition hover:border-gold/60 hover:text-gold"
+                              className="grid h-10 w-10 place-items-center rounded-full border border-white/10 text-cream transition hover:border-gold/60 hover:text-gold"
                             >
-                              <Plus className="h-3.5 w-3.5" />
+                              <Plus className="h-4 w-4" />
                             </button>
                           </div>
                           <span className="font-display font-bold text-cream">
@@ -212,7 +212,7 @@ export function CartDrawer() {
                               })
                             }
                             aria-label={`Ajouter ${s.name} au panier`}
-                            className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-gold text-ink transition hover:bg-gold-400 active:scale-95"
+                            className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-gold text-ink transition hover:bg-gold-400 active:scale-95"
                           >
                             <Plus className="h-4 w-4" />
                           </button>

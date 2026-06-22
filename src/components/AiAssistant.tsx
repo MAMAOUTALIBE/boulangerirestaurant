@@ -109,7 +109,7 @@ export function AiAssistant() {
   }
 
   return (
-    <div className="fixed bottom-5 right-5 z-40 flex flex-col items-end print:hidden">
+    <div className="fixed bottom-4 right-4 z-40 flex flex-col items-end print:hidden sm:bottom-5 sm:right-5">
       {open && (
         <section
           aria-label={`Assistant ${siteConfig.name}`}
@@ -239,12 +239,12 @@ export function AiAssistant() {
         transition={{ type: "spring", stiffness: 260, damping: 18, delay: 0.6 }}
         whileHover={{ scale: 1.04 }}
         whileTap={{ scale: 0.96 }}
-        className="group relative inline-flex h-14 items-center gap-2.5 rounded-full bg-gold py-2 pl-2 pr-4 text-ink shadow-card transition hover:bg-gold-400"
+        className="group relative inline-flex h-12 w-12 items-center justify-center rounded-full bg-gold p-1 text-ink shadow-card transition hover:bg-gold-400 sm:h-14 sm:w-auto sm:justify-start sm:gap-2.5 sm:py-2 sm:pl-2 sm:pr-4"
       >
         <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-ink text-gold transition group-hover:scale-105">
           <BotMessageSquare className="h-5 w-5" />
         </span>
-        <span className="flex flex-col items-start leading-tight">
+        <span className="hidden flex-col items-start leading-tight sm:flex">
           <span className="flex items-center gap-1 text-sm font-bold text-ink">
             {siteConfig.shortName}
             <Sparkles className="h-3 w-3" />

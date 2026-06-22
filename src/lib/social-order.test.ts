@@ -10,7 +10,7 @@ const item: CartItem = {
   lineId: "sandwich-1",
   dishId: "sandwich-baguette-poulet",
   name: "Sandwich baguette poulet",
-  image: "/images/boulangerie-snacking.png",
+  image: "/images/boulangerie-snacking.webp",
   basePrice: 6.9,
   unitPrice: 7.9,
   quantity: 2,

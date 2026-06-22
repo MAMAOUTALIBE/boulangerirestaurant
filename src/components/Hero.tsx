@@ -45,27 +45,27 @@ const serviceHighlights: {
 const heroSlides = [
   {
     label: "Boulangerie",
-    src: "/images/boulangerie-hero.png",
+    src: "/images/boulangerie-hero.webp",
     alt: "Comptoir de boulangerie avec croissants, pains au chocolat, baguettes et pains artisanaux",
   },
   {
     label: "Viennoiseries",
-    src: "/images/boulangerie-viennoiseries.png",
+    src: "/images/boulangerie-viennoiseries.webp",
     alt: "Croissants et pains au chocolat dorés sur un plateau en bois",
   },
   {
     label: "Pains au levain",
-    src: "/images/boulangerie-pains.png",
+    src: "/images/boulangerie-pains.webp",
     alt: "Pains au levain et baguettes artisanales dans un panier en osier",
   },
   {
     label: "Pâtisseries",
-    src: "/images/boulangerie-patisseries.png",
+    src: "/images/boulangerie-patisseries.webp",
     alt: "Pâtisseries françaises en vitrine avec tartelettes, éclairs, flans et mille-feuilles",
   },
   {
     label: "Snacking",
-    src: "/images/boulangerie-snacking.png",
+    src: "/images/boulangerie-snacking.webp",
     alt: "Sandwichs baguette, quiches, focaccias, salades et cafés sur un comptoir de boulangerie",
   },
 ] as const;
@@ -95,7 +95,7 @@ export function Hero() {
   return (
     <section
       id="accueil"
-      className="relative overflow-hidden bg-[#050505] px-4 pb-7 pt-[5.9rem] text-cream sm:px-6 sm:pb-9 sm:pt-[6.75rem] lg:min-h-[min(840px,calc(100svh-0.5rem))] lg:pt-[7rem] 2xl:min-h-[min(920px,calc(100svh-0.5rem))] 2xl:pt-[7.35rem] 3xl:min-h-[min(1040px,calc(100svh-0.5rem))] 4xl:min-h-[min(1180px,calc(100svh-0.5rem))]"
+      className="relative overflow-hidden bg-[#050505] px-4 pb-4 pt-[5.45rem] text-cream sm:px-6 sm:pb-9 sm:pt-[6.75rem] lg:min-h-[min(840px,calc(100svh-0.5rem))] lg:pt-[7rem] 2xl:min-h-[min(920px,calc(100svh-0.5rem))] 2xl:pt-[7.35rem] 3xl:min-h-[min(1040px,calc(100svh-0.5rem))] 4xl:min-h-[min(1180px,calc(100svh-0.5rem))]"
     >
       <div className="pointer-events-none absolute inset-0 z-0 h-full w-full">
         {heroSlides.map((slide, index) => (
@@ -130,9 +130,9 @@ export function Hero() {
       </div>
 
       <div className="relative z-20 mx-auto flex w-full max-w-[1680px] flex-col gap-5 sm:gap-6 lg:gap-7 3xl:max-w-[2100px] 4xl:max-w-[2360px]">
-        <div className="flex min-h-[430px] items-center pb-2 sm:min-h-[490px] lg:min-h-[560px] 2xl:min-h-[630px] 3xl:min-h-[720px] 4xl:min-h-[820px]">
+        <div className="flex min-h-[360px] items-center pb-1 min-[390px]:min-h-[390px] sm:min-h-[490px] sm:pb-2 lg:min-h-[560px] 2xl:min-h-[630px] 3xl:min-h-[720px] 4xl:min-h-[820px]">
           <motion.div
-            className="relative z-20 -mt-14 max-w-[620px] py-4 sm:-mt-[5.25rem] sm:max-w-[650px] lg:-mt-[6rem] lg:pl-2 xl:-mt-[6.75rem] xl:pl-4 3xl:-mt-32 3xl:max-w-[780px]"
+            className="relative z-20 -mt-16 max-w-[620px] py-4 sm:-mt-[5.25rem] sm:max-w-[650px] lg:-mt-[6rem] lg:pl-2 xl:-mt-[6.75rem] xl:pl-4 3xl:-mt-32 3xl:max-w-[780px]"
             initial={{ opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.65 }}
@@ -148,36 +148,38 @@ export function Hero() {
                 <span className="block">Artisanale</span>
               </h1>
 
-              <p className="text-[#F8F3EA]/94 mt-4 max-w-xl text-base font-semibold leading-7 drop-shadow-[0_2px_5px_rgba(0,0,0,0.98)] sm:mt-5 sm:text-xl sm:leading-8 3xl:max-w-3xl 3xl:text-2xl 3xl:leading-10">
+              <p className="text-[#F8F3EA]/94 mt-4 hidden max-w-xl text-base font-semibold leading-7 drop-shadow-[0_2px_5px_rgba(0,0,0,0.98)] sm:mt-5 sm:block sm:text-xl sm:leading-8 3xl:max-w-3xl 3xl:text-2xl 3xl:leading-10">
                 Pains au levain, viennoiseries pur beurre et pâtisseries de
                 saison, à commander pour le retrait ou la livraison.
               </p>
 
-              <div className="mt-5 flex flex-col gap-3 sm:mt-6 sm:flex-row sm:flex-wrap 3xl:gap-4">
+              <div className="mt-5 hidden flex-col gap-3 sm:mt-6 sm:flex sm:flex-row sm:flex-wrap 3xl:gap-4">
                 <Link
                   href="/commander"
-                  className="inline-flex min-h-[3.5rem] items-center justify-center gap-3 rounded-full bg-[#D89A1C] px-8 py-3 text-base font-black text-[#050505] shadow-[0_24px_58px_-24px_rgba(216,154,28,0.98)] transition hover:-translate-y-1 hover:bg-[#f0ad2f] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D89A1C]/70 sm:min-h-[3.75rem] sm:px-10 sm:py-3.5 sm:text-lg 3xl:min-h-[4.4rem] 3xl:px-12 3xl:text-xl"
+                  className="inline-flex min-h-[3.5rem] w-full items-center justify-center gap-3 rounded-full bg-[#D89A1C] px-8 py-3 text-base font-black text-[#050505] shadow-[0_24px_58px_-24px_rgba(216,154,28,0.98)] transition hover:-translate-y-1 hover:bg-[#f0ad2f] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D89A1C]/70 sm:min-h-[3.75rem] sm:w-auto sm:px-10 sm:py-3.5 sm:text-lg 3xl:min-h-[4.4rem] 3xl:px-12 3xl:text-xl"
                 >
                   <ShoppingBag className="h-5 w-5 3xl:h-6 3xl:w-6" />
                   Commander
                 </Link>
-                <a
-                  href={siteConfig.socials.whatsapp}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="bg-[#25D366]/16 hover:bg-[#25D366]/24 inline-flex min-h-[3.5rem] items-center justify-center gap-3 rounded-full border border-[#25D366]/70 px-7 py-3 text-base font-bold text-[#F8F3EA] transition hover:-translate-y-1 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#25D366]/70 sm:min-h-[3.75rem] sm:px-8 sm:py-3.5 3xl:min-h-[4.4rem] 3xl:px-10 3xl:text-xl"
-                >
-                  <MessageCircle className="h-5 w-5 text-[#25D366] 3xl:h-6 3xl:w-6" />
-                  WhatsApp
-                </a>
-                <span className="hidden basis-full sm:block" aria-hidden />
-                <Link
-                  href="/menu"
-                  className="border-white/26 bg-black/22 inline-flex min-h-[3rem] items-center justify-center gap-2.5 rounded-full border px-6 py-2.5 text-sm font-bold text-[#F8F3EA] transition hover:-translate-y-1 hover:border-[#D89A1C]/70 hover:bg-black/35 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50 3xl:min-h-[3.6rem] 3xl:px-8 3xl:text-base"
-                >
-                  <Croissant className="h-4 w-4 3xl:h-5 3xl:w-5" />
-                  Voir le menu
-                </Link>
+                <div className="contents">
+                  <a
+                    href={siteConfig.socials.whatsapp}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="bg-[#25D366]/16 hover:bg-[#25D366]/24 inline-flex min-h-[3rem] flex-1 items-center justify-center gap-2.5 rounded-full border border-[#25D366]/70 px-4 py-2.5 text-sm font-bold text-[#F8F3EA] transition hover:-translate-y-1 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#25D366]/70 sm:min-h-[3.75rem] sm:flex-none sm:gap-3 sm:px-8 sm:py-3.5 sm:text-base 3xl:min-h-[4.4rem] 3xl:px-10 3xl:text-xl"
+                  >
+                    <MessageCircle className="h-5 w-5 text-[#25D366] 3xl:h-6 3xl:w-6" />
+                    WhatsApp
+                  </a>
+                  <span className="hidden basis-full sm:block" aria-hidden />
+                  <Link
+                    href="/menu"
+                    className="border-white/26 bg-black/22 inline-flex min-h-[3rem] flex-1 items-center justify-center gap-2 rounded-full border px-4 py-2.5 text-sm font-bold text-[#F8F3EA] transition hover:-translate-y-1 hover:border-[#D89A1C]/70 hover:bg-black/35 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50 sm:flex-none sm:gap-2.5 sm:px-6 3xl:min-h-[3.6rem] 3xl:px-8 3xl:text-base"
+                  >
+                    <Croissant className="h-4 w-4 3xl:h-5 3xl:w-5" />
+                    <span className="whitespace-nowrap">Voir le menu</span>
+                  </Link>
+                </div>
               </div>
 
               <div
@@ -203,9 +205,25 @@ export function Hero() {
           </motion.div>
         </div>
 
+        {/* Mobile : réassurance en bandeau de chips défilant (1 ligne, swipe) */}
+        <div
+          className="relative z-20 -mx-4 flex gap-2 overflow-x-auto px-4 pb-0.5 [scrollbar-width:none] sm:hidden [&::-webkit-scrollbar]:hidden"
+          aria-label="Services disponibles"
+        >
+          {serviceHighlights.map(({ title, Icon }) => (
+            <span
+              key={title}
+              className="flex shrink-0 items-center gap-2 rounded-full border border-white/15 bg-black/50 px-4 py-2 text-sm font-semibold text-[#F8F3EA] backdrop-blur-[2px]"
+            >
+              <Icon className="h-4 w-4 shrink-0 text-[#D89A1C]" />
+              {title}
+            </span>
+          ))}
+        </div>
+
         <motion.div
           aria-label="Services disponibles"
-          className="bg-black/48 relative z-20 overflow-hidden rounded-[24px] border border-white/10 shadow-[0_22px_60px_-34px_rgba(216,154,28,0.95)] backdrop-blur-[2px] sm:rounded-[28px] 3xl:rounded-[34px]"
+          className="bg-black/48 relative z-20 hidden overflow-hidden rounded-[24px] border border-white/10 shadow-[0_22px_60px_-34px_rgba(216,154,28,0.95)] backdrop-blur-[2px] sm:block sm:rounded-[28px] 3xl:rounded-[34px]"
           initial={{ opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.65, delay: 0.2 }}

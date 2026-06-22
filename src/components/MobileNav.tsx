@@ -1,7 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { X, ShoppingBag, User } from "lucide-react";
+import { ChevronDown, ShoppingBag, User, X } from "lucide-react";
 import { Logo } from "@/components/Logo";
 import { LangToggle } from "@/components/LangToggle";
 import type { NavLink } from "@/types";
@@ -13,8 +13,15 @@ interface MobileNavProps {
   cartCount: number;
 }
 
+const mainLinkHrefs = new Set(["/menu", "/commander", "/reservation", "/contact"]);
+
 /** Panneau de navigation mobile coulissant (hamburger menu). */
 export function MobileNav({ open, onClose, links, cartCount }: MobileNavProps) {
+  const mainLinks = links.filter((link) => mainLinkHrefs.has(link.href));
+  const secondaryLinks = links.filter(
+    (link) => !mainLinkHrefs.has(link.href),
+  );
+
   return (
     <AnimatePresence>
       {open && (
@@ -28,7 +35,7 @@ export function MobileNav({ open, onClose, links, cartCount }: MobileNavProps) {
             aria-hidden="true"
           />
           <motion.aside
-            className="fixed right-0 top-0 z-50 flex h-full w-[82%] max-w-sm flex-col bg-ink-soft p-6 shadow-card lg:hidden"
+            className="fixed right-0 top-0 z-50 flex h-full w-[88%] max-w-sm flex-col overflow-y-auto bg-ink-soft px-5 py-5 shadow-card lg:hidden"
             initial={{ x: "100%" }}
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
@@ -48,23 +55,21 @@ export function MobileNav({ open, onClose, links, cartCount }: MobileNavProps) {
               </button>
             </div>
 
-            <nav className="mt-10 flex flex-col gap-1">
-              {links.map((link, i) => (
-                <motion.a
-                  key={link.href}
-                  href={link.href}
-                  onClick={onClose}
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.06 * i }}
-                  className="rounded-xl px-4 py-3 text-lg font-medium text-cream/90 transition hover:bg-white/5 hover:text-gold"
-                >
-                  {link.label}
-                </motion.a>
-              ))}
+            <nav className="mt-8 space-y-3" aria-label="Pages du site">
+              <MobileNavGroup
+                title="Pages principales"
+                links={mainLinks}
+                onClose={onClose}
+                defaultOpen
+              />
+              <MobileNavGroup
+                title="Autres pages"
+                links={secondaryLinks}
+                onClose={onClose}
+              />
             </nav>
 
-            <div className="mt-8 space-y-4 border-t border-white/10 pt-6">
+            <div className="mt-6 space-y-4 border-t border-white/10 pt-5">
               <a
                 href="/compte"
                 onClick={onClose}
@@ -81,17 +86,58 @@ export function MobileNav({ open, onClose, links, cartCount }: MobileNavProps) {
               </div>
             </div>
 
-            <a
-              href="/commander"
-              onClick={onClose}
-              className="btn-primary mt-auto w-full"
-            >
-              <ShoppingBag className="h-4 w-4" />
-              Commander {cartCount > 0 && `(${cartCount})`}
-            </a>
+            {cartCount > 0 && (
+              <a
+                href="/commander"
+                onClick={onClose}
+                className="btn-primary mt-6 w-full"
+              >
+                <ShoppingBag className="h-4 w-4" />
+                Finaliser le panier ({cartCount})
+              </a>
+            )}
           </motion.aside>
         </>
       )}
     </AnimatePresence>
+  );
+}
+
+function MobileNavGroup({
+  title,
+  links,
+  onClose,
+  defaultOpen = false,
+}: {
+  title: string;
+  links: NavLink[];
+  onClose: () => void;
+  defaultOpen?: boolean;
+}) {
+  return (
+    <details
+      open={defaultOpen}
+      className="group rounded-2xl border border-white/10 bg-white/[0.025]"
+    >
+      <summary className="flex min-h-14 cursor-pointer list-none items-center justify-between gap-3 px-4 text-left text-sm font-bold uppercase tracking-[0.18em] text-cream/70 transition hover:text-gold [&::-webkit-details-marker]:hidden">
+        {title}
+        <ChevronDown className="h-4 w-4 shrink-0 text-gold transition group-open:rotate-180" />
+      </summary>
+      <div className="border-t border-white/10 py-2">
+        {links.map((link, index) => (
+          <motion.a
+            key={link.href}
+            href={link.href}
+            onClick={onClose}
+            initial={{ opacity: 0, x: 12 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.03 * index }}
+            className="block px-4 py-3 text-left text-base font-medium text-cream/90 transition hover:bg-white/[0.045] hover:text-gold"
+          >
+            {link.label}
+          </motion.a>
+        ))}
+      </div>
+    </details>
   );
 }

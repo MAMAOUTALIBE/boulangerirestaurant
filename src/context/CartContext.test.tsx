@@ -6,7 +6,7 @@ import type { AddToCartInput } from "@/types";
 const croissant: AddToCartInput = {
   dishId: "croissant-beurre",
   name: "Croissant pur beurre",
-  image: "/images/boulangerie-viennoiseries.png",
+  image: "/images/boulangerie-viennoiseries.webp",
   basePrice: 1.6,
 };
 

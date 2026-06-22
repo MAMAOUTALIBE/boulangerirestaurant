@@ -23,7 +23,7 @@ const display = Playfair_Display({
   weight: ["500", "600", "700", "800"],
 });
 
-const heroImage = "/images/boulangerie-hero.png";
+const heroImage = "/images/boulangerie-hero.webp";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),

@@ -5,22 +5,22 @@ import type { Dish } from "@/types";
 import { remainingStock, isSoldOut } from "@/lib/stock";
 
 const dishImageOverrides: Record<string, string> = {
-  "baguette-tradition": "/images/boulangerie-pains.png",
-  "brioche-tressee": "/images/boulangerie-viennoiseries.png",
-  "cafe-allonge": "/images/boulangerie-snacking.png",
-  "chausson-pommes": "/images/boulangerie-viennoiseries.png",
-  "chocolat-chaud": "/images/boulangerie-snacking.png",
-  "croissant-beurre": "/images/boulangerie-viennoiseries.png",
-  "eclair-chocolat": "/images/boulangerie-patisseries.png",
-  "flan-patissier": "/images/boulangerie-patisseries.png",
-  "jus-orange-presse": "/images/boulangerie-snacking.png",
-  "pain-chocolat": "/images/boulangerie-viennoiseries.png",
-  "pain-complet-graines": "/images/boulangerie-pains.png",
-  "pain-levain": "/images/boulangerie-pains.png",
-  "paris-brest": "/images/boulangerie-patisseries.png",
-  "quiche-lorraine": "/images/boulangerie-snacking.png",
-  "sandwich-baguette-poulet": "/images/boulangerie-snacking.png",
-  "tartelette-fruits": "/images/boulangerie-patisseries.png",
+  "baguette-tradition": "/images/boulangerie-pains.webp",
+  "brioche-tressee": "/images/boulangerie-viennoiseries.webp",
+  "cafe-allonge": "/images/boulangerie-snacking.webp",
+  "chausson-pommes": "/images/boulangerie-viennoiseries.webp",
+  "chocolat-chaud": "/images/boulangerie-snacking.webp",
+  "croissant-beurre": "/images/boulangerie-viennoiseries.webp",
+  "eclair-chocolat": "/images/boulangerie-patisseries.webp",
+  "flan-patissier": "/images/boulangerie-patisseries.webp",
+  "jus-orange-presse": "/images/boulangerie-snacking.webp",
+  "pain-chocolat": "/images/boulangerie-viennoiseries.webp",
+  "pain-complet-graines": "/images/boulangerie-pains.webp",
+  "pain-levain": "/images/boulangerie-pains.webp",
+  "paris-brest": "/images/boulangerie-patisseries.webp",
+  "quiche-lorraine": "/images/boulangerie-snacking.webp",
+  "sandwich-baguette-poulet": "/images/boulangerie-snacking.webp",
+  "tartelette-fruits": "/images/boulangerie-patisseries.webp",
 };
 
 const publicMenuCategorySlugs = [

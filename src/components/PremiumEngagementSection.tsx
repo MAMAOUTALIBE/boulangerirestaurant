@@ -24,6 +24,7 @@ import {
 } from "@/components/PremiumEngagementForms";
 import { testimonials } from "@/data/testimonials";
 import { siteConfig } from "@/lib/config";
+import { mapsHref } from "@/lib/contactLinks";
 
 const footerServices = [
   { label: "Pains & viennoiseries du jour", Icon: Croissant },
@@ -179,7 +180,15 @@ export async function PremiumEngagementSection() {
                   </p>
                 </div>
               </div>
-              <div className="mt-3">
+              <details className="mt-3 rounded-2xl border border-gold/30 bg-gold/10 p-3 sm:hidden">
+                <summary className="cursor-pointer text-sm font-bold text-gold">
+                  Laisser un avis
+                </summary>
+                <div className="mt-3">
+                  <PremiumReviewForm />
+                </div>
+              </details>
+              <div className="mt-3 hidden sm:block">
                 <PremiumReviewForm />
               </div>
 
@@ -278,7 +287,15 @@ export async function PremiumEngagementSection() {
                 </h3>
               </div>
 
-              <div className="mt-3">
+              <details className="mt-3 rounded-2xl border border-gold/30 bg-gold/10 p-3 sm:hidden">
+                <summary className="cursor-pointer text-sm font-bold text-gold">
+                  Écrire un message
+                </summary>
+                <div className="mt-3">
+                  <PremiumContactForm />
+                </div>
+              </details>
+              <div className="mt-3 hidden sm:block">
                 <PremiumContactForm />
               </div>
             </Card>
@@ -303,7 +320,7 @@ export async function PremiumEngagementSection() {
 
               <div className="flex items-center justify-center gap-4">
                 <div
-                  className="h-28 w-28 overflow-hidden rounded-xl border border-gold/70 bg-white p-1.5 shadow-[0_18px_34px_-26px_rgba(5,5,5,0.7)] [&>svg]:h-full [&>svg]:w-full"
+                  className="h-24 w-24 overflow-hidden rounded-xl border border-gold/70 bg-white p-1.5 shadow-[0_18px_34px_-26px_rgba(5,5,5,0.7)] sm:h-28 sm:w-28 [&>svg]:h-full [&>svg]:w-full"
                   aria-label="QR code de commande"
                   role="img"
                   dangerouslySetInnerHTML={{ __html: qrSvg }}
@@ -325,7 +342,7 @@ export async function PremiumEngagementSection() {
                 </p>
               </div>
 
-              <div className="grid gap-4 sm:grid-cols-3">
+              <div className="hidden gap-4 sm:grid sm:grid-cols-3">
                 {qrBenefits.map(({ label, Icon }) => (
                   <div
                     key={label}
@@ -350,20 +367,23 @@ export async function PremiumEngagementSection() {
                 Pain frais, viennoiseries pur beurre et pâtisseries maison.
               </p>
               <div className="mt-4 flex gap-3">
-                {["Facebook", "Instagram", "TikTok", "WhatsApp"].map(
-                  (label) => (
+                {[
+                  { label: "Facebook", href: siteConfig.socials.facebook },
+                  { label: "Instagram", href: siteConfig.socials.instagram },
+                  { label: "TikTok", href: siteConfig.socials.tiktok },
+                  { label: "WhatsApp", href: siteConfig.socials.whatsapp },
+                ].map(({ label, href }) => (
                     <a
                       key={label}
-                      href={
-                        label === "WhatsApp" ? siteConfig.socials.whatsapp : "#"
-                      }
+                      href={href}
+                      target="_blank"
+                      rel="noopener noreferrer"
                       aria-label={label}
                       className="grid h-10 w-10 place-items-center rounded-full border border-gold/60 text-gold transition hover:bg-gold hover:text-ink"
                     >
                       <SocialIcon label={label} />
                     </a>
-                  ),
-                )}
+                  ))}
               </div>
             </div>
 
@@ -390,7 +410,7 @@ export async function PremiumEngagementSection() {
                 <div className="absolute inset-0 bg-[linear-gradient(35deg,rgba(216,154,28,0.12)_1px,transparent_1px),linear-gradient(125deg,rgba(255,255,255,0.06)_1px,transparent_1px)] bg-[size:42px_42px]" />
                 <MapPin className="absolute left-1/2 top-1/2 h-9 w-9 -translate-x-1/2 -translate-y-1/2 text-gold" />
                 <Link
-                  href="https://maps.google.com"
+                  href={mapsHref}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="absolute bottom-3 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-lg border border-white/20 bg-ink/80 px-4 py-2 text-xs font-bold uppercase tracking-wide text-cream transition hover:border-gold hover:text-gold"

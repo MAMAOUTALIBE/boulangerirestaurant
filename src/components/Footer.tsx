@@ -1,8 +1,10 @@
+import type { ReactNode } from "react";
 import { MapPin, Phone, Mail, Clock } from "lucide-react";
 import { Logo } from "@/components/Logo";
 import { footerLinks } from "@/data/services";
 import { NewsletterForm } from "@/components/NewsletterForm";
 import { siteConfig } from "@/lib/config";
+import { emailHref, mapsHref, phoneHref } from "@/lib/contactLinks";
 
 /* --- Icônes de marque (SVG inline, absentes de lucide) --- */
 function IconFacebook() {
@@ -79,9 +81,14 @@ const socials = [
 ].filter((item) => Boolean(item.href));
 
 const contact = [
-  { Icon: MapPin, lines: [siteConfig.contact.address] },
-  { Icon: Phone, lines: [siteConfig.contact.phone] },
-  { Icon: Mail, lines: [siteConfig.contact.email] },
+  {
+    Icon: MapPin,
+    lines: [siteConfig.contact.address],
+    href: mapsHref,
+    external: true,
+  },
+  { Icon: Phone, lines: [siteConfig.contact.phone], href: phoneHref },
+  { Icon: Mail, lines: [siteConfig.contact.email], href: emailHref },
   { Icon: Clock, lines: ["Lun – Dim : 7h00 – 19h30"] },
 ];
 
@@ -144,16 +151,16 @@ export function Footer() {
               Informations
             </h4>
             <ul className="mt-4 space-y-3">
-              {contact.map(({ Icon, lines }, i) => (
+              {contact.map(({ Icon, lines, href, external }, i) => (
                 <li key={i} className="flex gap-3 text-sm text-muted">
                   <Icon className="mt-0.5 h-4 w-4 shrink-0 text-gold" />
-                  <span>
+                  <ContactText href={href} external={external}>
                     {lines.map((l) => (
                       <span key={l} className="block">
                         {l}
                       </span>
                     ))}
-                  </span>
+                  </ContactText>
                 </li>
               ))}
             </ul>
@@ -205,5 +212,28 @@ export function Footer() {
         </div>
       </div>
     </footer>
+  );
+}
+
+function ContactText({
+  href,
+  external,
+  children,
+}: {
+  href?: string;
+  external?: boolean;
+  children: ReactNode;
+}) {
+  if (!href) return <span>{children}</span>;
+
+  return (
+    <a
+      href={href}
+      target={external ? "_blank" : undefined}
+      rel={external ? "noopener noreferrer" : undefined}
+      className="underline-offset-4 transition hover:text-gold hover:underline"
+    >
+      {children}
+    </a>
   );
 }

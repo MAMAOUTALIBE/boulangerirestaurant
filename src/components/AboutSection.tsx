@@ -4,9 +4,9 @@ import { Reveal } from "@/components/ui/Reveal";
 import { aboutPoints } from "@/data/services";
 
 const gallery = [
-  { src: "/images/boulangerie-pains.png", alt: "Pains artisanaux" },
-  { src: "/images/boulangerie-viennoiseries.png", alt: "Viennoiseries" },
-  { src: "/images/boulangerie-patisseries.png", alt: "Pâtisseries" },
+  { src: "/images/boulangerie-pains.webp", alt: "Pains artisanaux" },
+  { src: "/images/boulangerie-viennoiseries.webp", alt: "Viennoiseries" },
+  { src: "/images/boulangerie-patisseries.webp", alt: "Pâtisseries" },
 ];
 
 /** Bloc « À propos de nous » (colonne centrale de la bande). */
