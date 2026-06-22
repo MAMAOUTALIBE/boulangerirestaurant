@@ -1,18 +1,17 @@
 # Mettre à jour le site en ligne
 
-Runbook générique pour le futur hébergement de la boulangerie.
-
-L'ancien domaine et l'ancien serveur ne sont plus configurés dans ce projet.
-Avant un déploiement, renseigner les variables du nouveau serveur.
+Runbook de mise à jour de la boulangerie sur le VPS Hostinger **partagé**
+(`boulangerie.lodene.cloud`, projet Docker Compose `boulangerie`, port 3200).
+La première mise en ligne est décrite dans `HOSTINGER.md`.
 
 ## Méthode rapide
 
-Depuis la racine du projet :
+Depuis la racine du projet (sur ce Mac) :
 
 ```bash
-DEPLOY_VPS="user@host" \
-DEPLOY_REMOTE_DIR="/chemin/projet" \
-DEPLOY_SITE_URL="https://nouveau-domaine.fr" \
+DEPLOY_VPS="root@IP_DU_VPS" \
+DEPLOY_REMOTE_DIR="/root/boulangerie" \
+DEPLOY_SITE_URL="https://boulangerie.lodene.cloud" \
 DEPLOY_KEY="$HOME/.ssh/deploy_key" \
 DEPLOY_COMPOSE_PROJECT="boulangerie" \
 ./deploy/update-production.sh

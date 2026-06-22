@@ -50,6 +50,7 @@ A running PostgreSQL instance and `DATABASE_URL` are **required** even for local
 - Menu data (`Category`, `Dish`, `OptionGroup`, `Option`) lives in the DB and is editable from `/admin/menu`. `src/data/*.ts` are **legacy mock files**; the live source is the DB via `src/lib/dishes.ts`. The app-level `Dish.id` maps to the DB `slug` (stable), not the cuid. Queries use `distinct: ["slug"]` because slugs can be duplicated by historical data.
 - `Order` has a French status string machine (`OrderStatus` in `src/types/index.ts`): `en attente → payée → en préparation → prête → en livraison → livrée → annulée`. Every transition is audited in `OrderEvent`. Loyalty points are awarded idempotently when status becomes `payée` (`pointsAwarded` flag). Order references look like `NK-<base36>`.
 - Multi-restaurant: orders attach to a default `Restaurant` (chosen by `DEFAULT_RESTAURANT_SLUG`, see `src/lib/restaurants.ts`); Stripe **Connect** routes funds to that restaurant's account via `transfer_data` (`src/lib/stripe-connect.ts`, `src/lib/payment.ts`).
+- **Legacy naming**: the product is a bakery, but the schema/libs keep restaurant-era model names — `Restaurant` (= établissement), `Dish` (= produit/pain/viennoiserie), `Driver`. The seed, README, and UI use bakery vocabulary; don't rename the models to match, the mapping is intentional.
 
 ### Auth & sessions (`src/lib/session.ts`, `src/lib/auth.ts`)
 
@@ -81,3 +82,7 @@ Optional integrations fall back to a working "simulation" mode when their env ke
 ## Deployment
 
 Vercel (`vercel.json`: build runs `prisma migrate deploy`, region `cdg1`, weekly re-engagement cron at `/api/cron/reengage` protected by `CRON_SECRET`) or Docker/VPS (`Dockerfile`, `docker-compose.yml`). See `DEPLOYMENT.md` and `HOSTINGER.md`. Security headers are set in `next.config.mjs` (CSP intentionally omitted to avoid breaking Stripe/JSON-LD).
+
+Production target is a **shared Hostinger VPS** that also runs a separate "restaurant" site — keep the bakery isolated and **don't touch** that site: Compose project `boulangerie` (`docker compose -p boulangerie …`), dedicated `boulangerie_pgdata` volume, app published on `127.0.0.1:3200` only (3000 is taken), its own Nginx file, domain `boulangerie.lodene.cloud`. Full first-deploy guide in `HOSTINGER.md`; `deploy/nginx.conf` is the reverse-proxy config (proxies to 3200).
+
+Updates run from the Mac via `deploy/update-production.sh` — an env-var-driven script (`DEPLOY_VPS`, `DEPLOY_REMOTE_DIR`, `DEPLOY_SITE_URL`, `DEPLOY_KEY`, `DEPLOY_COMPOSE_PROJECT=boulangerie`) that does local checks → rsync (excluding `.env*`) → Docker rebuild → Prisma migrate → `/api/health` check (see `deploy/MISE-A-JOUR.md`). No GitHub remote is configured yet — don't push until the bakery repo is set (see the Git note above).

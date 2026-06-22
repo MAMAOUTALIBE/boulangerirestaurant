@@ -3,16 +3,16 @@ services:
     image: postgres:16-alpine
     restart: unless-stopped
     environment:
-      POSTGRES_USER: ${POSTGRES_USER:-restaurant}
+      POSTGRES_USER: ${POSTGRES_USER:-boulangerie}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-change-me}
-      POSTGRES_DB: ${POSTGRES_DB:-restaurant}
+      POSTGRES_DB: ${POSTGRES_DB:-boulangerie}
     volumes:
-      - restaurant_pgdata:/var/lib/postgresql/data
+      - pgdata:/var/lib/postgresql/data
     healthcheck:
       test:
         [
           "CMD-SHELL",
-          "pg_isready -U ${POSTGRES_USER:-restaurant} -d ${POSTGRES_DB:-restaurant}",
+          "pg_isready -U ${POSTGRES_USER:-boulangerie} -d ${POSTGRES_DB:-boulangerie}",
         ]
       interval: 10s
       timeout: 5s
@@ -28,7 +28,7 @@ services:
       db:
         condition: service_healthy
     environment:
-      DATABASE_URL: postgresql://${POSTGRES_USER:-restaurant}:${POSTGRES_PASSWORD:-change-me}@db:5432/${POSTGRES_DB:-restaurant}?schema=public
+      DATABASE_URL: postgresql://${POSTGRES_USER:-boulangerie}:${POSTGRES_PASSWORD:-change-me}@db:5432/${POSTGRES_DB:-boulangerie}?schema=public
 
   app:
     build:
@@ -49,7 +49,7 @@ services:
         condition: service_completed_successfully
     environment:
       # La base est jointe par le nom de service « db ».
-      DATABASE_URL: postgresql://${POSTGRES_USER:-restaurant}:${POSTGRES_PASSWORD:-change-me}@db:5432/${POSTGRES_DB:-restaurant}?schema=public
+      DATABASE_URL: postgresql://${POSTGRES_USER:-boulangerie}:${POSTGRES_PASSWORD:-change-me}@db:5432/${POSTGRES_DB:-boulangerie}?schema=public
       NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL}
       NEXT_PUBLIC_WHATSAPP_ORDER_NUMBER: ${NEXT_PUBLIC_WHATSAPP_ORDER_NUMBER:-}
       NEXT_PUBLIC_TELEGRAM_ORDER_USERNAME: ${NEXT_PUBLIC_TELEGRAM_ORDER_USERNAME:-}
@@ -60,7 +60,7 @@ services:
       SESSION_SECRET: ${SESSION_SECRET}
       ADMIN_EMAILS: ${ADMIN_EMAILS}
       ADMIN_PASSWORD: ${ADMIN_PASSWORD:-}
-      DEFAULT_RESTAURANT_SLUG: ${DEFAULT_RESTAURANT_SLUG:-restaurant}
+      DEFAULT_RESTAURANT_SLUG: ${DEFAULT_RESTAURANT_SLUG:-boulangerie}
       STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY:-}
       STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET:-}
       STRIPE_CONNECT_COUNTRY: ${STRIPE_CONNECT_COUNTRY:-FR}
@@ -78,8 +78,8 @@ services:
       UPSTASH_REDIS_REST_TOKEN: ${UPSTASH_REDIS_REST_TOKEN:-}
     ports:
       # VPS partagé : exposé uniquement en local (Nginx fait le reverse-proxy).
-      # Port hôte 3100 pour éviter le 3000 déjà pris par un autre site.
-      - "127.0.0.1:3100:3000"
+      # 3000 (autre site Next) et 3100 (restaurant lodene.cloud) déjà pris → 3200.
+      - "127.0.0.1:3200:3000"
 
 volumes:
-  restaurant_pgdata:
+  pgdata:
