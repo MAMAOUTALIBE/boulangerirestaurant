@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900">
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#f5c466"/>
+      <stop offset="0.45" stop-color="#8b4a18"/>
+      <stop offset="1" stop-color="#1a0f08"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="50%" cy="22%" r="65%">
+      <stop offset="0" stop-color="#fff2b8" stop-opacity=".85"/>
+      <stop offset=".45" stop-color="#f59e0b" stop-opacity=".22"/>
+      <stop offset="1" stop-color="#000" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="canRed" x1="0" x2="1">
+      <stop offset="0" stop-color="#8b0d13"/>
+      <stop offset=".5" stop-color="#e3272e"/>
+      <stop offset="1" stop-color="#7b0f16"/>
+    </linearGradient>
+    <linearGradient id="canOrange" x1="0" x2="1">
+      <stop offset="0" stop-color="#c76a0b"/>
+      <stop offset=".5" stop-color="#ff9d1b"/>
+      <stop offset="1" stop-color="#b45309"/>
+    </linearGradient>
+    <linearGradient id="canBlue" x1="0" x2="1">
+      <stop offset="0" stop-color="#0f3a70"/>
+      <stop offset=".5" stop-color="#1e88e5"/>
+      <stop offset="1" stop-color="#0f2f5f"/>
+    </linearGradient>
+    <linearGradient id="canTeal" x1="0" x2="1">
+      <stop offset="0" stop-color="#076b78"/>
+      <stop offset=".5" stop-color="#19c2dc"/>
+      <stop offset="1" stop-color="#075985"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="160%">
+      <feDropShadow dx="0" dy="26" stdDeviation="18" flood-color="#000" flood-opacity=".42"/>
+    </filter>
+  </defs>
+  <rect width="1600" height="900" fill="url(#bg)"/>
+  <rect width="1600" height="900" fill="url(#glow)"/>
+  <g opacity=".22" fill="none" stroke="#2f1609" stroke-width="12">
+    <path d="M0 745h1600M0 815h1600"/>
+    <path d="M35 780l45-35 45 35-45 35zM145 780l45-35 45 35-45 35zM255 780l45-35 45 35-45 35zM365 780l45-35 45 35-45 35zM475 780l45-35 45 35-45 35zM585 780l45-35 45 35-45 35zM695 780l45-35 45 35-45 35zM805 780l45-35 45 35-45 35zM915 780l45-35 45 35-45 35zM1025 780l45-35 45 35-45 35zM1135 780l45-35 45 35-45 35zM1245 780l45-35 45 35-45 35zM1355 780l45-35 45 35-45 35zM1465 780l45-35 45 35-45 35z"/>
+  </g>
+  <g opacity=".45">
+    <circle cx="220" cy="710" r="34" fill="#f8fafc"/>
+    <circle cx="320" cy="725" r="26" fill="#e2e8f0"/>
+    <circle cx="1290" cy="712" r="32" fill="#f8fafc"/>
+    <circle cx="1385" cy="740" r="24" fill="#e2e8f0"/>
+  </g>
+  <g filter="url(#shadow)" transform="translate(270 135)">
+    <g transform="translate(0 45)">
+      <rect x="0" y="60" width="205" height="510" rx="42" fill="url(#canRed)"/>
+      <ellipse cx="102.5" cy="60" rx="102.5" ry="35" fill="#fca5a5"/>
+      <ellipse cx="102.5" cy="570" rx="102.5" ry="34" fill="#6b0f13"/>
+      <path d="M55 175c46-38 93-39 141-3-39 14-84 17-141 3z" fill="#fff" opacity=".92"/>
+      <path d="M34 244h138v36H34zM34 300h112v24H34z" fill="#fff" opacity=".82"/>
+    </g>
+    <g transform="translate(260 18)">
+      <rect x="0" y="60" width="205" height="535" rx="42" fill="url(#canOrange)"/>
+      <ellipse cx="102.5" cy="60" rx="102.5" ry="35" fill="#fed7aa"/>
+      <ellipse cx="102.5" cy="595" rx="102.5" ry="34" fill="#92400e"/>
+      <circle cx="102" cy="260" r="78" fill="#fff" opacity=".84"/>
+      <path d="M102 183v154M25 260h154M49 207l108 108M157 207 49 315" stroke="#f97316" stroke-width="10"/>
+    </g>
+    <g transform="translate(520 0)">
+      <rect x="0" y="60" width="205" height="555" rx="42" fill="url(#canBlue)"/>
+      <ellipse cx="102.5" cy="60" rx="102.5" ry="35" fill="#bfdbfe"/>
+      <ellipse cx="102.5" cy="615" rx="102.5" ry="34" fill="#082f49"/>
+      <path d="M42 410 164 180h-52l45-78-122 224h54z" fill="#fef3c7"/>
+    </g>
+    <g transform="translate(780 35)">
+      <rect x="0" y="60" width="205" height="520" rx="42" fill="url(#canTeal)"/>
+      <ellipse cx="102.5" cy="60" rx="102.5" ry="35" fill="#a5f3fc"/>
+      <ellipse cx="102.5" cy="580" rx="102.5" ry="34" fill="#0e7490"/>
+      <path d="M70 185c55-54 111-35 108 36-66-5-105 26-138 78-12-43-2-83 30-114z" fill="#ecfccb"/>
+      <path d="M42 382c42-30 86-33 133-8-34 28-80 31-133 8z" fill="#fff" opacity=".85"/>
+    </g>
+  </g>
+  <g fill="#fff8e7" opacity=".95" font-family="Arial, Helvetica, sans-serif" text-anchor="middle">
+    <text x="800" y="95" font-size="56" font-weight="700">Boissons fraiches</text>
+    <text x="800" y="860" font-size="34" font-weight="700">A savourer partout</text>
+  </g>
+</svg>

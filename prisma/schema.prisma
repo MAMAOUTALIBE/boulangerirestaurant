@@ -1,0 +1,310 @@
+// Schéma Prisma — base PostgreSQL pour boulangerie.
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Order {
+  id        String      @id @default(cuid())
+  reference String      @unique
+  createdAt DateTime    @default(now())
+  // Statut : en attente | payée | en préparation | prête | livrée | annulée
+  status    String      @default("en attente")
+
+  customerName    String
+  customerEmail   String
+  customerPhone   String
+  customerAddress String?
+  customerNotes   String?
+
+  subtotal      Float        @default(0)
+  discount      Float        @default(0)
+  promoCode     String?
+  /// Mode : livraison | emporter | surplace
+  fulfillment   String       @default("emporter")
+  deliveryFee   Float        @default(0)
+  tip           Float        @default(0)
+  /// Créneau souhaité (null = dès que possible)
+  scheduledAt   DateTime?
+  /// Temps de préparation estimé (minutes)
+  prepTimeMin   Int          @default(20)
+  total         Float
+  /// Points de fidélité déjà attribués pour cette commande (idempotence).
+  pointsAwarded Boolean      @default(false)
+  restaurant    Restaurant?  @relation(fields: [restaurantId], references: [id])
+  restaurantId  String?
+  driver        Driver?      @relation(fields: [driverId], references: [id])
+  driverId      String?
+  items         OrderLine[]
+  events        OrderEvent[]
+
+  @@index([customerEmail])
+  @@index([restaurantId])
+}
+
+/// Restaurant géré sur la plateforme (multi-établissement).
+model Restaurant {
+  id                        String   @id @default(cuid())
+  slug                      String   @unique
+  name                      String
+  active                    Boolean  @default(true)
+  stripeAccountId           String?  @unique
+  stripeOnboardingComplete  Boolean  @default(false)
+  stripeChargesEnabled      Boolean  @default(false)
+  stripePayoutsEnabled      Boolean  @default(false)
+  stripeDetailsSubmitted    Boolean  @default(false)
+  stripeLastSyncedAt        DateTime?
+  createdAt                 DateTime @default(now())
+  updatedAt                 DateTime @updatedAt
+  orders                    Order[]
+}
+
+/// Livreur « maison ».
+model Driver {
+  id        String   @id @default(cuid())
+  name      String
+  phone     String?
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  orders    Order[]
+}
+
+/// Journal d'audit des changements de statut d'une commande.
+model OrderEvent {
+  id        String   @id @default(cuid())
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  orderId   String
+  status    String
+  actor     String?
+  createdAt DateTime @default(now())
+
+  @@index([orderId])
+}
+
+/// Code promotionnel géré en base.
+model PromoCode {
+  id         String   @id @default(cuid())
+  code       String   @unique
+  /// "percent" (ex: 10 = -10%) ou "fixed" (ex: 5 = -5€)
+  type       String   @default("percent")
+  value      Float
+  active     Boolean  @default(true)
+  expiresAt  DateTime?
+  usageLimit Int?
+  usedCount  Int      @default(0)
+  createdAt  DateTime @default(now())
+}
+
+model OrderLine {
+  id       String @id @default(cuid())
+  order    Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  orderId  String
+  dishId   String
+  name     String
+  /// Prix unitaire (base + options).
+  price    Float
+  quantity Int
+  /// Options choisies : [{ label, priceDelta }]
+  options  Json?
+  /// Instructions spéciales du client.
+  note     String?
+}
+
+model NewsletterSubscriber {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  createdAt DateTime @default(now())
+}
+
+model ContactMessage {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  message   String
+  handled   Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+/// Catégorie de menu (Entrées, Plats, Desserts, Boissons…).
+model Category {
+  id        String   @id @default(cuid())
+  slug      String   @unique
+  name      String
+  sortOrder Int      @default(0)
+  dishes    Dish[]
+}
+
+/// Plat du menu (éditable depuis le back-office).
+model Dish {
+  id          String        @id @default(cuid())
+  slug        String        @unique
+  name        String
+  description String
+  price       Float
+  image       String
+  tag         String?
+  available   Boolean       @default(true)
+  sortOrder   Int           @default(0)
+  /// Temps de préparation estimé du plat (minutes) — sert au calcul d'ETA.
+  prepMinutes Int           @default(15)
+  category    Category?     @relation(fields: [categoryId], references: [id])
+  categoryId  String?
+  optionGroups OptionGroup[]
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+}
+
+/// Groupe d'options d'un plat (ex: « Accompagnement », « Suppléments »).
+model OptionGroup {
+  id        String   @id @default(cuid())
+  dish      Dish     @relation(fields: [dishId], references: [id], onDelete: Cascade)
+  dishId    String
+  name      String
+  /// "single" (choisir 1) ou "multi" (choisir plusieurs)
+  type      String   @default("single")
+  required  Boolean  @default(false)
+  sortOrder Int      @default(0)
+  options   Option[]
+
+  @@index([dishId])
+}
+
+/// Une option dans un groupe (avec éventuel surcoût).
+model Option {
+  id         String      @id @default(cuid())
+  group      OptionGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  groupId    String
+  name       String
+  priceDelta Float       @default(0)
+  sortOrder  Int         @default(0)
+
+  @@index([groupId])
+}
+
+/// Panier suivi côté serveur (pour le funnel de conversion et la relance).
+model AbandonedCart {
+  id        String   @id @default(cuid())
+  cartId    String   @unique
+  email     String?
+  name      String?
+  phone     String?
+  items     Json
+  itemCount Int      @default(0)
+  total     Float    @default(0)
+  /// actif | converti | relancé
+  status    String   @default("actif")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+  @@index([email])
+}
+
+/// Avis client (modéré avant publication).
+model Review {
+  id        String   @id @default(cuid())
+  name      String
+  rating    Int
+  comment   String
+  approved  Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([approved])
+}
+
+/// Horaires d'ouverture par jour (0 = dimanche … 6 = samedi).
+model OpeningHour {
+  id           Int     @id @default(autoincrement())
+  dayOfWeek    Int     @unique
+  closed       Boolean @default(false)
+  /// Minutes depuis minuit (ex: 660 = 11h00, 1380 = 23h00).
+  openMinutes  Int     @default(660)
+  closeMinutes Int     @default(1380)
+}
+
+/// Réglages de prise de commande (singleton, id = "default").
+model OrderingSetting {
+  id              String @id @default("default")
+  slotIntervalMin Int    @default(15)
+  leadTimeMin     Int    @default(20)
+  capacityPerSlot Int    @default(8)
+  /// Alerte « imminent » : minutes avant l'échéance.
+  imminentMin     Int    @default(5)
+  /// Stagnation max en « en préparation » (minutes).
+  prepMaxMin      Int    @default(10)
+  /// Stagnation max dans les autres colonnes (minutes).
+  stageMaxMin     Int    @default(5)
+}
+
+/// Zone de livraison : frais et minimum de commande par code postal.
+model DeliveryZone {
+  id         String @id @default(cuid())
+  postalCode String @unique
+  fee        Float  @default(0)
+  minOrder   Float  @default(0)
+}
+
+/// Fiche client consolidée (CRM), clé = email.
+model Customer {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  phone     String?
+  /// Notes internes (allergies, préférences, incidents…).
+  notes     String   @default("")
+  /// Étiquettes de segmentation (VIP, habitué, à relancer…).
+  tags      String[] @default([])
+  /// Points de fidélité cumulés.
+  loyaltyPoints Int   @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+/// Réservation de table.
+model Reservation {
+  id        String   @id @default(cuid())
+  reference String   @unique
+  createdAt DateTime @default(now())
+  status    String   @default("en attente") // en attente | confirmée | annulée
+
+  name      String
+  email     String
+  phone     String
+  date      String // jour souhaité (AAAA-MM-JJ)
+  time      String // créneau souhaité (HH:MM)
+  guests    Int
+  notes     String?
+
+  @@index([email])
+}
+
+/// Demande de devis traiteur / événementiel.
+model CateringRequest {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  status    String   @default("nouveau") // nouveau | traité
+
+  name      String
+  email     String
+  phone     String
+  eventDate String?
+  guests    Int
+  message   String
+
+  @@index([email])
+}
+
+/// Jeton à usage unique pour la connexion par lien magique (magic link).
+model VerificationToken {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  email     String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([email])
+}

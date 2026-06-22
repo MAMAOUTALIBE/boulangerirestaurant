@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "Dish" ADD COLUMN     "prepMinutes" INTEGER NOT NULL DEFAULT 15;

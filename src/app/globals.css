@@ -1,0 +1,142 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #080808;
+  --foreground: #f8f3ea;
+}
+
+* {
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  overflow-x: hidden;
+}
+
+@layer components {
+  .container-page {
+    @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:max-w-[1440px] lg:px-8 2xl:max-w-[1680px] 2xl:px-10 3xl:max-w-[1880px] 3xl:px-12 4xl:max-w-[2200px] 4xl:px-16;
+  }
+
+  .section {
+    @apply py-14 sm:py-20 lg:py-24 3xl:py-32;
+  }
+
+  .eyebrow {
+    @apply text-xs font-semibold uppercase tracking-[0.25em] text-gold;
+  }
+
+  .heading {
+    @apply font-display text-3xl leading-tight sm:text-4xl lg:text-5xl;
+  }
+
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-semibold transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-gold/60;
+  }
+
+  .btn-primary {
+    @apply btn bg-gold text-ink shadow-glow hover:-translate-y-0.5 hover:bg-gold-400;
+  }
+
+  .btn-outline {
+    @apply btn border border-white/20 bg-white/5 text-cream backdrop-blur hover:border-gold/60 hover:bg-white/10;
+  }
+}
+
+/* Champs de formulaire natifs (date, heure, nombre) lisibles sur fond sombre */
+input[type="date"],
+input[type="time"],
+input[type="number"] {
+  color-scheme: dark;
+}
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="time"]::-webkit-calendar-picker-indicator {
+  opacity: 0.75;
+  cursor: pointer;
+}
+
+/* Scrollbar premium */
+::-webkit-scrollbar {
+  width: 10px;
+}
+::-webkit-scrollbar-track {
+  background: #080808;
+}
+::-webkit-scrollbar-thumb {
+  background: #262626;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #f59e0b;
+}
+
+/* --- Alertes écran Service --- */
+@keyframes nk-spin {
+  to {
+    transform: rotate(1turn);
+  }
+}
+@keyframes nk-blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.45;
+  }
+}
+@keyframes nk-glow {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 var(--alert-color, #ef4444);
+  }
+  50% {
+    box-shadow: 0 0 22px 2px var(--alert-color, #ef4444);
+  }
+}
+/* Lumière tournante autour d'une carte (couleur = var --alert-color). */
+.alert-rotating {
+  position: relative;
+  overflow: hidden;
+  border-radius: 1rem;
+  padding: 2px;
+  --alert-color: #ef4444;
+  --alert-speed: 1.4s;
+}
+.alert-rotating::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 2px;
+  background: conic-gradient(
+    from 0deg,
+    transparent 0deg,
+    var(--alert-color) 55deg,
+    transparent 150deg
+  );
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: nk-spin var(--alert-speed) linear infinite;
+  pointer-events: none;
+}
+/* Halo pulsé sous la carte (gravité forte). */
+.alert-glow {
+  animation: nk-glow 1.6s ease-in-out infinite;
+  border-radius: 1rem;
+}
+.alert-blink {
+  animation: nk-blink 0.9s ease-in-out infinite;
+}

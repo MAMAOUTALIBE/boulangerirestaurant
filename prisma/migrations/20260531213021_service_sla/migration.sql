@@ -1,0 +1,4 @@
+-- AlterTable
+ALTER TABLE "OrderingSetting" ADD COLUMN     "imminentMin" INTEGER NOT NULL DEFAULT 5,
+ADD COLUMN     "prepMaxMin" INTEGER NOT NULL DEFAULT 10,
+ADD COLUMN     "stageMaxMin" INTEGER NOT NULL DEFAULT 5;

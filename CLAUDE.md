@@ -1,0 +1,83 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+## Project
+
+Full-stack bakery website (showcase + online ordering + admin CRM) built with **Next.js 16 (App Router)**, TypeScript (strict), PostgreSQL via **Prisma 6**, Zod, Tailwind 3, and Framer Motion. The codebase, UI, comments, commit messages, and order-status strings are all in **French** — match that language when editing.
+
+Important Git note: this local project was adapted from a restaurant base. The
+current remote may still point to the old restaurant repository; do not push
+until the bakery GitHub remote is explicitly configured.
+
+## Commands
+
+```bash
+npm run dev          # dev server on 0.0.0.0:3000
+npm run build        # prisma generate + next build + assemble standalone output
+npm run start        # serve the standalone production build (node .next/standalone/server.js)
+npm run lint         # eslint
+npm run typecheck    # tsc --noEmit
+npm run format       # prettier --write src
+npm test             # vitest run (one shot)
+npm run test:watch   # vitest watch
+
+# A single test file / test name:
+npx vitest run src/lib/validation.test.ts
+npx vitest run -t "applies a percent promo"
+
+# Database (Prisma):
+npm run db:migrate   # prisma migrate dev (apply + create migration in dev)
+npm run db:seed      # tsx prisma/seed.ts (categories, products, options, hours, establishment…)
+npm run db:studio    # prisma studio
+```
+
+A running PostgreSQL instance and `DATABASE_URL` are **required** even for local dev — dishes, menu, orders, and most pages read from the DB, not from static files. Copy `.env.example` → `.env.local` to start. After cloning: `npm install` (runs `prisma generate` via postinstall) → `npm run db:migrate` → `npm run db:seed`.
+
+> The `build` script produces Next.js `standalone` output and then manually copies `public/` and `.next/static` into `.next/standalone`. Production is served with `npm start` (Docker/VPS) — not `next start`.
+
+## Architecture
+
+### Layers
+
+- **Server Actions** (`src/app/actions.ts`) are the primary mutation entry point — every form posts to one. They follow a fixed pattern: honeypot bot check (`isBot`) → `rateLimit(...)` → Zod `safeParse` → call a `src/lib/*` function → `revalidatePath`/`redirect`. Admin actions are prefixed `admin*` and re-check `isAdminEmail`.
+- **Domain logic** lives in `src/lib/*.ts`, each file marked `import "server-only"` (orders, payment, auth, customers, promo, delivery, loyalty, slots, reviews, segmentation, stripe-connect, email, sms, assistant…). Keep business rules here, not in components or routes.
+- **API routes** (`src/app/api/*`) serve JSON/CSV and webhooks. The Stripe webhook (`/api/webhooks/stripe`) is the **source of truth** for payment confirmation (reads the raw body to verify the signature) — the browser redirect is not trusted.
+- **Prisma client** is a `globalThis` singleton (`src/lib/prisma.ts`) to survive dev hot-reload.
+
+### Data model notes (`prisma/schema.prisma`)
+
+- Menu data (`Category`, `Dish`, `OptionGroup`, `Option`) lives in the DB and is editable from `/admin/menu`. `src/data/*.ts` are **legacy mock files**; the live source is the DB via `src/lib/dishes.ts`. The app-level `Dish.id` maps to the DB `slug` (stable), not the cuid. Queries use `distinct: ["slug"]` because slugs can be duplicated by historical data.
+- `Order` has a French status string machine (`OrderStatus` in `src/types/index.ts`): `en attente → payée → en préparation → prête → en livraison → livrée → annulée`. Every transition is audited in `OrderEvent`. Loyalty points are awarded idempotently when status becomes `payée` (`pointsAwarded` flag). Order references look like `NK-<base36>`.
+- Multi-restaurant: orders attach to a default `Restaurant` (chosen by `DEFAULT_RESTAURANT_SLUG`, see `src/lib/restaurants.ts`); Stripe **Connect** routes funds to that restaurant's account via `transfer_data` (`src/lib/stripe-connect.ts`, `src/lib/payment.ts`).
+
+### Auth & sessions (`src/lib/session.ts`, `src/lib/auth.ts`)
+
+- Passwordless. Customers log in via **magic link** (single-use `VerificationToken`, 15 min TTL). Admins log in via the `ADMIN_EMAILS` allowlist + `ADMIN_PASSWORD` (timing-safe compare).
+- The session is just the user's email, stored in an **HMAC-signed cookie** (`SESSION_SECRET`). `src/app/admin/layout.tsx` is the single access guard for all `/admin/*` routes (`force-dynamic`, redirects non-admins to `/compte`).
+
+### Graceful-degradation pattern (important & pervasive)
+
+Optional integrations fall back to a working "simulation" mode when their env keys are absent. Preserve this when touching these areas:
+
+- **Stripe** missing → `startCheckout` returns `{ simulated: true }`, app confirms locally.
+- **Resend** (`src/lib/email.ts`) missing → logs the email to console.
+- **Twilio** (`src/lib/sms.ts`) missing → logs the SMS to console.
+- **Assistant LLM** (`ASSISTANT_API_KEY`, OpenAI-compatible, default Groq) missing or failing → `ruleBasedAnswer` keyword fallback. The assistant validates/re-resolves prices and actions server-side (`resolveActions`) against a whitelist — never trust the model's prices or links.
+- **Upstash Redis** (`src/lib/rate-limit.ts`) missing → in-memory per-instance bucket (fine for single-instance, replace for multi-instance prod).
+
+### Client state & i18n
+
+- Cart, order, and language are React Contexts in `src/context/` (`CartContext` persists to `localStorage`; cart lines are keyed by a composite `lineId` of dish + options + note). i18n is a small fr/en dictionary (`src/lib/i18n.ts`) driven by `LangContext`.
+
+## Conventions
+
+- Path alias `@/*` → `src/*`.
+- Prettier: double quotes, semicolons, trailing commas, 80 cols, `prettier-plugin-tailwindcss` (keep Tailwind class order). Run `npm run format` before finishing.
+- Tests are Vitest + Testing Library (`jsdom`), colocated as `*.test.ts(x)`. The Vitest setup clears `localStorage` after each test.
+- Theme colors are centralized in `tailwind.config.ts` (`ink`, `cream`, `gold`, `forest`, `muted`) — use these tokens, not raw hex.
+- Money is rounded with the `roundCurrency` helper (cents precision); don't introduce float drift.
+
+## Deployment
+
+Vercel (`vercel.json`: build runs `prisma migrate deploy`, region `cdg1`, weekly re-engagement cron at `/api/cron/reengage` protected by `CRON_SECRET`) or Docker/VPS (`Dockerfile`, `docker-compose.yml`). See `DEPLOYMENT.md` and `HOSTINGER.md`. Security headers are set in `next.config.mjs` (CSP intentionally omitted to avoid breaking Stripe/JSON-LD).

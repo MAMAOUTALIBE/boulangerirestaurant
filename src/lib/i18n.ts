@@ -1,0 +1,47 @@
+export type Locale = "fr" | "en";
+
+/** Dictionnaire des chaînes d'interface (chrome public). */
+export const dict: Record<Locale, Record<string, string>> = {
+  fr: {
+    "nav.#accueil": "Accueil",
+    "nav.#a-propos": "À propos",
+    "nav./menu": "Menu",
+    "nav./commander": "Commander",
+    "nav./reservation": "Réservation",
+    "nav./traiteur": "Traiteur",
+    "nav./contact": "Contact",
+    "nav.#avis": "Avis",
+    "nav./#avis-clients": "Avis",
+    "nav.#contact": "Contact",
+    "nav./#contact": "Contact",
+    "cta.order": "Commander",
+    "cta.viewMenu": "Voir le menu",
+    "cta.account": "Mon compte",
+    "cart.title": "Votre panier",
+  },
+  en: {
+    "nav.#accueil": "Home",
+    "nav.#a-propos": "About",
+    "nav./menu": "Menu",
+    "nav./commander": "Order",
+    "nav./reservation": "Booking",
+    "nav./traiteur": "Catering",
+    "nav./contact": "Contact",
+    "nav.#avis": "Reviews",
+    "nav./#avis-clients": "Reviews",
+    "nav.#contact": "Contact",
+    "nav./#contact": "Contact",
+    "cta.order": "Order",
+    "cta.viewMenu": "View menu",
+    "cta.account": "My account",
+    "cart.title": "Your cart",
+  },
+};
+
+export function translate(
+  locale: Locale,
+  key: string,
+  fallback?: string,
+): string {
+  return dict[locale]?.[key] ?? fallback ?? key;
+}
