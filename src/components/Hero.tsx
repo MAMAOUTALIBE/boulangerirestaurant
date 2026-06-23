@@ -95,7 +95,7 @@ export function Hero() {
   return (
     <section
       id="accueil"
-      className="relative overflow-hidden bg-[#050505] px-4 pb-4 pt-[5.45rem] text-cream sm:px-6 sm:pb-9 sm:pt-[6.75rem] lg:min-h-[min(840px,calc(100svh-0.5rem))] lg:pt-[7rem] 2xl:min-h-[min(920px,calc(100svh-0.5rem))] 2xl:pt-[7.35rem] 3xl:min-h-[min(1040px,calc(100svh-0.5rem))] 4xl:min-h-[min(1180px,calc(100svh-0.5rem))]"
+      className="relative overflow-hidden bg-[#050505] px-4 pb-3 pt-[5.15rem] text-cream sm:px-6 sm:pb-9 sm:pt-[6.75rem] lg:min-h-[min(840px,calc(100svh-0.5rem))] lg:pt-[7rem] 2xl:min-h-[min(920px,calc(100svh-0.5rem))] 2xl:pt-[7.35rem] 3xl:min-h-[min(1040px,calc(100svh-0.5rem))] 4xl:min-h-[min(1180px,calc(100svh-0.5rem))]"
     >
       <div className="pointer-events-none absolute inset-0 z-0 h-full w-full">
         {heroSlides.map((slide, index) => (
@@ -130,9 +130,9 @@ export function Hero() {
       </div>
 
       <div className="relative z-20 mx-auto flex w-full max-w-[1680px] flex-col gap-5 sm:gap-6 lg:gap-7 3xl:max-w-[2100px] 4xl:max-w-[2360px]">
-        <div className="flex min-h-[360px] items-center pb-1 min-[390px]:min-h-[390px] sm:min-h-[490px] sm:pb-2 lg:min-h-[560px] 2xl:min-h-[630px] 3xl:min-h-[720px] 4xl:min-h-[820px]">
+        <div className="flex min-h-[300px] items-center pb-1 min-[390px]:min-h-[330px] sm:min-h-[490px] sm:pb-2 lg:min-h-[560px] 2xl:min-h-[630px] 3xl:min-h-[720px] 4xl:min-h-[820px]">
           <motion.div
-            className="relative z-20 -mt-16 max-w-[620px] py-4 sm:-mt-[5.25rem] sm:max-w-[650px] lg:-mt-[6rem] lg:pl-2 xl:-mt-[6.75rem] xl:pl-4 3xl:-mt-32 3xl:max-w-[780px]"
+            className="relative z-20 -mt-8 max-w-[620px] py-3 sm:-mt-[5.25rem] sm:max-w-[650px] sm:py-4 lg:-mt-[6rem] lg:pl-2 xl:-mt-[6.75rem] xl:pl-4 3xl:-mt-32 3xl:max-w-[780px]"
             initial={{ opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.65 }}
@@ -143,12 +143,12 @@ export function Hero() {
             />
 
             <div className="relative z-10">
-              <h1 className="font-display text-5xl font-bold leading-[0.98] text-[#F8F3EA] drop-shadow-[0_3px_8px_rgba(0,0,0,0.96)] sm:text-6xl lg:text-[4.15rem] xl:text-[4.8rem] 3xl:text-[5.8rem] 4xl:text-[6.5rem]">
+              <h1 className="font-display text-[2.65rem] font-bold leading-[0.98] text-[#F8F3EA] drop-shadow-[0_3px_8px_rgba(0,0,0,0.96)] min-[390px]:text-5xl sm:text-6xl lg:text-[4.15rem] xl:text-[4.8rem] 3xl:text-[5.8rem] 4xl:text-[6.5rem]">
                 <span className="block text-[#D89A1C]">Boulangerie</span>
                 <span className="block">Artisanale</span>
               </h1>
 
-              <p className="text-[#F8F3EA]/94 mt-4 hidden max-w-xl text-base font-semibold leading-7 drop-shadow-[0_2px_5px_rgba(0,0,0,0.98)] sm:mt-5 sm:block sm:text-xl sm:leading-8 3xl:max-w-3xl 3xl:text-2xl 3xl:leading-10">
+              <p className="text-[#F8F3EA]/88 mt-3 max-w-[18rem] text-sm font-semibold leading-5 drop-shadow-[0_2px_5px_rgba(0,0,0,0.98)] sm:mt-5 sm:max-w-xl sm:text-xl sm:leading-8 3xl:max-w-3xl 3xl:text-2xl 3xl:leading-10">
                 Pains au levain, viennoiseries pur beurre et pâtisseries de
                 saison, à commander pour le retrait ou la livraison.
               </p>
@@ -174,7 +174,7 @@ export function Hero() {
                   <span className="hidden basis-full sm:block" aria-hidden />
                   <Link
                     href="/menu"
-                    className="border-white/26 bg-black/22 inline-flex min-h-[3rem] flex-1 items-center justify-center gap-2 rounded-full border px-4 py-2.5 text-sm font-bold text-[#F8F3EA] transition hover:-translate-y-1 hover:border-[#D89A1C]/70 hover:bg-black/35 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50 sm:flex-none sm:gap-2.5 sm:px-6 3xl:min-h-[3.6rem] 3xl:px-8 3xl:text-base"
+                    className="inline-flex min-h-[3rem] flex-1 items-center justify-center gap-2 rounded-full border border-white/25 bg-black/20 px-4 py-2.5 text-sm font-bold text-[#F8F3EA] transition hover:-translate-y-1 hover:border-[#D89A1C]/70 hover:bg-black/35 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50 sm:flex-none sm:gap-2.5 sm:px-6 3xl:min-h-[3.6rem] 3xl:px-8 3xl:text-base"
                   >
                     <Croissant className="h-4 w-4 3xl:h-5 3xl:w-5" />
                     <span className="whitespace-nowrap">Voir le menu</span>
@@ -183,7 +183,7 @@ export function Hero() {
               </div>
 
               <div
-                className="mt-5 flex items-center gap-2 3xl:mt-7 3xl:gap-3"
+                className="mt-4 flex items-center gap-2 sm:mt-5 3xl:mt-7 3xl:gap-3"
                 aria-label="Images du hero"
               >
                 {heroSlides.map((slide, index) => (

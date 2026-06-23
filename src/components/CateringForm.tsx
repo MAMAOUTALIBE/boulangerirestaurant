@@ -19,7 +19,7 @@ function SubmitButton({ compact = false }: { compact?: boolean }) {
       disabled={pending}
       className={`${compact ? "min-h-9 px-4 py-2 text-sm min-[390px]:min-h-10" : ""} btn-primary w-full disabled:opacity-60`}
     >
-      {pending ? "Envoi…" : compact ? "Recevoir un devis" : "Demander un devis"}
+      {pending ? "Envoi…" : compact ? "Envoyer" : "Demander un devis"}
     </button>
   );
 }
@@ -101,7 +101,7 @@ export function CateringForm() {
             name="message"
             rows={2}
             required
-            placeholder="Projet : date, formule, lieu, budget..."
+            placeholder="Projet : date, formule, lieu..."
             maxLength={240}
             className={compactTextarea}
           />
@@ -114,8 +114,8 @@ export function CateringForm() {
           </p>
         )}
         <SubmitButton compact />
-        <p className="hidden text-center text-[0.72rem] text-muted min-[390px]:block">
-          Réponse sous 48 h · aucun paiement en ligne
+        <p className="text-center text-[0.72rem] text-muted">
+          Réponse sous 48 h
         </p>
       </form>
 

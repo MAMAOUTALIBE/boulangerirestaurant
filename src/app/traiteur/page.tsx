@@ -25,7 +25,7 @@ export default function TraiteurPage() {
       <Header />
       <main className="bg-ink pb-0 pt-20 sm:pt-28">
         <div className="container-page max-w-4xl">
-          <section className="flex flex-col justify-start pt-8 min-[390px]:pt-12 sm:hidden">
+          <section className="flex flex-col justify-start pt-5 min-[390px]:pt-7 sm:hidden">
             <h1 className="flex items-center gap-2 font-display text-[1.72rem] font-bold leading-tight text-cream">
               <ChefHat className="h-6 w-6 shrink-0 text-gold" />
               Service traiteur

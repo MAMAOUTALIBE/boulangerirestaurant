@@ -8,6 +8,8 @@ const field =
   "w-full rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-sm text-cream placeholder:text-muted focus:border-gold/60 focus:outline-none focus:ring-1 focus:ring-gold/40";
 const compactField =
   "h-9 w-full rounded-xl border border-white/15 bg-white/5 px-3 text-[0.8rem] text-cream placeholder:text-muted focus:border-gold/60 focus:outline-none focus:ring-1 focus:ring-gold/40 min-[390px]:h-10 min-[390px]:text-[0.82rem]";
+const compactTextarea =
+  "min-h-12 w-full rounded-xl border border-white/15 bg-white/5 px-3 py-2 text-[0.8rem] text-cream placeholder:text-muted focus:border-gold/60 focus:outline-none focus:ring-1 focus:ring-gold/40 min-[390px]:min-h-14 min-[390px]:text-[0.82rem]";
 
 function SubmitButton({ compact = false }: { compact?: boolean }) {
   const { pending } = useFormStatus();
@@ -127,14 +129,29 @@ export function ReservationForm({
           defaultValue={defaults.guests}
         />
 
+        <div>
+          <label htmlFor="mobile-reservation-notes" className="sr-only">
+            Demande particulière
+          </label>
+          <textarea
+            id="mobile-reservation-notes"
+            name="notes"
+            rows={2}
+            placeholder="Demande particulière"
+            maxLength={180}
+            defaultValue={defaults.notes}
+            className={compactTextarea}
+          />
+        </div>
+
         {state && !state.ok && !state.errors && (
           <p role="alert" className="text-xs text-red-400">
             {state.message}
           </p>
         )}
         <SubmitButton compact />
-        <p className="hidden text-center text-[0.72rem] text-muted min-[390px]:block">
-          Confirmation par email · modification possible
+        <p className="text-center text-[0.72rem] text-muted">
+          Confirmation par email
         </p>
       </form>
 

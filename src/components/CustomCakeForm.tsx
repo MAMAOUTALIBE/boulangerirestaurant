@@ -32,11 +32,7 @@ function SubmitButton({ compact = false }: { compact?: boolean }) {
       disabled={pending}
       className={`${compact ? "min-h-9 px-4 py-2 text-sm min-[390px]:min-h-10" : ""} btn-primary w-full disabled:opacity-60`}
     >
-      {pending
-        ? "Envoi…"
-        : compact
-          ? "Recevoir un devis"
-          : "Envoyer ma demande"}
+      {pending ? "Envoi…" : compact ? "Envoyer" : "Envoyer ma demande"}
     </button>
   );
 }
@@ -137,7 +133,7 @@ export function CustomCakeForm() {
             name="details"
             rows={2}
             required
-            placeholder="Projet : occasion, parfum, décor, message..."
+            placeholder="Projet : occasion, parfum, décor..."
             maxLength={240}
             className={compactTextarea}
           />
@@ -150,9 +146,7 @@ export function CustomCakeForm() {
           </p>
         )}
         <SubmitButton compact />
-        <p className="hidden text-center text-[0.72rem] text-muted min-[390px]:block">
-          Réponse rapide · aucun paiement en ligne
-        </p>
+        <p className="text-center text-[0.72rem] text-muted">Réponse rapide</p>
       </form>
 
       <form action={formAction} className="hidden space-y-4 sm:block">

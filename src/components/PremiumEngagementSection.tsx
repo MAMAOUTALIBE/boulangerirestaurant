@@ -169,16 +169,16 @@ function MobileFooter() {
   ] as const;
 
   return (
-    <footer className="border-t border-white/[0.08] bg-[radial-gradient(circle_at_top,rgba(245,158,11,0.08),transparent_34%),linear-gradient(180deg,#080808,#050505)] px-5 pb-7 pt-10 sm:hidden">
+    <footer className="border-t border-white/[0.08] bg-[radial-gradient(circle_at_top,rgba(245,158,11,0.08),transparent_34%),linear-gradient(180deg,#080808,#050505)] px-4 pb-5 pt-7 sm:hidden">
       <Link
         href="/"
         aria-label="Boulangerie Artisanale - Accueil"
         className="mx-auto grid w-fit justify-items-center text-center"
       >
-        <span className="grid h-[5.25rem] w-[5.25rem] place-items-center rounded-[1.65rem] border-2 border-gold bg-black/30 text-gold shadow-[0_0_34px_-18px_rgba(245,158,11,0.95)]">
+        <span className="grid h-16 w-16 place-items-center rounded-2xl border border-gold bg-black/30 text-gold shadow-[0_0_34px_-18px_rgba(245,158,11,0.95)]">
           <svg
             viewBox="0 0 48 48"
-            className="h-12 w-12"
+            className="h-10 w-10"
             fill="none"
             aria-hidden
           >
@@ -200,22 +200,22 @@ function MobileFooter() {
             />
           </svg>
         </span>
-        <span className="mt-4 font-display text-4xl font-bold leading-none text-cream">
+        <span className="mt-3 font-display text-3xl font-bold leading-none text-cream">
           {siteConfig.shortName}
         </span>
       </Link>
 
-      <p className="text-cream/72 mx-auto mt-5 max-w-xs text-center text-lg leading-relaxed">
+      <p className="mx-auto mt-3 max-w-xs text-center text-sm leading-5 text-cream/70">
         Pain frais, viennoiseries pur beurre et pâtisseries maison.
       </p>
 
-      <p className="mt-8 text-center text-sm font-bold uppercase tracking-[0.42em] text-gold">
+      <p className="mt-5 text-center text-xs font-bold uppercase tracking-[0.32em] text-gold">
         Suivez-nous
       </p>
 
       <nav
         aria-label="Réseaux sociaux"
-        className="mt-5 flex items-center justify-center gap-5"
+        className="mt-3 flex items-center justify-center gap-3"
       >
         {socials.map(({ label, href }) => (
           <a
@@ -224,32 +224,32 @@ function MobileFooter() {
             target="_blank"
             rel="noopener noreferrer"
             aria-label={label}
-            className="grid h-14 w-14 place-items-center rounded-full border border-white/15 bg-white/[0.02] text-cream/85 shadow-[0_16px_36px_-28px_rgba(255,255,255,0.7)] transition hover:border-gold/60 hover:text-gold"
+            className="grid h-11 w-11 place-items-center rounded-full border border-white/15 bg-white/[0.02] text-cream/85 shadow-[0_16px_36px_-28px_rgba(255,255,255,0.7)] transition hover:border-gold/60 hover:text-gold"
           >
-            <span className="[&_svg]:h-7 [&_svg]:w-7">
+            <span className="[&_svg]:h-5 [&_svg]:w-5">
               <SocialIcon label={label} />
             </span>
           </a>
         ))}
       </nav>
 
-      <div className="bg-white/12 my-8 h-px" />
+      <div className="my-5 h-px bg-white/10" />
 
       <FooterMobileHeading>Liens rapides</FooterMobileHeading>
       <nav
         aria-label="Liens rapides du pied de page"
-        className="mt-6 grid gap-x-4 gap-y-5 min-[380px]:grid-cols-[0.8fr_1.2fr]"
+        className="mt-4 grid grid-cols-2 gap-x-4 gap-y-3"
       >
         {quickLinks.map((column, columnIndex) => (
-          <ul key={columnIndex} className="space-y-5">
+          <ul key={columnIndex} className="space-y-3">
             {column.map((link) => (
               <li key={link.href}>
                 <Link
                   href={link.href}
-                  className="group flex min-h-8 items-center justify-between gap-2 text-base text-cream transition hover:text-gold"
+                  className="group flex min-h-7 items-center justify-between gap-2 text-sm text-cream transition hover:text-gold"
                 >
                   <span className="min-w-0">{link.label}</span>
-                  <ChevronRight className="h-5 w-5 shrink-0 text-cream transition group-hover:translate-x-0.5 group-hover:text-gold" />
+                  <ChevronRight className="h-4 w-4 shrink-0 text-cream transition group-hover:translate-x-0.5 group-hover:text-gold" />
                 </Link>
               </li>
             ))}
@@ -257,44 +257,44 @@ function MobileFooter() {
         ))}
       </nav>
 
-      <div className="bg-white/12 my-8 h-px" />
+      <div className="my-5 h-px bg-white/10" />
 
       <FooterMobileHeading>Informations</FooterMobileHeading>
-      <div className="text-cream/68 mt-6 space-y-5 text-lg leading-relaxed">
+      <div className="mt-4 space-y-3 text-sm leading-5 text-cream/70">
         <a
           href={mapsHref}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex gap-4"
+          className="flex gap-3"
         >
-          <MapPin className="mt-1 h-6 w-6 shrink-0 text-gold" />
+          <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-gold" />
           <span>{siteConfig.contact.address}</span>
         </a>
-        <a href={phoneHref} className="flex gap-4">
-          <Phone className="mt-1 h-6 w-6 shrink-0 text-gold" />
+        <a href={phoneHref} className="flex gap-3">
+          <Phone className="mt-0.5 h-4 w-4 shrink-0 text-gold" />
           <span>{siteConfig.contact.phone}</span>
         </a>
-        <a href={emailHref} className="flex gap-4">
-          <Mail className="mt-1 h-6 w-6 shrink-0 text-gold" />
+        <a href={emailHref} className="flex gap-3">
+          <Mail className="mt-0.5 h-4 w-4 shrink-0 text-gold" />
           <span>{siteConfig.contact.email}</span>
         </a>
-        <div className="flex gap-4">
-          <Clock className="mt-1 h-6 w-6 shrink-0 text-gold" />
+        <div className="flex gap-3">
+          <Clock className="mt-0.5 h-4 w-4 shrink-0 text-gold" />
           <span>Lun - Dim : 7h00 - 19h30</span>
         </div>
       </div>
 
-      <section className="border-white/12 mt-8 rounded-[1.35rem] border bg-white/[0.035] p-5 shadow-[0_24px_70px_-58px_rgba(255,255,255,0.7)]">
+      <section className="mt-5 rounded-2xl border border-white/10 bg-white/[0.035] p-3 shadow-[0_24px_70px_-58px_rgba(255,255,255,0.7)]">
         <FooterMobileHeading>Newsletter</FooterMobileHeading>
-        <p className="text-cream/78 mt-4 text-base leading-relaxed">
+        <p className="text-cream/78 mt-2 text-sm leading-5">
           Recevez nos offres, fournées spéciales et nouveautés
         </p>
-        <div className="[&_button]:h-14 [&_button]:w-14 [&_button]:shrink-0 [&_button]:px-0 [&_input]:h-14 [&_input]:bg-black/35 [&_input]:text-base">
+        <div className="[&_button]:h-11 [&_button]:w-11 [&_button]:shrink-0 [&_button]:px-0 [&_input]:h-11 [&_input]:bg-black/35 [&_input]:text-sm">
           <NewsletterForm />
         </div>
       </section>
 
-      <p className="mt-6 flex items-center justify-center gap-2 text-center text-sm text-muted">
+      <p className="mt-4 flex items-center justify-center gap-2 text-center text-xs text-muted">
         <Lock className="h-4 w-4" />
         <span>© 2026 {siteConfig.shortName} · Tous droits réservés</span>
       </p>
@@ -304,7 +304,7 @@ function MobileFooter() {
 
 function FooterMobileHeading({ children }: { children: React.ReactNode }) {
   return (
-    <h3 className="text-sm font-bold uppercase tracking-[0.42em] text-gold">
+    <h3 className="text-xs font-bold uppercase tracking-[0.28em] text-gold">
       {children}
     </h3>
   );
@@ -320,7 +320,7 @@ export async function PremiumEngagementSection() {
   return (
     <section
       id="avis-clients"
-      className="scroll-mt-24 bg-[#050505] px-4 py-6 text-cream sm:px-6 lg:px-8"
+      className="scroll-mt-24 bg-[#050505] px-4 py-4 text-cream sm:px-6 sm:py-6 lg:px-8"
     >
       <div className="mx-auto max-w-[1600px] overflow-hidden rounded-3xl border border-white/[0.08] bg-[#080808] shadow-[0_30px_80px_-60px_rgba(0,0,0,0.95)]">
         <div className="px-4 pb-5 pt-4 sm:px-8 lg:px-8">

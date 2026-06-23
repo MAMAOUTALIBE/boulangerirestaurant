@@ -4,6 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { Header } from "@/components/Header";
+import { Footer } from "@/components/Footer";
 import { getDishWithOptions } from "@/lib/dishes";
 import { DishOrderPanel } from "@/components/DishOrderPanel";
 import { formatPrice } from "@/lib/utils";
@@ -85,7 +86,7 @@ export default async function DishPage({
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <Header />
-      <main className="min-h-screen bg-ink pb-20 pt-28">
+      <main className="bg-ink pb-4 pt-24 sm:pb-12 sm:pt-28">
         <div className="container-page max-w-4xl">
           <Link
             href="/menu"
@@ -95,8 +96,8 @@ export default async function DishPage({
             Retour au menu
           </Link>
 
-          <div className="mt-6 grid gap-8 lg:grid-cols-2">
-            <div className="relative aspect-square overflow-hidden rounded-3xl">
+          <div className="mt-4 grid gap-4 sm:mt-6 sm:gap-8 lg:grid-cols-2">
+            <div className="relative aspect-[4/3] overflow-hidden rounded-2xl sm:aspect-square sm:rounded-3xl">
               <Image
                 src={dish.image}
                 alt={dish.name}
@@ -107,11 +108,13 @@ export default async function DishPage({
               />
             </div>
             <div>
-              <h1 className="font-display text-3xl font-bold text-cream sm:text-4xl">
+              <h1 className="font-display text-2xl font-bold text-cream sm:text-4xl">
                 {dish.name}
               </h1>
-              <p className="mt-2 text-muted">{dish.description}</p>
-              <p className="mt-2 font-display text-2xl font-bold text-gold">
+              <p className="mt-1.5 text-sm leading-5 text-muted sm:mt-2 sm:text-base sm:leading-6">
+                {dish.description}
+              </p>
+              <p className="mt-2 font-display text-xl font-bold text-gold sm:text-2xl">
                 {formatPrice(dish.price)}
               </p>
 
@@ -120,7 +123,7 @@ export default async function DishPage({
                   Ce produit est actuellement épuisé.
                 </p>
               ) : (
-                <div className="mt-6">
+                <div className="mt-4 sm:mt-6">
                   <DishOrderPanel
                     dish={{
                       slug: dish.slug,
@@ -136,6 +139,7 @@ export default async function DishPage({
           </div>
         </div>
       </main>
+      <Footer />
     </>
   );
 }

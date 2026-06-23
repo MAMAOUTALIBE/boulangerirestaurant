@@ -63,7 +63,7 @@ export default async function BoutiqueDeSaisonPage() {
       <Header />
       <main className="bg-ink pb-0 pt-20 sm:pt-28">
         <div className="container-page max-w-5xl">
-          <section className="pt-8 min-[390px]:pt-12 sm:hidden">
+          <section className="pt-5 min-[390px]:pt-7 sm:hidden">
             <div className="flex items-start justify-between gap-3">
               <div>
                 <h1 className="flex items-center gap-2 font-display text-[1.72rem] font-bold leading-tight text-cream">
@@ -236,7 +236,7 @@ function MobileSeasonalProduct({
             </h2>
             {featured && <Gift className="mt-0.5 h-4 w-4 shrink-0 text-gold" />}
           </div>
-          <p className="text-cream/72 mt-1 line-clamp-2 text-[0.78rem] leading-4">
+          <p className="mt-1 line-clamp-2 text-[0.78rem] leading-4 text-cream/70">
             {product.description}
           </p>
           <div className="mt-2 flex flex-wrap gap-1.5">
