@@ -19,7 +19,7 @@ export default async function MenuPage() {
   return (
     <>
       <Header />
-      <main className="bg-ink pb-20 text-cream">
+      <main className="bg-ink pb-0 text-cream">
         {/* Hero sombre, cohérent avec le reste du site, pour donner de la respiration */}
         <section className="relative overflow-hidden bg-hero-radial pb-6 pt-24 sm:pb-12 sm:pt-32">
           <div className="absolute inset-0 bg-kente opacity-50" aria-hidden />

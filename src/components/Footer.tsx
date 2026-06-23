@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
-import { MapPin, Phone, Mail, Clock } from "lucide-react";
+import { ChevronRight, Clock, Lock, Mail, MapPin, Phone } from "lucide-react";
+import Link from "next/link";
 import { Logo } from "@/components/Logo";
 import { footerLinks } from "@/data/services";
 import { NewsletterForm } from "@/components/NewsletterForm";
@@ -80,6 +81,25 @@ const socials = [
   { label: "Telegram", Icon: IconTelegram, href: siteConfig.socials.telegram },
 ].filter((item) => Boolean(item.href));
 
+const mobileSocials = socials.filter(({ label }) => label !== "Telegram");
+
+const mobileQuickLinks = [
+  [
+    { label: "Accueil", href: "/" },
+    { label: "Menu", href: "/menu" },
+    { label: "Commander", href: "/commander" },
+    { label: "Réservation", href: "/reservation" },
+    { label: "Contact", href: "/contact" },
+  ],
+  [
+    { label: "Boutique de saison", href: "/boutique-de-saison" },
+    { label: "Sur-mesure", href: "/sur-mesure" },
+    { label: "Traiteur", href: "/traiteur" },
+    { label: "Avis", href: "/#avis-clients" },
+    { label: "À propos", href: "/#a-propos" },
+  ],
+] as const;
+
 const contact = [
   {
     Icon: MapPin,
@@ -98,7 +118,8 @@ const payments = ["VISA", "Mastercard", "PayPal", "Apple Pay"];
 export function Footer() {
   return (
     <footer className="border-t border-white/10 bg-ink-soft">
-      <div className="container-page py-14">
+      <MobileFooter />
+      <div className="container-page hidden py-14 sm:block">
         <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-4">
           {/* Marque + socials */}
           <div>
@@ -212,6 +233,144 @@ export function Footer() {
         </div>
       </div>
     </footer>
+  );
+}
+
+function MobileFooter() {
+  return (
+    <div className="sm:hidden">
+      <div className="mx-auto max-w-[48rem] border-x border-white/[0.08] bg-[radial-gradient(circle_at_top,rgba(245,158,11,0.08),transparent_34%),linear-gradient(180deg,#080808,#050505)] px-5 pb-7 pt-10">
+        <Link
+          href="/"
+          aria-label="Boulangerie Artisanale — Accueil"
+          className="mx-auto grid w-fit justify-items-center text-center"
+        >
+          <span className="grid h-[5.25rem] w-[5.25rem] place-items-center rounded-[1.65rem] border-2 border-gold bg-black/30 text-gold shadow-[0_0_34px_-18px_rgba(245,158,11,0.95)]">
+            <svg
+              viewBox="0 0 48 48"
+              className="h-12 w-12"
+              fill="none"
+              aria-hidden="true"
+            >
+              <path
+                d="M10 29c0-8 6-15 14-15s14 7 14 15c0 7-5.7 12-14 12S10 36 10 29Z"
+                stroke="currentColor"
+                strokeWidth="2.4"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M17 29c0-4 3-8 7-10M24 19c4 2 7 6 7 10M14 31h20"
+                stroke="currentColor"
+                strokeWidth="2.4"
+                strokeLinecap="round"
+              />
+              <path
+                d="M18 10c1.5-3 3.5-4 6-4s4.5 1 6 4"
+                stroke="currentColor"
+                strokeWidth="2.4"
+                strokeLinecap="round"
+              />
+            </svg>
+          </span>
+          <span className="mt-4 font-display text-4xl font-bold leading-none text-cream">
+            {siteConfig.shortName}
+          </span>
+        </Link>
+
+        <p className="text-cream/72 mx-auto mt-5 max-w-xs text-center text-lg leading-relaxed">
+          Pain frais, viennoiseries pur beurre et pâtisseries maison.
+        </p>
+
+        <p className="mt-8 text-center text-sm font-bold uppercase tracking-[0.42em] text-gold">
+          Suivez-nous
+        </p>
+        <div className="mt-5 flex justify-center gap-5">
+          {mobileSocials.map(({ label, Icon, href }) => (
+            <a
+              key={label}
+              href={href}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={`Suivre ${siteConfig.name} sur ${label}`}
+              title={label}
+              className="grid h-14 w-14 place-items-center rounded-full border border-white/15 bg-white/[0.02] text-cream/85 shadow-[0_16px_36px_-28px_rgba(255,255,255,0.7)] transition hover:border-gold/60 hover:text-gold"
+            >
+              <span className="[&_svg]:h-7 [&_svg]:w-7">
+                <Icon />
+              </span>
+            </a>
+          ))}
+        </div>
+
+        <div className="bg-white/12 my-8 h-px" />
+
+        <FooterMobileHeading>Liens rapides</FooterMobileHeading>
+        <nav
+          aria-label="Liens rapides du pied de page"
+          className="mt-6 grid gap-x-4 gap-y-5 min-[380px]:grid-cols-[0.8fr_1.2fr]"
+        >
+          {mobileQuickLinks.map((column, columnIndex) => (
+            <ul key={columnIndex} className="space-y-5">
+              {column.map((link) => (
+                <li key={link.href}>
+                  <a
+                    href={link.href}
+                    className="group flex min-h-8 items-center justify-between gap-2 text-base text-cream transition hover:text-gold"
+                  >
+                    <span className="min-w-0">{link.label}</span>
+                    <ChevronRight className="h-5 w-5 shrink-0 text-cream transition group-hover:translate-x-0.5 group-hover:text-gold" />
+                  </a>
+                </li>
+              ))}
+            </ul>
+          ))}
+        </nav>
+
+        <div className="bg-white/12 my-8 h-px" />
+
+        <FooterMobileHeading>Informations</FooterMobileHeading>
+        <ul className="mt-6 space-y-5">
+          {contact.map(({ Icon, lines, href, external }, i) => (
+            <li
+              key={i}
+              className="text-cream/68 flex items-start gap-4 text-lg"
+            >
+              <Icon className="mt-1 h-6 w-6 shrink-0 text-gold" />
+              <ContactText href={href} external={external}>
+                {lines.map((l) => (
+                  <span key={l} className="block leading-relaxed">
+                    {l}
+                  </span>
+                ))}
+              </ContactText>
+            </li>
+          ))}
+        </ul>
+
+        <section className="border-white/12 mt-8 rounded-[1.35rem] border bg-white/[0.035] p-5 shadow-[0_24px_70px_-58px_rgba(255,255,255,0.7)]">
+          <FooterMobileHeading>Newsletter</FooterMobileHeading>
+          <p className="text-cream/78 mt-4 text-base leading-relaxed">
+            Recevez nos offres, fournées spéciales et nouveautés
+          </p>
+          <div className="[&_button]:h-14 [&_button]:w-14 [&_button]:shrink-0 [&_button]:px-0 [&_input]:h-14 [&_input]:bg-black/35 [&_input]:text-base">
+            <NewsletterForm />
+          </div>
+        </section>
+
+        <p className="mt-6 flex items-center justify-center gap-2 text-center text-sm text-muted">
+          <Lock className="h-4 w-4" />
+          <span>© 2026 {siteConfig.shortName} · Tous droits réservés</span>
+        </p>
+      </div>
+    </div>
+  );
+}
+
+function FooterMobileHeading({ children }: { children: ReactNode }) {
+  return (
+    <h4 className="text-sm font-bold uppercase tracking-[0.42em] text-gold">
+      {children}
+    </h4>
   );
 }
 

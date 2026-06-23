@@ -6,6 +6,14 @@ import { requestCustomCake, type ActionState } from "@/app/actions";
 
 const field =
   "w-full rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-sm text-cream placeholder:text-muted focus:border-gold/60 focus:outline-none focus:ring-1 focus:ring-gold/40";
+const compactField =
+  "h-9 w-full rounded-xl border border-white/15 bg-white/5 px-3 text-[0.8rem] text-cream placeholder:text-muted focus:border-gold/60 focus:outline-none focus:ring-1 focus:ring-gold/40 min-[390px]:h-10 min-[390px]:text-[0.82rem]";
+const compactTextarea =
+  "min-h-14 w-full rounded-xl border border-white/15 bg-white/5 px-3 py-2 text-[0.8rem] text-cream placeholder:text-muted focus:border-gold/60 focus:outline-none focus:ring-1 focus:ring-gold/40 min-[390px]:min-h-[4.25rem] min-[390px]:text-[0.82rem]";
+const mobileHiddenDefaults = {
+  occasion: "Sur-mesure",
+  flavor: "À définir avec la boulangerie",
+};
 
 const occasions = [
   "Anniversaire",
@@ -16,15 +24,19 @@ const occasions = [
   "Autre",
 ];
 
-function SubmitButton() {
+function SubmitButton({ compact = false }: { compact?: boolean }) {
   const { pending } = useFormStatus();
   return (
     <button
       type="submit"
       disabled={pending}
-      className="btn-primary w-full disabled:opacity-60"
+      className={`${compact ? "min-h-9 px-4 py-2 text-sm min-[390px]:min-h-10" : ""} btn-primary w-full disabled:opacity-60`}
     >
-      {pending ? "Envoi…" : "Envoyer ma demande"}
+      {pending
+        ? "Envoi…"
+        : compact
+          ? "Recevoir un devis"
+          : "Envoyer ma demande"}
     </button>
   );
 }
@@ -39,7 +51,7 @@ export function CustomCakeForm() {
     return (
       <div
         role="status"
-        className="rounded-2xl border border-green-500/30 bg-green-500/10 p-6 text-center text-green-300"
+        className="rounded-2xl border border-green-500/30 bg-green-500/10 p-4 text-center text-sm text-green-300 sm:p-6 sm:text-base"
       >
         {state.message}
       </div>
@@ -47,135 +59,297 @@ export function CustomCakeForm() {
   }
 
   return (
-    <form action={formAction} className="space-y-4">
-      <input
-        type="text"
-        name="company"
-        tabIndex={-1}
-        autoComplete="off"
-        aria-hidden="true"
-        className="absolute left-[-9999px] h-0 w-0 opacity-0"
-      />
-      <div className="grid gap-4 sm:grid-cols-2">
-        <Field id="name" label="Votre nom" error={state?.errors?.name} />
-        <Field
-          id="phone"
-          label="Téléphone"
-          type="tel"
-          error={state?.errors?.phone}
+    <>
+      <form
+        action={formAction}
+        className="space-y-1.5 min-[390px]:space-y-2 sm:hidden"
+      >
+        <AntiSpamInput />
+        <input
+          type="hidden"
+          name="occasion"
+          value={mobileHiddenDefaults.occasion}
         />
-      </div>
-      <Field
-        id="email"
-        label="Email"
-        type="email"
-        error={state?.errors?.email}
-      />
+        <input
+          type="hidden"
+          name="flavor"
+          value={mobileHiddenDefaults.flavor}
+        />
 
-      <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid grid-cols-2 gap-2">
+          <CompactField
+            id="mobile-cake-name"
+            name="name"
+            label="Votre nom"
+            placeholder="Nom"
+            autoComplete="name"
+            error={state?.errors?.name}
+          />
+          <CompactField
+            id="mobile-cake-phone"
+            name="phone"
+            label="Téléphone"
+            type="tel"
+            placeholder="Téléphone"
+            autoComplete="tel"
+            inputMode="tel"
+            error={state?.errors?.phone}
+          />
+        </div>
+
+        <CompactField
+          id="mobile-cake-email"
+          name="email"
+          label="Email"
+          type="email"
+          placeholder="Email"
+          autoComplete="email"
+          inputMode="email"
+          error={state?.errors?.email}
+        />
+
+        <div className="grid grid-cols-2 gap-2">
+          <CompactField
+            id="mobile-cake-pickup-date"
+            name="pickupDate"
+            label="Date de retrait"
+            type="date"
+            error={state?.errors?.pickupDate}
+          />
+          <CompactField
+            id="mobile-cake-servings"
+            name="servings"
+            label="Nombre de parts"
+            type="number"
+            placeholder="Parts"
+            autoComplete="off"
+            inputMode="numeric"
+            error={state?.errors?.servings}
+          />
+        </div>
+
         <div>
-          <label
-            htmlFor="occasion"
-            className="mb-1.5 block text-sm text-cream/80"
-          >
-            Occasion
+          <label htmlFor="mobile-cake-details" className="sr-only">
+            Votre projet
           </label>
-          <select id="occasion" name="occasion" required className={field}>
-            {occasions.map((o) => (
-              <option key={o} value={o} className="text-ink">
-                {o}
-              </option>
-            ))}
-          </select>
-          {state?.errors?.occasion && (
-            <p className="mt-1 text-xs text-red-400">{state.errors.occasion}</p>
-          )}
+          <textarea
+            id="mobile-cake-details"
+            name="details"
+            rows={2}
+            required
+            placeholder="Projet : occasion, parfum, décor, message..."
+            maxLength={240}
+            className={compactTextarea}
+          />
+          <FieldError error={state?.errors?.details} />
+        </div>
+
+        {state && !state.ok && !state.errors && (
+          <p role="alert" className="text-xs text-red-400">
+            {state.message}
+          </p>
+        )}
+        <SubmitButton compact />
+        <p className="hidden text-center text-[0.72rem] text-muted min-[390px]:block">
+          Réponse rapide · aucun paiement en ligne
+        </p>
+      </form>
+
+      <form action={formAction} className="hidden space-y-4 sm:block">
+        <AntiSpamInput />
+        <div className="grid gap-4 sm:grid-cols-2">
+          <Field id="name" label="Votre nom" error={state?.errors?.name} />
+          <Field
+            id="phone"
+            label="Téléphone"
+            type="tel"
+            error={state?.errors?.phone}
+          />
         </div>
         <Field
-          id="servings"
-          label="Nombre de parts"
-          type="number"
-          error={state?.errors?.servings}
+          id="email"
+          label="Email"
+          type="email"
+          error={state?.errors?.email}
         />
-      </div>
 
-      <Field
-        id="flavor"
-        label="Parfum / base souhaité (ex : chocolat, fraisier…)"
-        error={state?.errors?.flavor}
-      />
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div>
+            <label
+              htmlFor="occasion"
+              className="mb-1.5 block text-sm text-cream/80"
+            >
+              Occasion
+            </label>
+            <select id="occasion" name="occasion" required className={field}>
+              {occasions.map((o) => (
+                <option key={o} value={o} className="text-ink">
+                  {o}
+                </option>
+              ))}
+            </select>
+            {state?.errors?.occasion && (
+              <p className="mt-1 text-xs text-red-400">
+                {state.errors.occasion}
+              </p>
+            )}
+          </div>
+          <Field
+            id="servings"
+            label="Nombre de parts"
+            type="number"
+            error={state?.errors?.servings}
+          />
+        </div>
 
-      <div className="grid gap-4 sm:grid-cols-2">
         <Field
-          id="pickupDate"
-          label="Date de retrait"
-          type="date"
-          error={state?.errors?.pickupDate}
+          id="flavor"
+          label="Parfum / base souhaité (ex : chocolat, fraisier…)"
+          error={state?.errors?.flavor}
         />
+
+        <div className="grid gap-4 sm:grid-cols-2">
+          <Field
+            id="pickupDate"
+            label="Date de retrait"
+            type="date"
+            error={state?.errors?.pickupDate}
+          />
+          <Field
+            id="pickupTime"
+            label="Heure de retrait (optionnel)"
+            type="time"
+            required={false}
+            error={state?.errors?.pickupTime}
+          />
+        </div>
+
         <Field
-          id="pickupTime"
-          label="Heure de retrait (optionnel)"
-          type="time"
+          id="messageOnCake"
+          label="Message à écrire sur le gâteau (optionnel)"
           required={false}
-          error={state?.errors?.pickupTime}
+          error={state?.errors?.messageOnCake}
         />
-      </div>
 
-      <Field
-        id="messageOnCake"
-        label="Message à écrire sur le gâteau (optionnel)"
-        required={false}
-        error={state?.errors?.messageOnCake}
-      />
+        <div className="grid gap-4 sm:grid-cols-2">
+          <Field
+            id="budget"
+            label="Budget indicatif (optionnel)"
+            required={false}
+            error={state?.errors?.budget}
+          />
+          <Field
+            id="allergies"
+            label="Allergies (optionnel)"
+            required={false}
+            error={state?.errors?.allergies}
+          />
+        </div>
 
-      <div className="grid gap-4 sm:grid-cols-2">
         <Field
-          id="budget"
-          label="Budget indicatif (optionnel)"
+          id="inspirationUrl"
+          label="Lien d'une photo d'inspiration (Pinterest, Instagram…)"
+          type="url"
           required={false}
-          error={state?.errors?.budget}
+          placeholder="https://…"
+          error={state?.errors?.inspirationUrl}
         />
-        <Field
-          id="allergies"
-          label="Allergies (optionnel)"
-          required={false}
-          error={state?.errors?.allergies}
-        />
-      </div>
 
-      <Field
-        id="inspirationUrl"
-        label="Lien d'une photo d'inspiration (Pinterest, Instagram…)"
-        type="url"
-        required={false}
-        placeholder="https://…"
-        error={state?.errors?.inspirationUrl}
-      />
+        <div>
+          <label
+            htmlFor="details"
+            className="mb-1.5 block text-sm text-cream/80"
+          >
+            Décrivez le gâteau de vos rêves
+          </label>
+          <textarea
+            id="details"
+            name="details"
+            rows={4}
+            required
+            className={field}
+          />
+          {state?.errors?.details && (
+            <p className="mt-1 text-xs text-red-400">{state.errors.details}</p>
+          )}
+        </div>
 
-      <div>
-        <label htmlFor="details" className="mb-1.5 block text-sm text-cream/80">
-          Décrivez le gâteau de vos rêves
-        </label>
-        <textarea
-          id="details"
-          name="details"
-          rows={4}
-          required
-          className={field}
-        />
-        {state?.errors?.details && (
-          <p className="mt-1 text-xs text-red-400">{state.errors.details}</p>
+        {state && !state.ok && !state.errors && (
+          <p role="alert" className="text-sm text-red-400">
+            {state.message}
+          </p>
         )}
-      </div>
-
-      {state && !state.ok && !state.errors && (
-        <p role="alert" className="text-sm text-red-400">
-          {state.message}
-        </p>
-      )}
-      <SubmitButton />
-    </form>
+        <SubmitButton />
+      </form>
+    </>
   );
+}
+
+function AntiSpamInput() {
+  return (
+    <input
+      type="text"
+      name="company"
+      tabIndex={-1}
+      autoComplete="off"
+      aria-hidden="true"
+      className="absolute left-[-9999px] h-0 w-0 opacity-0"
+    />
+  );
+}
+
+function CompactField({
+  id,
+  name,
+  label,
+  type = "text",
+  placeholder,
+  autoComplete,
+  inputMode,
+  error,
+}: {
+  id: string;
+  name: string;
+  label: string;
+  type?: string;
+  placeholder?: string;
+  autoComplete?: string;
+  inputMode?:
+    | "none"
+    | "text"
+    | "tel"
+    | "url"
+    | "email"
+    | "numeric"
+    | "decimal"
+    | "search";
+  error?: string;
+}) {
+  return (
+    <div>
+      <label htmlFor={id} className="sr-only">
+        {label}
+      </label>
+      <input
+        id={id}
+        name={name}
+        type={type}
+        required
+        placeholder={placeholder}
+        min={type === "number" ? 1 : undefined}
+        autoComplete={autoComplete}
+        inputMode={inputMode}
+        className={compactField}
+      />
+      <FieldError error={error} />
+    </div>
+  );
+}
+
+function FieldError({ error }: { error?: string }) {
+  if (!error) return null;
+
+  return <p className="mt-1 text-[0.68rem] text-red-400">{error}</p>;
 }
 
 function Field({

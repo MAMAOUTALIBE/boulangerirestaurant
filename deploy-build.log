@@ -1,0 +1,373 @@
+==> Redéploiement boulangerie -> https://boulangerie.lodene.cloud (root@213.130.144.215)
+==> 1/4  Vérifications locales (typecheck + lint)
+
+> boulangerie@0.1.0 typecheck
+> tsc --noEmit
+
+
+> boulangerie@0.1.0 lint
+> eslint .
+
+==> 2/4  Synchronisation du code vers le VPS (rsync)
+==> 3/4  Rebuild + redéploiement sur le VPS (migrations auto)
+ Image boulangerie-app Building 
+ Image boulangerie-migrate Building 
+#1 [internal] load local bake definitions
+#1 reading from stdin 1.27kB done
+#1 DONE 0.0s
+
+#2 [app internal] load build definition from Dockerfile
+#2 transferring dockerfile: 2.13kB done
+#2 DONE 0.0s
+
+#3 [migrate internal] load metadata for docker.io/library/node:20-alpine
+#3 DONE 0.6s
+
+#4 [app internal] load .dockerignore
+#4 transferring context: 163B done
+#4 DONE 0.0s
+
+#5 [migrate base 1/3] FROM docker.io/library/node:20-alpine@sha256:fb4cd12c85ee03686f6af5362a0b0d56d50c58a04632e6c0fb8363f609372293
+#5 resolve docker.io/library/node:20-alpine@sha256:fb4cd12c85ee03686f6af5362a0b0d56d50c58a04632e6c0fb8363f609372293 0.0s done
+#5 DONE 0.0s
+
+#6 [migrate internal] load build context
+#6 transferring context: 20.89kB 0.0s done
+#6 DONE 0.0s
+
+#7 [migrate base 2/3] RUN apk add --no-cache libc6-compat openssl
+#7 CACHED
+
+#8 [migrate base 3/3] WORKDIR /app
+#8 CACHED
+
+#9 [migrate deps 1/2] COPY package.json package-lock.json ./
+#9 CACHED
+
+#10 [migrate deps 2/2] RUN npm ci --ignore-scripts
+#10 CACHED
+
+#11 [migrate builder 1/3] COPY --from=deps /app/node_modules ./node_modules
+#11 CACHED
+
+#12 [migrate builder 2/3] COPY . .
+#12 DONE 0.1s
+
+#13 [app builder 3/3] RUN npm run build
+#13 0.702 
+#13 0.702 > boulangerie@0.1.0 build
+#13 0.702 > prisma generate && next build && rm -rf .next/standalone/public .next/standalone/.next/static && mkdir -p .next/standalone/.next && cp -R public .next/standalone/public && cp -R .next/static .next/standalone/.next/static
+#13 0.702 
+#13 1.723 warn The configuration property `package.json#prisma` is deprecated and will be removed in Prisma 7. Please migrate to a Prisma config file (e.g., `prisma.config.ts`).
+#13 1.723 For more information, see: https://pris.ly/prisma-config
+#13 1.723 
+#13 2.636 Prisma schema loaded from prisma/schema.prisma
+#13 3.406 
+#13 3.406 ✔ Generated Prisma Client (v6.19.3) to ./node_modules/@prisma/client in 331ms
+#13 3.406 
+#13 3.406 Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+#13 3.406 
+#13 3.406 Tip: Want to turn off tips and other hints? https://pris.ly/tip-4-nohints
+#13 3.406 
+#13 4.000 ▲ Next.js 16.2.6 (Turbopack)
+#13 4.001 
+#13 4.038   Creating an optimized production build ...
+#13 ...
+
+#14 [migrate builder 3/3] RUN npm run build
+#14 0.717 
+#14 0.717 > boulangerie@0.1.0 build
+#14 0.717 > prisma generate && next build && rm -rf .next/standalone/public .next/standalone/.next/static && mkdir -p .next/standalone/.next && cp -R public .next/standalone/public && cp -R .next/static .next/standalone/.next/static
+#14 0.717 
+#14 1.722 warn The configuration property `package.json#prisma` is deprecated and will be removed in Prisma 7. Please migrate to a Prisma config file (e.g., `prisma.config.ts`).
+#14 1.722 For more information, see: https://pris.ly/prisma-config
+#14 1.722 
+#14 2.562 Prisma schema loaded from prisma/schema.prisma
+#14 3.341 
+#14 3.341 ✔ Generated Prisma Client (v6.19.3) to ./node_modules/@prisma/client in 326ms
+#14 3.341 
+#14 3.341 Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+#14 3.341 
+#14 3.341 Tip: Need your database queries to be 1000x faster? Accelerate offers you that and more: https://pris.ly/tip-2-accelerate
+#14 3.341 
+#14 3.932 ▲ Next.js 16.2.6 (Turbopack)
+#14 3.934 
+#14 3.980   Creating an optimized production build ...
+#14 ...
+
+#13 [app builder 3/3] RUN npm run build
+#13 15.71 ✓ Compiled successfully in 11.4s
+#13 15.71   Running TypeScript ...
+#13 ...
+
+#14 [migrate builder 3/3] RUN npm run build
+#14 16.62 ✓ Compiled successfully in 12.4s
+#14 16.62   Running TypeScript ...
+#14 ...
+
+#13 [app builder 3/3] RUN npm run build
+#13 30.34   Finished TypeScript in 14.6s ...
+#13 30.35   Collecting page data using 7 workers ...
+#13 32.00   Generating static pages using 7 workers (0/19) ...
+#13 32.16   Generating static pages using 7 workers (4/19) 
+#13 32.65   Generating static pages using 7 workers (9/19) 
+#13 32.69   Generating static pages using 7 workers (14/19) 
+#13 32.73 prisma:error 
+#13 32.73 Invalid `prisma.dish.findMany()` invocation:
+#13 32.73 
+#13 32.73 
+#13 32.73 error: Environment variable not found: DATABASE_URL.
+#13 32.73   -->  schema.prisma:8
+#13 32.73    | 
+#13 32.73  7 |   provider = "postgresql"
+#13 32.73  8 |   url      = env("DATABASE_URL")
+#13 32.73    | 
+#13 32.73 
+#13 32.73 Validation Error Count: 1
+#13 32.80 ✓ Generating static pages using 7 workers (19/19) in 799ms
+#13 32.81   Finalizing page optimization ...
+#13 33.40 
+#13 33.40 Route (app)
+#13 33.40 ┌ ƒ /
+#13 33.40 ├ ○ /_not-found
+#13 33.40 ├ ƒ /admin
+#13 33.40 ├ ƒ /admin/anti-gaspi
+#13 33.40 ├ ƒ /admin/avis
+#13 33.40 ├ ƒ /admin/clients
+#13 33.40 ├ ƒ /admin/clients/[email]
+#13 33.40 ├ ƒ /admin/commandes
+#13 33.40 ├ ƒ /admin/commandes/[reference]
+#13 33.40 ├ ƒ /admin/commandes/[reference]/ticket
+#13 33.40 ├ ƒ /admin/gateaux
+#13 33.40 ├ ƒ /admin/livraisons
+#13 33.40 ├ ƒ /admin/marketing
+#13 33.40 ├ ƒ /admin/menu
+#13 33.40 ├ ƒ /admin/messages
+#13 33.40 ├ ƒ /admin/paniers
+#13 33.40 ├ ƒ /admin/parametres
+#13 33.40 ├ ƒ /admin/rapports
+#13 33.40 ├ ƒ /admin/recap
+#13 33.40 ├ ƒ /admin/reservations
+#13 33.40 ├ ƒ /admin/saison
+#13 33.40 ├ ƒ /admin/service
+#13 33.40 ├ ƒ /admin/traiteur
+#13 33.40 ├ ƒ /anti-gaspi
+#13 33.40 ├ ƒ /api/admin/finance.csv
+#13 33.40 ├ ƒ /api/admin/orders.csv
+#13 33.40 ├ ƒ /api/admin/orders/pending
+#13 33.40 ├ ƒ /api/admin/search
+#13 33.40 ├ ƒ /api/admin/subscribers.csv
+#13 33.40 ├ ƒ /api/assistant
+#13 33.40 ├ ƒ /api/cart
+#13 33.40 ├ ƒ /api/cron/reengage
+#13 33.40 ├ ƒ /api/dishes
+#13 33.40 ├ ƒ /api/health
+#13 33.40 ├ ƒ /api/order-status
+#13 33.40 ├ ƒ /api/orders
+#13 33.40 ├ ƒ /api/slots
+#13 33.40 ├ ƒ /api/stripe/connect/refresh
+#13 33.40 ├ ƒ /api/suggestions
+#13 33.40 ├ ƒ /api/testimonials
+#13 33.40 ├ ƒ /api/webhooks/stripe
+#13 33.40 ├ ƒ /boutique-de-saison
+#13 33.40 ├ ○ /cgv
+#13 33.40 ├ ƒ /commande/[reference]
+#13 33.40 ├ ○ /commander
+#13 33.40 ├ ƒ /compte
+#13 33.40 ├ ƒ /compte/verify
+#13 33.40 ├ ○ /confidentialite
+#13 33.40 ├ ○ /contact
+#13 33.40 ├ ○ /icon.svg
+#13 33.40 ├ ○ /manifest.webmanifest
+#13 33.40 ├ ○ /mentions-legales
+#13 33.40 ├ ƒ /menu
+#13 33.40 ├ ƒ /menu/[slug]
+#13 33.40 ├ ƒ /reservation
+#13 33.40 ├ ○ /robots.txt
+#13 33.40 ├ ○ /sitemap.xml
+#13 33.40 ├ ○ /sur-mesure
+#13 33.40 └ ○ /traiteur
+#13 33.40 
+#13 33.40 
+#13 33.41 ○  (Static)   prerendered as static content
+#13 33.41 ƒ  (Dynamic)  server-rendered on demand
+#13 33.41 
+#13 33.58 npm notice
+#13 33.58 npm notice New major version of npm available! 10.8.2 -> 11.17.0
+#13 33.58 npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.17.0
+#13 33.58 npm notice To update run: npm install -g npm@11.17.0
+#13 33.58 npm notice
+#13 DONE 33.8s
+
+#14 [migrate builder 3/3] RUN npm run build
+#14 30.74   Finished TypeScript in 14.1s ...
+#14 30.74   Collecting page data using 7 workers ...
+#14 32.25   Generating static pages using 7 workers (0/19) ...
+#14 32.41   Generating static pages using 7 workers (4/19) 
+#14 32.91   Generating static pages using 7 workers (9/19) 
+#14 32.96   Generating static pages using 7 workers (14/19) 
+#14 33.02 prisma:error 
+#14 33.02 Invalid `prisma.dish.findMany()` invocation:
+#14 33.02 
+#14 33.02 
+#14 33.02 error: Environment variable not found: DATABASE_URL.
+#14 33.02   -->  schema.prisma:8
+#14 33.02    | 
+#14 33.02  7 |   provider = "postgresql"
+#14 33.02  8 |   url      = env("DATABASE_URL")
+#14 33.02    | 
+#14 33.02 
+#14 33.02 Validation Error Count: 1
+#14 33.10 ✓ Generating static pages using 7 workers (19/19) in 842ms
+#14 33.11   Finalizing page optimization ...
+#14 33.80 
+#14 33.80 Route (app)
+#14 33.80 ┌ ƒ /
+#14 33.80 ├ ○ /_not-found
+#14 33.80 ├ ƒ /admin
+#14 33.80 ├ ƒ /admin/anti-gaspi
+#14 33.80 ├ ƒ /admin/avis
+#14 33.80 ├ ƒ /admin/clients
+#14 33.80 ├ ƒ /admin/clients/[email]
+#14 33.80 ├ ƒ /admin/commandes
+#14 33.80 ├ ƒ /admin/commandes/[reference]
+#14 33.80 ├ ƒ /admin/commandes/[reference]/ticket
+#14 33.80 ├ ƒ /admin/gateaux
+#14 33.80 ├ ƒ /admin/livraisons
+#14 33.80 ├ ƒ /admin/marketing
+#14 33.80 ├ ƒ /admin/menu
+#14 33.80 ├ ƒ /admin/messages
+#14 33.80 ├ ƒ /admin/paniers
+#14 33.80 ├ ƒ /admin/parametres
+#14 33.80 ├ ƒ /admin/rapports
+#14 33.80 ├ ƒ /admin/recap
+#14 33.80 ├ ƒ /admin/reservations
+#14 33.80 ├ ƒ /admin/saison
+#14 33.80 ├ ƒ /admin/service
+#14 33.80 ├ ƒ /admin/traiteur
+#14 33.80 ├ ƒ /anti-gaspi
+#14 33.80 ├ ƒ /api/admin/finance.csv
+#14 33.80 ├ ƒ /api/admin/orders.csv
+#14 33.80 ├ ƒ /api/admin/orders/pending
+#14 33.80 ├ ƒ /api/admin/search
+#14 33.80 ├ ƒ /api/admin/subscribers.csv
+#14 33.80 ├ ƒ /api/assistant
+#14 33.80 ├ ƒ /api/cart
+#14 33.80 ├ ƒ /api/cron/reengage
+#14 33.80 ├ ƒ /api/dishes
+#14 33.80 ├ ƒ /api/health
+#14 33.80 ├ ƒ /api/order-status
+#14 33.80 ├ ƒ /api/orders
+#14 33.80 ├ ƒ /api/slots
+#14 33.80 ├ ƒ /api/stripe/connect/refresh
+#14 33.80 ├ ƒ /api/suggestions
+#14 33.80 ├ ƒ /api/testimonials
+#14 33.80 ├ ƒ /api/webhooks/stripe
+#14 33.80 ├ ƒ /boutique-de-saison
+#14 33.80 ├ ○ /cgv
+#14 33.80 ├ ƒ /commande/[reference]
+#14 33.80 ├ ○ /commander
+#14 33.80 ├ ƒ /compte
+#14 33.80 ├ ƒ /compte/verify
+#14 33.80 ├ ○ /confidentialite
+#14 33.80 ├ ○ /contact
+#14 33.80 ├ ○ /icon.svg
+#14 33.80 ├ ○ /manifest.webmanifest
+#14 33.80 ├ ○ /mentions-legales
+#14 33.80 ├ ƒ /menu
+#14 33.80 ├ ƒ /menu/[slug]
+#14 33.80 ├ ƒ /reservation
+#14 33.80 ├ ○ /robots.txt
+#14 33.80 ├ ○ /sitemap.xml
+#14 33.80 ├ ○ /sur-mesure
+#14 33.80 └ ○ /traiteur
+#14 33.80 
+#14 33.80 
+#14 33.80 ○  (Static)   prerendered as static content
+#14 33.80 ƒ  (Dynamic)  server-rendered on demand
+#14 33.80 
+#14 33.98 npm notice
+#14 33.98 npm notice New major version of npm available! 10.8.2 -> 11.17.0
+#14 33.98 npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.17.0
+#14 33.98 npm notice To update run: npm install -g npm@11.17.0
+#14 33.98 npm notice
+#14 DONE 34.1s
+
+#15 [migrate] exporting to image
+#15 exporting layers
+#15 ...
+
+#16 [app runner 1/6] RUN addgroup -g 1001 -S nodejs && adduser -S nextjs -u 1001
+#16 CACHED
+
+#17 [app runner 2/6] COPY --from=builder /app/public ./public
+#17 CACHED
+
+#18 [app runner 3/6] COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
+#18 DONE 0.9s
+
+#15 [migrate] exporting to image
+#15 ...
+
+#19 [app runner 4/6] COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+#19 DONE 0.1s
+
+#20 [app runner 5/6] COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
+#20 DONE 0.1s
+
+#21 [app runner 6/6] COPY --from=builder /app/node_modules/@prisma/client ./node_modules/@prisma/client
+#21 DONE 0.2s
+
+#15 [migrate] exporting to image
+#15 ...
+
+#22 [app] exporting to image
+#22 exporting layers 6.9s done
+#22 exporting manifest sha256:f3dd043fda534f99bd10bd7d74002419b8c703d970ae9ee450b01c9dcb751475 0.0s done
+#22 exporting config sha256:6bdda4276ba3742f07656074489ec4e8078456f36f155a37228a8ba2668b2cf0 done
+#22 exporting attestation manifest sha256:9a084617b69424277907610be37a981ee58d1b1aa932302067d1ce85b6fd4c25 0.0s done
+#22 exporting manifest list sha256:fafd6c45abcd0e95cb846ba9a68697a527ab15c32993d7ad0747937c3442e642 done
+#22 naming to docker.io/library/boulangerie-app:latest done
+#22 unpacking to docker.io/library/boulangerie-app:latest
+#22 unpacking to docker.io/library/boulangerie-app:latest 1.9s done
+#22 DONE 8.9s
+
+#23 [app] resolving provenance for metadata file
+#23 DONE 0.0s
+
+#15 [migrate] exporting to image
+#15 exporting layers 15.0s done
+#15 exporting manifest sha256:c70dc93ecc60d20d619a78c15e292914d1a0b42a5e50f7a8fb538195bc2a6e17 0.0s done
+#15 exporting config sha256:a072c303d829ff13ad163613a778a2c6e221ce781aeb3770b4da90d4f0a9a382 0.0s done
+#15 exporting attestation manifest sha256:c53c8a07998d604a3e0844d3a7c50dcd6d95a751e294baa3a8eed5448f8fd2dd 0.0s done
+#15 exporting manifest list sha256:aecc0bbd4f253d946873bdce54a534afb5c7901785c317a4c8b04562c08d88e6 0.0s done
+#15 naming to docker.io/library/boulangerie-migrate:latest done
+#15 unpacking to docker.io/library/boulangerie-migrate:latest
+#15 unpacking to docker.io/library/boulangerie-migrate:latest 2.3s done
+#15 DONE 17.5s
+
+#24 [migrate] resolving provenance for metadata file
+#24 DONE 0.0s
+ Image boulangerie-migrate Built 
+ Image boulangerie-app Built 
+ Container boulangerie-db-1 Running 
+ Container boulangerie-migrate-1 Recreate 
+ Container boulangerie-migrate-1 Recreated 
+ Container boulangerie-app-1 Recreate 
+ Container boulangerie-app-1 Recreated 
+ Container boulangerie-db-1 Waiting 
+ Container boulangerie-db-1 Healthy 
+ Container boulangerie-migrate-1 Starting 
+ Container boulangerie-migrate-1 Started 
+ Container boulangerie-db-1 Waiting 
+ Container boulangerie-migrate-1 Waiting 
+ Container boulangerie-db-1 Healthy 
+ Container boulangerie-migrate-1 Exited 
+ Container boulangerie-app-1 Starting 
+ Container boulangerie-app-1 Started 
+==> 4/4  Vérification
+NAME                IMAGE                COMMAND                  SERVICE   CREATED         STATUS                  PORTS
+boulangerie-app-1   boulangerie-app      "docker-entrypoint.s…"   app       4 seconds ago   Up Less than a second   127.0.0.1:3200->3000/tcp
+boulangerie-db-1    postgres:16-alpine   "docker-entrypoint.s…"   db        23 hours ago    Up 23 hours (healthy)   5432/tcp
+health : {"status":"ok","db":"up","time":"2026-06-23T12:09:21.955Z"}
+✅ Mise à jour terminée — https://boulangerie.lodene.cloud

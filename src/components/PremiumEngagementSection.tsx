@@ -2,10 +2,12 @@ import Image from "next/image";
 import Link from "next/link";
 import QRCode from "qrcode";
 import {
+  ChevronRight,
   Clock,
   Coffee,
   Croissant,
   ExternalLink,
+  Lock,
   Mail,
   MapPin,
   MessageCircle,
@@ -23,9 +25,10 @@ import {
   PremiumContactForm,
   PremiumReviewForm,
 } from "@/components/PremiumEngagementForms";
+import { NewsletterForm } from "@/components/NewsletterForm";
 import { testimonials } from "@/data/testimonials";
 import { siteConfig } from "@/lib/config";
-import { mapsHref, phoneHref } from "@/lib/contactLinks";
+import { emailHref, mapsHref, phoneHref } from "@/lib/contactLinks";
 
 const footerServices = [
   { label: "Pains & viennoiseries du jour", Icon: Croissant },
@@ -141,9 +144,6 @@ function Card({
 }
 
 function MobileFooter() {
-  const actionClass =
-    "inline-flex min-h-11 items-center justify-center gap-2 rounded-2xl border border-gold/35 bg-white/[0.03] px-3 text-sm font-bold text-cream transition active:scale-[0.98]";
-
   const socials = [
     { label: "Facebook", href: siteConfig.socials.facebook },
     { label: "Instagram", href: siteConfig.socials.instagram },
@@ -151,11 +151,37 @@ function MobileFooter() {
     { label: "WhatsApp", href: siteConfig.socials.whatsapp },
   ];
 
+  const quickLinks = [
+    [
+      { label: "Accueil", href: "/" },
+      { label: "Menu", href: "/menu" },
+      { label: "Commander", href: "/commander" },
+      { label: "Réservation", href: "/reservation" },
+      { label: "Contact", href: "/contact" },
+    ],
+    [
+      { label: "Boutique de saison", href: "/boutique-de-saison" },
+      { label: "Sur-mesure", href: "/sur-mesure" },
+      { label: "Traiteur", href: "/traiteur" },
+      { label: "Avis", href: "/#avis-clients" },
+      { label: "À propos", href: "/#a-propos" },
+    ],
+  ] as const;
+
   return (
-    <footer className="border-t border-white/[0.08] px-4 py-6 sm:hidden">
-      <div className="text-center">
-        <span className="mx-auto grid h-12 w-12 place-items-center rounded-2xl border border-gold/45 text-gold">
-          <svg viewBox="0 0 48 48" className="h-8 w-8" fill="none" aria-hidden>
+    <footer className="border-t border-white/[0.08] bg-[radial-gradient(circle_at_top,rgba(245,158,11,0.08),transparent_34%),linear-gradient(180deg,#080808,#050505)] px-5 pb-7 pt-10 sm:hidden">
+      <Link
+        href="/"
+        aria-label="Boulangerie Artisanale - Accueil"
+        className="mx-auto grid w-fit justify-items-center text-center"
+      >
+        <span className="grid h-[5.25rem] w-[5.25rem] place-items-center rounded-[1.65rem] border-2 border-gold bg-black/30 text-gold shadow-[0_0_34px_-18px_rgba(245,158,11,0.95)]">
+          <svg
+            viewBox="0 0 48 48"
+            className="h-12 w-12"
+            fill="none"
+            aria-hidden
+          >
             <path
               d="M11 25h26v3c0 7-5 12-13 12S11 35 11 28v-3Z"
               stroke="currentColor"
@@ -174,41 +200,22 @@ function MobileFooter() {
             />
           </svg>
         </span>
-        <h2 className="mt-3 font-display text-3xl font-bold tracking-tight text-cream">
+        <span className="mt-4 font-display text-4xl font-bold leading-none text-cream">
           {siteConfig.shortName}
-        </h2>
-        <p className="text-cream/68 mx-auto mt-1.5 max-w-[18rem] text-sm leading-6">
-          Pain frais, viennoiseries pur beurre et pâtisseries maison.
-        </p>
-      </div>
+        </span>
+      </Link>
 
-      <div className="mt-5 grid grid-cols-2 gap-2.5">
-        <a href={phoneHref} className={actionClass}>
-          <Phone className="h-4 w-4 shrink-0 text-gold" />
-          Appeler
-        </a>
-        <a
-          href={mapsHref}
-          target="_blank"
-          rel="noopener noreferrer"
-          className={actionClass}
-        >
-          <MapPin className="h-4 w-4 shrink-0 text-gold" />
-          Itinéraire
-        </a>
-        <Link href="/menu" className={actionClass}>
-          <Croissant className="h-4 w-4 shrink-0 text-gold" />
-          Menu
-        </Link>
-        <Link href="/contact" className={actionClass}>
-          <Mail className="h-4 w-4 shrink-0 text-gold" />
-          Contact
-        </Link>
-      </div>
+      <p className="text-cream/72 mx-auto mt-5 max-w-xs text-center text-lg leading-relaxed">
+        Pain frais, viennoiseries pur beurre et pâtisseries maison.
+      </p>
+
+      <p className="mt-8 text-center text-sm font-bold uppercase tracking-[0.42em] text-gold">
+        Suivez-nous
+      </p>
 
       <nav
         aria-label="Réseaux sociaux"
-        className="mt-5 flex items-center justify-center gap-2.5"
+        className="mt-5 flex items-center justify-center gap-5"
       >
         {socials.map(({ label, href }) => (
           <a
@@ -217,42 +224,89 @@ function MobileFooter() {
             target="_blank"
             rel="noopener noreferrer"
             aria-label={label}
-            className="border-white/12 text-cream/78 grid h-9 w-9 place-items-center rounded-full border bg-white/[0.03] transition active:scale-95"
+            className="grid h-14 w-14 place-items-center rounded-full border border-white/15 bg-white/[0.02] text-cream/85 shadow-[0_16px_36px_-28px_rgba(255,255,255,0.7)] transition hover:border-gold/60 hover:text-gold"
           >
-            <SocialIcon label={label} />
+            <span className="[&_svg]:h-7 [&_svg]:w-7">
+              <SocialIcon label={label} />
+            </span>
           </a>
         ))}
       </nav>
 
-      <div className="mt-5 rounded-2xl border border-white/[0.08] bg-white/[0.03] p-3.5">
-        <h3 className="text-xs font-bold uppercase tracking-[0.24em] text-gold">
-          Infos pratiques
-        </h3>
-        <div className="text-cream/72 mt-3 space-y-2.5 text-sm leading-5">
-          <a
-            href={mapsHref}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex gap-2.5"
-          >
-            <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-gold" />
-            <span>{siteConfig.contact.address}</span>
-          </a>
-          <a href={phoneHref} className="flex gap-2.5">
-            <Phone className="mt-0.5 h-4 w-4 shrink-0 text-gold" />
-            <span>{siteConfig.contact.phone}</span>
-          </a>
-          <div className="flex gap-2.5">
-            <Clock className="mt-0.5 h-4 w-4 shrink-0 text-gold" />
-            <span>Lun - Ven : 7h00 - 19h30</span>
-          </div>
+      <div className="bg-white/12 my-8 h-px" />
+
+      <FooterMobileHeading>Liens rapides</FooterMobileHeading>
+      <nav
+        aria-label="Liens rapides du pied de page"
+        className="mt-6 grid gap-x-4 gap-y-5 min-[380px]:grid-cols-[0.8fr_1.2fr]"
+      >
+        {quickLinks.map((column, columnIndex) => (
+          <ul key={columnIndex} className="space-y-5">
+            {column.map((link) => (
+              <li key={link.href}>
+                <Link
+                  href={link.href}
+                  className="group flex min-h-8 items-center justify-between gap-2 text-base text-cream transition hover:text-gold"
+                >
+                  <span className="min-w-0">{link.label}</span>
+                  <ChevronRight className="h-5 w-5 shrink-0 text-cream transition group-hover:translate-x-0.5 group-hover:text-gold" />
+                </Link>
+              </li>
+            ))}
+          </ul>
+        ))}
+      </nav>
+
+      <div className="bg-white/12 my-8 h-px" />
+
+      <FooterMobileHeading>Informations</FooterMobileHeading>
+      <div className="text-cream/68 mt-6 space-y-5 text-lg leading-relaxed">
+        <a
+          href={mapsHref}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex gap-4"
+        >
+          <MapPin className="mt-1 h-6 w-6 shrink-0 text-gold" />
+          <span>{siteConfig.contact.address}</span>
+        </a>
+        <a href={phoneHref} className="flex gap-4">
+          <Phone className="mt-1 h-6 w-6 shrink-0 text-gold" />
+          <span>{siteConfig.contact.phone}</span>
+        </a>
+        <a href={emailHref} className="flex gap-4">
+          <Mail className="mt-1 h-6 w-6 shrink-0 text-gold" />
+          <span>{siteConfig.contact.email}</span>
+        </a>
+        <div className="flex gap-4">
+          <Clock className="mt-1 h-6 w-6 shrink-0 text-gold" />
+          <span>Lun - Dim : 7h00 - 19h30</span>
         </div>
       </div>
 
-      <p className="mt-5 text-center text-xs text-cream/50">
-        © 2026 {siteConfig.shortName} · Tous droits réservés.
+      <section className="border-white/12 mt-8 rounded-[1.35rem] border bg-white/[0.035] p-5 shadow-[0_24px_70px_-58px_rgba(255,255,255,0.7)]">
+        <FooterMobileHeading>Newsletter</FooterMobileHeading>
+        <p className="text-cream/78 mt-4 text-base leading-relaxed">
+          Recevez nos offres, fournées spéciales et nouveautés
+        </p>
+        <div className="[&_button]:h-14 [&_button]:w-14 [&_button]:shrink-0 [&_button]:px-0 [&_input]:h-14 [&_input]:bg-black/35 [&_input]:text-base">
+          <NewsletterForm />
+        </div>
+      </section>
+
+      <p className="mt-6 flex items-center justify-center gap-2 text-center text-sm text-muted">
+        <Lock className="h-4 w-4" />
+        <span>© 2026 {siteConfig.shortName} · Tous droits réservés</span>
       </p>
     </footer>
+  );
+}
+
+function FooterMobileHeading({ children }: { children: React.ReactNode }) {
+  return (
+    <h3 className="text-sm font-bold uppercase tracking-[0.42em] text-gold">
+      {children}
+    </h3>
   );
 }
 

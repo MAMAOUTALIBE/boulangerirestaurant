@@ -6,16 +6,20 @@ import { requestCatering, type ActionState } from "@/app/actions";
 
 const field =
   "w-full rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-sm text-cream placeholder:text-muted focus:border-gold/60 focus:outline-none focus:ring-1 focus:ring-gold/40";
+const compactField =
+  "h-9 w-full rounded-xl border border-white/15 bg-white/5 px-3 text-[0.8rem] text-cream placeholder:text-muted focus:border-gold/60 focus:outline-none focus:ring-1 focus:ring-gold/40 min-[390px]:h-10 min-[390px]:text-[0.82rem]";
+const compactTextarea =
+  "min-h-14 w-full rounded-xl border border-white/15 bg-white/5 px-3 py-2 text-[0.8rem] text-cream placeholder:text-muted focus:border-gold/60 focus:outline-none focus:ring-1 focus:ring-gold/40 min-[390px]:min-h-[4.25rem] min-[390px]:text-[0.82rem]";
 
-function SubmitButton() {
+function SubmitButton({ compact = false }: { compact?: boolean }) {
   const { pending } = useFormStatus();
   return (
     <button
       type="submit"
       disabled={pending}
-      className="btn-primary w-full disabled:opacity-60"
+      className={`${compact ? "min-h-9 px-4 py-2 text-sm min-[390px]:min-h-10" : ""} btn-primary w-full disabled:opacity-60`}
     >
-      {pending ? "Envoi…" : "Demander un devis"}
+      {pending ? "Envoi…" : compact ? "Recevoir un devis" : "Demander un devis"}
     </button>
   );
 }
@@ -38,71 +42,156 @@ export function CateringForm() {
   }
 
   return (
-    <form action={formAction} className="space-y-4">
-      <input
-        type="text"
-        name="company"
-        tabIndex={-1}
-        autoComplete="off"
-        aria-hidden="true"
-        className="absolute left-[-9999px] h-0 w-0 opacity-0"
-      />
-      <div className="grid gap-4 sm:grid-cols-2">
-        <Field
-          id="name"
-          label="Nom / organisation"
-          error={state?.errors?.name}
-        />
-        <Field
-          id="phone"
-          label="Téléphone"
-          type="tel"
-          error={state?.errors?.phone}
-        />
-      </div>
-      <Field
-        id="email"
-        label="Email"
-        type="email"
-        error={state?.errors?.email}
-      />
-      <div className="grid gap-4 sm:grid-cols-2">
-        <Field
-          id="eventDate"
-          label="Date de l'événement (optionnel)"
-          type="date"
-          required={false}
-          error={state?.errors?.eventDate}
-        />
-        <Field
-          id="guests"
-          label="Nombre de convives"
-          type="number"
-          error={state?.errors?.guests}
-        />
-      </div>
-      <div>
-        <label htmlFor="message" className="mb-1.5 block text-sm text-cream/80">
-          Votre projet
-        </label>
-        <textarea
-          id="message"
-          name="message"
-          rows={4}
-          required
-          className={field}
-        />
-        {state?.errors?.message && (
-          <p className="mt-1 text-xs text-red-400">{state.errors.message}</p>
+    <>
+      <form
+        action={formAction}
+        className="space-y-1.5 min-[390px]:space-y-2 sm:hidden"
+      >
+        <AntiSpamInput />
+        <div className="grid grid-cols-2 gap-2">
+          <CompactField
+            id="mobile-catering-name"
+            name="name"
+            label="Nom / organisation"
+            placeholder="Nom"
+            autoComplete="name"
+            error={state?.errors?.name}
+          />
+          <CompactField
+            id="mobile-catering-phone"
+            name="phone"
+            label="Téléphone"
+            type="tel"
+            placeholder="Téléphone"
+            autoComplete="tel"
+            inputMode="tel"
+            error={state?.errors?.phone}
+          />
+        </div>
+
+        <div className="grid grid-cols-[1fr_7.25rem] gap-2">
+          <CompactField
+            id="mobile-catering-email"
+            name="email"
+            label="Email"
+            type="email"
+            placeholder="Email"
+            autoComplete="email"
+            inputMode="email"
+            error={state?.errors?.email}
+          />
+          <CompactField
+            id="mobile-catering-guests"
+            name="guests"
+            label="Nombre de convives"
+            type="number"
+            placeholder="Convives"
+            autoComplete="off"
+            inputMode="numeric"
+            error={state?.errors?.guests}
+          />
+        </div>
+
+        <div>
+          <label htmlFor="mobile-catering-message" className="sr-only">
+            Votre projet
+          </label>
+          <textarea
+            id="mobile-catering-message"
+            name="message"
+            rows={2}
+            required
+            placeholder="Projet : date, formule, lieu, budget..."
+            maxLength={240}
+            className={compactTextarea}
+          />
+          <FieldError error={state?.errors?.message} />
+        </div>
+
+        {state && !state.ok && !state.errors && (
+          <p role="alert" className="text-xs text-red-400">
+            {state.message}
+          </p>
         )}
-      </div>
-      {state && !state.ok && !state.errors && (
-        <p role="alert" className="text-sm text-red-400">
-          {state.message}
+        <SubmitButton compact />
+        <p className="hidden text-center text-[0.72rem] text-muted min-[390px]:block">
+          Réponse sous 48 h · aucun paiement en ligne
         </p>
-      )}
-      <SubmitButton />
-    </form>
+      </form>
+
+      <form action={formAction} className="hidden space-y-4 sm:block">
+        <AntiSpamInput />
+        <div className="grid gap-4 sm:grid-cols-2">
+          <Field
+            id="name"
+            label="Nom / organisation"
+            error={state?.errors?.name}
+          />
+          <Field
+            id="phone"
+            label="Téléphone"
+            type="tel"
+            error={state?.errors?.phone}
+          />
+        </div>
+        <Field
+          id="email"
+          label="Email"
+          type="email"
+          error={state?.errors?.email}
+        />
+        <div className="grid gap-4 sm:grid-cols-2">
+          <Field
+            id="eventDate"
+            label="Date de l'événement (optionnel)"
+            type="date"
+            required={false}
+            error={state?.errors?.eventDate}
+          />
+          <Field
+            id="guests"
+            label="Nombre de convives"
+            type="number"
+            error={state?.errors?.guests}
+          />
+        </div>
+        <div>
+          <label
+            htmlFor="message"
+            className="mb-1.5 block text-sm text-cream/80"
+          >
+            Votre projet
+          </label>
+          <textarea
+            id="message"
+            name="message"
+            rows={4}
+            required
+            className={field}
+          />
+          <FieldError error={state?.errors?.message} />
+        </div>
+        {state && !state.ok && !state.errors && (
+          <p role="alert" className="text-sm text-red-400">
+            {state.message}
+          </p>
+        )}
+        <SubmitButton />
+      </form>
+    </>
+  );
+}
+
+function AntiSpamInput() {
+  return (
+    <input
+      type="text"
+      name="company"
+      tabIndex={-1}
+      autoComplete="off"
+      aria-hidden="true"
+      className="absolute left-[-9999px] h-0 w-0 opacity-0"
+    />
   );
 }
 
@@ -135,4 +224,57 @@ function Field({
       {error && <p className="mt-1 text-xs text-red-400">{error}</p>}
     </div>
   );
+}
+
+function CompactField({
+  id,
+  name,
+  label,
+  type = "text",
+  placeholder,
+  autoComplete,
+  inputMode,
+  error,
+}: {
+  id: string;
+  name: string;
+  label: string;
+  type?: string;
+  placeholder?: string;
+  autoComplete?: string;
+  inputMode?:
+    | "none"
+    | "text"
+    | "tel"
+    | "url"
+    | "email"
+    | "numeric"
+    | "decimal"
+    | "search";
+  error?: string;
+}) {
+  return (
+    <div>
+      <label htmlFor={id} className="sr-only">
+        {label}
+      </label>
+      <input
+        id={id}
+        name={name}
+        type={type}
+        required
+        min={type === "number" ? 1 : undefined}
+        placeholder={placeholder}
+        autoComplete={autoComplete}
+        inputMode={inputMode}
+        className={compactField}
+      />
+      <FieldError error={error} />
+    </div>
+  );
+}
+
+function FieldError({ error }: { error?: string }) {
+  if (!error) return null;
+  return <p className="mt-1 text-xs text-red-400">{error}</p>;
 }

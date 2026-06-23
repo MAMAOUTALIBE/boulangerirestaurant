@@ -41,7 +41,7 @@ A running PostgreSQL instance and `DATABASE_URL` are **required** even for local
 ### Layers
 
 - **Server Actions** (`src/app/actions.ts`) are the primary mutation entry point — every form posts to one. They follow a fixed pattern: honeypot bot check (`isBot`) → `rateLimit(...)` → Zod `safeParse` → call a `src/lib/*` function → `revalidatePath`/`redirect`. Admin actions are prefixed `admin*` and re-check `isAdminEmail`.
-- **Domain logic** lives in `src/lib/*.ts`, each file marked `import "server-only"` (orders, payment, auth, customers, promo, delivery, loyalty, slots, reviews, segmentation, stripe-connect, email, sms, assistant…). Keep business rules here, not in components or routes.
+- **Domain logic** lives in `src/lib/*.ts`, each file marked `import "server-only"` (orders, payment, auth, customers, promo, delivery, loyalty, slots, reviews, segmentation, stripe-connect, email, sms, assistant, plus the bakery features: `stock`, `seasonal`, `antiwaste`, `service-alert`, `social-order`…). Keep business rules here, not in components or routes. A few helpers are deliberately **pure / framework-free** (no `server-only`, no DB) so they can be unit-tested in isolation — `stock.ts`, `service-alert.ts`, `social-order.ts` (see their colocated `*.test.ts`).
 - **API routes** (`src/app/api/*`) serve JSON/CSV and webhooks. The Stripe webhook (`/api/webhooks/stripe`) is the **source of truth** for payment confirmation (reads the raw body to verify the signature) — the browser redirect is not trusted.
 - **Prisma client** is a `globalThis` singleton (`src/lib/prisma.ts`) to survive dev hot-reload.
 
@@ -51,6 +51,23 @@ A running PostgreSQL instance and `DATABASE_URL` are **required** even for local
 - `Order` has a French status string machine (`OrderStatus` in `src/types/index.ts`): `en attente → payée → en préparation → prête → en livraison → livrée → annulée`. Every transition is audited in `OrderEvent`. Loyalty points are awarded idempotently when status becomes `payée` (`pointsAwarded` flag). Order references look like `NK-<base36>`.
 - Multi-restaurant: orders attach to a default `Restaurant` (chosen by `DEFAULT_RESTAURANT_SLUG`, see `src/lib/restaurants.ts`); Stripe **Connect** routes funds to that restaurant's account via `transfer_data` (`src/lib/stripe-connect.ts`, `src/lib/payment.ts`).
 - **Legacy naming**: the product is a bakery, but the schema/libs keep restaurant-era model names — `Restaurant` (= établissement), `Dish` (= produit/pain/viennoiserie), `Driver`. The seed, README, and UI use bakery vocabulary; don't rename the models to match, the mapping is intentional.
+
+### Bakery features (the 2026-06 lot — `8eb4863`)
+
+Four self-contained features, each with a `src/lib` module, a public route, an `/admin` route, and (for three of them) their own Prisma models. The latter three are **paid at pickup** (a `paid` flag on the reservation, not Stripe) — they reserve a quota, they don't run checkout.
+
+- **Stock du jour** (`stock.ts`, no new model): adds `dailyStock` / `soldToday` / `stockDate` to `Dish`. `remainingStock` does a **lazy daily reset** — `soldToday` is ignored unless `stockDate === stockToday()` (today in `Europe/Paris`, `AAAA-MM-JJ`). `null` `dailyStock` = unlimited. Drives the "épuisé" badge and caps cart quantities.
+- **Gâteaux sur-mesure** (`/sur-mesure`, `/admin/gateaux`, `CustomCakeRequest`): custom-cake quote requests, status machine `nouveau → devis envoyé → confirmé → prêt → récupéré → annulé`.
+- **Précommandes de saison** (`seasonal.ts`, `/boutique-de-saison`, `/admin/saison`, `SeasonalProduct` + `SeasonalPreorder`): quota-limited preorders (galettes, bûches…) with a sales window (`salesStart/End`) and a pickup window. `remaining = quota − sold`. Throws `SeasonalError` on closed window / sold out.
+- **Paniers anti-gaspi** (`antiwaste.ts`, `/anti-gaspi`, `/admin/paniers`, `AntiWasteOffer` + `AntiWasteReservation`): one surprise-basket offer **per day** (`date` is `@unique`), `remaining = quantity − sold`, throws `AntiWasteError`. Admin manages today's offer.
+
+### Admin screens beyond CRUD
+
+`/admin/service` is a **kitchen/service board** (`src/components/admin/ServiceBoard.tsx`) that ranks live orders by urgency via the pure `computeServiceAlert` (`service-alert.ts`): levels `ok < imminent < stagnant < late`, computed from the order's due time (chosen slot, else creation + `Dish.prepMinutes`) and time-in-current-status. `/admin/recap` is a daily summary. Other admin sections mirror the features above (`anti-gaspi`/`paniers`, `gateaux`, `saison`).
+
+### Social order fallback (`social-order.ts`)
+
+When checkout can't complete (e.g. no payment configured), the cart can be sent as a pre-filled **WhatsApp message** — `formatSocialOrderMessage` builds the text, the checkout page (`/commander`) opens `wa.me`. Pure/testable, no server dependency.
 
 ### Auth & sessions (`src/lib/session.ts`, `src/lib/auth.ts`)
 

@@ -12,7 +12,7 @@ export default function NotFound() {
   return (
     <>
       <Header />
-      <main className="flex min-h-[70vh] flex-col items-center justify-center bg-ink px-6 pt-24 text-center text-cream">
+      <main className="flex flex-col items-center justify-center bg-ink px-6 pb-0 pt-28 text-center text-cream sm:pt-32">
         <p className="font-display text-7xl font-bold text-gold">404</p>
         <h1 className="mt-4 font-display text-3xl font-semibold">
           Cette page n&apos;existe pas

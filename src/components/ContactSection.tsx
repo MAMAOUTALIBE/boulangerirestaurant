@@ -19,7 +19,10 @@ const infos = [
 /** Section Contact : coordonnées + formulaire connecté. */
 export function ContactSection() {
   return (
-    <section id="contact" className="section bg-ink">
+    <section
+      id="contact"
+      className="bg-ink pb-0 pt-10 sm:pt-20 lg:pt-24 3xl:pt-32"
+    >
       <div className="container-page">
         <Reveal>
           <p className="text-sm font-semibold uppercase tracking-wider text-gold">
