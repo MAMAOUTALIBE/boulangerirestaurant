@@ -4,7 +4,17 @@ Runbook de mise à jour de la boulangerie sur le VPS Hostinger **partagé**
 (`boulangerie.lodene.cloud`, projet Docker Compose `boulangerie`, port 3200).
 La première mise en ligne est décrite dans `HOSTINGER.md`.
 
-## Méthode rapide
+## Le plus simple (recommandé)
+
+Une seule commande, tous les paramètres pré-remplis :
+
+```bash
+./deploy/redeploy.sh
+```
+
+(Idéal pour confier le redéploiement à un agent comme Codex — voir `AGENTS.md`.)
+
+## Méthode rapide (paramètres explicites)
 
 Depuis la racine du projet (sur ce Mac) :
 

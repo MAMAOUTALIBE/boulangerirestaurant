@@ -18,13 +18,14 @@ import {
   Truck,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
+import { MobileTestimonialsCompact } from "@/components/MobileTestimonialsCompact";
 import {
   PremiumContactForm,
   PremiumReviewForm,
 } from "@/components/PremiumEngagementForms";
 import { testimonials } from "@/data/testimonials";
 import { siteConfig } from "@/lib/config";
-import { mapsHref } from "@/lib/contactLinks";
+import { mapsHref, phoneHref } from "@/lib/contactLinks";
 
 const footerServices = [
   { label: "Pains & viennoiseries du jour", Icon: Croissant },
@@ -139,6 +140,122 @@ function Card({
   );
 }
 
+function MobileFooter() {
+  const actionClass =
+    "inline-flex min-h-11 items-center justify-center gap-2 rounded-2xl border border-gold/35 bg-white/[0.03] px-3 text-sm font-bold text-cream transition active:scale-[0.98]";
+
+  const socials = [
+    { label: "Facebook", href: siteConfig.socials.facebook },
+    { label: "Instagram", href: siteConfig.socials.instagram },
+    { label: "TikTok", href: siteConfig.socials.tiktok },
+    { label: "WhatsApp", href: siteConfig.socials.whatsapp },
+  ];
+
+  return (
+    <footer className="border-t border-white/[0.08] px-4 py-6 sm:hidden">
+      <div className="text-center">
+        <span className="mx-auto grid h-12 w-12 place-items-center rounded-2xl border border-gold/45 text-gold">
+          <svg viewBox="0 0 48 48" className="h-8 w-8" fill="none" aria-hidden>
+            <path
+              d="M11 25h26v3c0 7-5 12-13 12S11 35 11 28v-3Z"
+              stroke="currentColor"
+              strokeWidth="2"
+            />
+            <path
+              d="M16 25c0-5 4-9 8-9s8 4 8 9"
+              stroke="currentColor"
+              strokeWidth="2"
+            />
+            <path
+              d="M13 31h28M8 25h32M21 11h6M24 6v5"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+            />
+          </svg>
+        </span>
+        <h2 className="mt-3 font-display text-3xl font-bold tracking-tight text-cream">
+          {siteConfig.shortName}
+        </h2>
+        <p className="text-cream/68 mx-auto mt-1.5 max-w-[18rem] text-sm leading-6">
+          Pain frais, viennoiseries pur beurre et pâtisseries maison.
+        </p>
+      </div>
+
+      <div className="mt-5 grid grid-cols-2 gap-2.5">
+        <a href={phoneHref} className={actionClass}>
+          <Phone className="h-4 w-4 shrink-0 text-gold" />
+          Appeler
+        </a>
+        <a
+          href={mapsHref}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={actionClass}
+        >
+          <MapPin className="h-4 w-4 shrink-0 text-gold" />
+          Itinéraire
+        </a>
+        <Link href="/menu" className={actionClass}>
+          <Croissant className="h-4 w-4 shrink-0 text-gold" />
+          Menu
+        </Link>
+        <Link href="/contact" className={actionClass}>
+          <Mail className="h-4 w-4 shrink-0 text-gold" />
+          Contact
+        </Link>
+      </div>
+
+      <nav
+        aria-label="Réseaux sociaux"
+        className="mt-5 flex items-center justify-center gap-2.5"
+      >
+        {socials.map(({ label, href }) => (
+          <a
+            key={label}
+            href={href}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={label}
+            className="border-white/12 text-cream/78 grid h-9 w-9 place-items-center rounded-full border bg-white/[0.03] transition active:scale-95"
+          >
+            <SocialIcon label={label} />
+          </a>
+        ))}
+      </nav>
+
+      <div className="mt-5 rounded-2xl border border-white/[0.08] bg-white/[0.03] p-3.5">
+        <h3 className="text-xs font-bold uppercase tracking-[0.24em] text-gold">
+          Infos pratiques
+        </h3>
+        <div className="text-cream/72 mt-3 space-y-2.5 text-sm leading-5">
+          <a
+            href={mapsHref}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex gap-2.5"
+          >
+            <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-gold" />
+            <span>{siteConfig.contact.address}</span>
+          </a>
+          <a href={phoneHref} className="flex gap-2.5">
+            <Phone className="mt-0.5 h-4 w-4 shrink-0 text-gold" />
+            <span>{siteConfig.contact.phone}</span>
+          </a>
+          <div className="flex gap-2.5">
+            <Clock className="mt-0.5 h-4 w-4 shrink-0 text-gold" />
+            <span>Lun - Ven : 7h00 - 19h30</span>
+          </div>
+        </div>
+      </div>
+
+      <p className="mt-5 text-center text-xs text-cream/50">
+        © 2026 {siteConfig.shortName} · Tous droits réservés.
+      </p>
+    </footer>
+  );
+}
+
 export async function PremiumEngagementSection() {
   const qrSvg = await QRCode.toString(`${siteConfig.url}/commander`, {
     type: "svg",
@@ -152,214 +269,204 @@ export async function PremiumEngagementSection() {
       className="scroll-mt-24 bg-[#050505] px-4 py-6 text-cream sm:px-6 lg:px-8"
     >
       <div className="mx-auto max-w-[1600px] overflow-hidden rounded-3xl border border-white/[0.08] bg-[#080808] shadow-[0_30px_80px_-60px_rgba(0,0,0,0.95)]">
-        <div className="px-5 pb-5 pt-4 sm:px-8 lg:px-8">
-          <div className="text-center">
-            <div className="flex items-center justify-center gap-4">
-              <span className="hidden h-px w-20 bg-gold sm:block" />
-              <h2 className="font-display text-2xl font-bold uppercase tracking-wide text-cream sm:text-4xl">
-                Ils parlent de <span className="text-gold">nous</span>
-              </h2>
-              <span className="hidden h-px w-20 bg-gold sm:block" />
-            </div>
-            <p className="mt-1.5 text-sm text-cream/80">
-              Vos avis nous motivent chaque jour à proposer le meilleur du fait
-              maison.
-            </p>
-          </div>
+        <div className="px-4 pb-5 pt-4 sm:px-8 lg:px-8">
+          <MobileTestimonialsCompact />
 
-          <div className="mt-3 grid gap-4 xl:grid-cols-[0.86fr_1.38fr_1fr]">
-            <Card className="p-4">
-              <div className="flex items-start gap-3">
-                <Star className="h-7 w-7 text-gold" />
-                <div>
-                  <h3 className="text-lg font-bold uppercase tracking-wide">
-                    Laissez un avis
-                  </h3>
-                  <p className="mt-0.5 text-sm text-cream/70">
-                    Votre retour aide les autres gourmands.
-                  </p>
-                </div>
+          <div className="hidden sm:block">
+            <div className="text-center">
+              <div className="flex items-center justify-center gap-4">
+                <span className="hidden h-px w-20 bg-gold sm:block" />
+                <h2 className="font-display text-2xl font-bold uppercase tracking-wide text-cream sm:text-4xl">
+                  Ils parlent de <span className="text-gold">nous</span>
+                </h2>
+                <span className="hidden h-px w-20 bg-gold sm:block" />
               </div>
-              <details className="mt-3 rounded-2xl border border-gold/30 bg-gold/10 p-3 sm:hidden">
-                <summary className="cursor-pointer text-sm font-bold text-gold">
-                  Laisser un avis
-                </summary>
-                <div className="mt-3">
+              <p className="mt-1.5 text-sm text-cream/80">
+                Vos avis nous motivent chaque jour à proposer le meilleur du
+                fait maison.
+              </p>
+            </div>
+
+            <div className="mt-3 grid gap-4 xl:grid-cols-[0.86fr_1.38fr_1fr]">
+              <Card className="p-4">
+                <div className="flex items-start gap-3">
+                  <Star className="h-7 w-7 text-gold" />
+                  <div>
+                    <h3 className="text-lg font-bold uppercase tracking-wide">
+                      Laissez un avis
+                    </h3>
+                    <p className="mt-0.5 text-sm text-cream/70">
+                      Votre retour aide les autres gourmands.
+                    </p>
+                  </div>
+                </div>
+                <div className="mt-3 hidden sm:block">
                   <PremiumReviewForm />
                 </div>
-              </details>
-              <div className="mt-3 hidden sm:block">
-                <PremiumReviewForm />
-              </div>
 
-              <div className="mt-3 rounded-2xl border border-white/[0.08] bg-white/[0.03] p-3">
-                <div className="flex items-center gap-3">
-                  <GoogleMark />
-                  <div>
-                    <Stars />
-                    <p className="mt-1 text-lg font-semibold">
-                      Note <span className="font-bold text-cream">4,8/5</span>{" "}
-                      sur Google
-                    </p>
-                    <p className="mt-1 text-sm text-cream/70">
-                      Basé sur +230 avis clients
-                    </p>
-                    <a
-                      href="https://www.google.com/search?q=boulangerie+avis"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="mt-1 inline-flex items-center gap-1.5 text-sm font-semibold text-gold transition hover:text-gold-400"
-                    >
-                      Voir tous les avis sur Google
-                      <ExternalLink className="h-3.5 w-3.5" />
-                    </a>
+                <div className="mt-3 rounded-2xl border border-white/[0.08] bg-white/[0.03] p-3">
+                  <div className="flex items-center gap-3">
+                    <GoogleMark />
+                    <div>
+                      <Stars />
+                      <p className="mt-1 text-lg font-semibold">
+                        Note <span className="font-bold text-cream">4,8/5</span>{" "}
+                        sur Google
+                      </p>
+                      <p className="mt-1 text-sm text-cream/70">
+                        Basé sur +230 avis clients
+                      </p>
+                      <a
+                        href="https://www.google.com/search?q=boulangerie+avis"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="mt-1 inline-flex items-center gap-1.5 text-sm font-semibold text-gold transition hover:text-gold-400"
+                      >
+                        Voir tous les avis sur Google
+                        <ExternalLink className="h-3.5 w-3.5" />
+                      </a>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </Card>
+              </Card>
 
-            <div className="border-white/[0.08] xl:border-x xl:px-6">
-              <div className="mb-3 flex items-center gap-3">
-                <span className="grid h-10 w-10 place-items-center rounded-full border border-gold/50 text-gold">
-                  <MessageCircle className="h-5 w-5" />
-                </span>
-                <h3 className="text-lg font-bold uppercase tracking-wide">
-                  Ce qu&apos;ils disent de nous
-                </h3>
-              </div>
+              <div className="border-white/[0.08] xl:border-x xl:px-6">
+                <div className="mb-3 flex items-center gap-3">
+                  <span className="grid h-10 w-10 place-items-center rounded-full border border-gold/50 text-gold">
+                    <MessageCircle className="h-5 w-5" />
+                  </span>
+                  <h3 className="text-lg font-bold uppercase tracking-wide">
+                    Ce qu&apos;ils disent de nous
+                  </h3>
+                </div>
 
-              <div className="space-y-2.5">
-                {testimonials.slice(0, 2).map((item) => (
-                  <Card key={item.id} className="relative p-3.5">
-                    <Quote className="absolute right-4 top-3.5 h-7 w-7 text-gold" />
-                    <div className="flex gap-3.5 pr-10">
-                      <Image
-                        src={item.avatar}
-                        alt={item.name}
-                        width={64}
-                        height={64}
-                        className="h-12 w-12 rounded-full object-cover ring-2 ring-gold/50"
-                      />
-                      <div>
-                        <p className="font-bold">{item.name}</p>
-                        <Stars />
-                        <blockquote className="mt-1.5 max-w-xl text-sm leading-relaxed text-cream/80">
-                          &ldquo;{item.comment}&rdquo;
-                        </blockquote>
-                        {item.city && (
-                          <p className="mt-1.5 text-xs uppercase tracking-wider text-cream/55">
-                            {item.city}
-                          </p>
-                        )}
+                <div className="space-y-2.5">
+                  {testimonials.slice(0, 2).map((item) => (
+                    <Card key={item.id} className="relative p-3.5">
+                      <Quote className="absolute right-4 top-3.5 h-7 w-7 text-gold" />
+                      <div className="flex gap-3.5 pr-10">
+                        <Image
+                          src={item.avatar}
+                          alt={item.name}
+                          width={64}
+                          height={64}
+                          className="h-12 w-12 rounded-full object-cover ring-2 ring-gold/50"
+                        />
+                        <div>
+                          <p className="font-bold">{item.name}</p>
+                          <Stars />
+                          <blockquote className="mt-1.5 max-w-xl text-sm leading-relaxed text-cream/80">
+                            &ldquo;{item.comment}&rdquo;
+                          </blockquote>
+                          {item.city && (
+                            <p className="mt-1.5 text-xs uppercase tracking-wider text-cream/55">
+                              {item.city}
+                            </p>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  </Card>
-                ))}
-              </div>
-
-              <div className="mt-2.5 text-center">
-                <Link
-                  href="#avis-clients"
-                  className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-gold/70 px-5 py-2 text-sm font-semibold text-gold transition hover:bg-gold hover:text-ink"
-                >
-                  Voir plus d&apos;avis
-                  <ArrowMini />
-                </Link>
-                <div className="mt-2 flex items-center justify-center gap-2">
-                  {[0, 1, 2, 3].map((dot) => (
-                    <span
-                      key={dot}
-                      className={`h-2 w-2 rounded-full ${
-                        dot === 0 ? "bg-gold" : "bg-white/30"
-                      }`}
-                    />
+                    </Card>
                   ))}
                 </div>
-              </div>
-            </div>
 
-            <Card className="p-4">
-              <div id="contact" className="-mt-24 pt-24" />
-              <div className="flex items-center gap-3">
-                <Send className="h-7 w-7 text-gold" />
-                <h3 className="text-lg font-bold uppercase tracking-wide">
-                  Contactez-nous
-                </h3>
+                <div className="mt-2.5 text-center">
+                  <Link
+                    href="#avis-clients"
+                    className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-gold/70 px-5 py-2 text-sm font-semibold text-gold transition hover:bg-gold hover:text-ink"
+                  >
+                    Voir plus d&apos;avis
+                    <ArrowMini />
+                  </Link>
+                  <div className="mt-2 flex items-center justify-center gap-2">
+                    {[0, 1, 2, 3].map((dot) => (
+                      <span
+                        key={dot}
+                        className={`h-2 w-2 rounded-full ${
+                          dot === 0 ? "bg-gold" : "bg-white/30"
+                        }`}
+                      />
+                    ))}
+                  </div>
+                </div>
               </div>
 
-              <details className="mt-3 rounded-2xl border border-gold/30 bg-gold/10 p-3 sm:hidden">
-                <summary className="cursor-pointer text-sm font-bold text-gold">
-                  Écrire un message
-                </summary>
-                <div className="mt-3">
+              <Card className="p-4">
+                <div id="contact" className="-mt-24 pt-24" />
+                <div className="flex items-center gap-3">
+                  <Send className="h-7 w-7 text-gold" />
+                  <h3 className="text-lg font-bold uppercase tracking-wide">
+                    Contactez-nous
+                  </h3>
+                </div>
+
+                <div className="mt-3 hidden sm:block">
                   <PremiumContactForm />
                 </div>
-              </details>
-              <div className="mt-3 hidden sm:block">
-                <PremiumContactForm />
-              </div>
-            </Card>
-          </div>
+              </Card>
+            </div>
 
-          <div className="mt-6 overflow-hidden rounded-3xl border border-gold/25 bg-[#F8F3EA] text-[#050505] shadow-[0_24px_70px_-50px_rgba(216,154,28,0.72)]">
-            <div className="grid gap-6 p-6 lg:grid-cols-[1.1fr_auto_1.2fr_1.6fr] lg:items-center">
-              <div className="flex items-center gap-4">
-                <span className="grid h-16 w-16 shrink-0 place-items-center rounded-2xl border border-gold/60 bg-white text-gold-600 shadow-[0_16px_32px_-26px_rgba(5,5,5,0.45)]">
-                  <QrCode className="h-8 w-8" />
-                </span>
-                <div>
-                  <h3 className="font-bold uppercase tracking-wide text-[#050505]">
-                    Commandez en un scan
-                  </h3>
-                  <p className="text-[#050505]/68 mt-1 text-sm leading-relaxed">
-                    Scannez le QR code, accédez au menu et commandez en quelques
-                    secondes.
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-center justify-center gap-4">
-                <div
-                  className="h-24 w-24 overflow-hidden rounded-xl border border-gold/70 bg-white p-1.5 shadow-[0_18px_34px_-26px_rgba(5,5,5,0.7)] sm:h-28 sm:w-28 [&>svg]:h-full [&>svg]:w-full"
-                  aria-label="QR code de commande"
-                  role="img"
-                  dangerouslySetInnerHTML={{ __html: qrSvg }}
-                />
-                <span className="hidden text-gold md:block" aria-hidden>
-                  <CurvedArrow />
-                </span>
-              </div>
-
-              <div className="rounded-2xl border border-gold/55 bg-white p-4 text-center shadow-[0_18px_40px_-32px_rgba(5,5,5,0.55)]">
-                <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#050505]/55">
-                  Code Promo
-                </p>
-                <p className="mt-1 font-display text-3xl font-bold text-gold-600">
-                  BOULANGERIE10
-                </p>
-                <p className="mt-1 text-sm font-semibold text-[#050505]">
-                  -10% sur votre première commande
-                </p>
-              </div>
-
-              <div className="hidden gap-4 sm:grid sm:grid-cols-3">
-                {qrBenefits.map(({ label, Icon }) => (
-                  <div
-                    key={label}
-                    className="border-[#050505]/10 text-center sm:border-l sm:px-4"
-                  >
-                    <Icon className="mx-auto h-8 w-8 text-gold-600" />
-                    <p className="mt-2 text-sm font-semibold leading-snug">
-                      {label}
+            <div className="mt-6 overflow-hidden rounded-3xl border border-gold/25 bg-[#F8F3EA] text-[#050505] shadow-[0_24px_70px_-50px_rgba(216,154,28,0.72)]">
+              <div className="grid gap-6 p-6 lg:grid-cols-[1.1fr_auto_1.2fr_1.6fr] lg:items-center">
+                <div className="flex items-center gap-4">
+                  <span className="grid h-16 w-16 shrink-0 place-items-center rounded-2xl border border-gold/60 bg-white text-gold-600 shadow-[0_16px_32px_-26px_rgba(5,5,5,0.45)]">
+                    <QrCode className="h-8 w-8" />
+                  </span>
+                  <div>
+                    <h3 className="font-bold uppercase tracking-wide text-[#050505]">
+                      Commandez en un scan
+                    </h3>
+                    <p className="text-[#050505]/68 mt-1 text-sm leading-relaxed">
+                      Scannez le QR code, accédez au menu et commandez en
+                      quelques secondes.
                     </p>
                   </div>
-                ))}
+                </div>
+
+                <div className="flex items-center justify-center gap-4">
+                  <div
+                    className="h-24 w-24 overflow-hidden rounded-xl border border-gold/70 bg-white p-1.5 shadow-[0_18px_34px_-26px_rgba(5,5,5,0.7)] sm:h-28 sm:w-28 [&>svg]:h-full [&>svg]:w-full"
+                    aria-label="QR code de commande"
+                    role="img"
+                    dangerouslySetInnerHTML={{ __html: qrSvg }}
+                  />
+                  <span className="hidden text-gold md:block" aria-hidden>
+                    <CurvedArrow />
+                  </span>
+                </div>
+
+                <div className="rounded-2xl border border-gold/55 bg-white p-4 text-center shadow-[0_18px_40px_-32px_rgba(5,5,5,0.55)]">
+                  <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#050505]/55">
+                    Code Promo
+                  </p>
+                  <p className="mt-1 font-display text-3xl font-bold text-gold-600">
+                    BOULANGERIE10
+                  </p>
+                  <p className="mt-1 text-sm font-semibold text-[#050505]">
+                    -10% sur votre première commande
+                  </p>
+                </div>
+
+                <div className="hidden gap-4 sm:grid sm:grid-cols-3">
+                  {qrBenefits.map(({ label, Icon }) => (
+                    <div
+                      key={label}
+                      className="border-[#050505]/10 text-center sm:border-l sm:px-4"
+                    >
+                      <Icon className="mx-auto h-8 w-8 text-gold-600" />
+                      <p className="mt-2 text-sm font-semibold leading-snug">
+                        {label}
+                      </p>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
         </div>
 
-        <footer className="border-t border-white/[0.08] px-5 py-8 sm:px-8 lg:px-10">
+        <MobileFooter />
+
+        <footer className="hidden border-t border-white/[0.08] px-5 py-8 sm:block sm:px-8 lg:px-10">
           <div className="grid gap-8 lg:grid-cols-[1.1fr_1fr_1.1fr_1.2fr_1.25fr]">
             <div>
               <BrandLogo />
@@ -373,17 +480,17 @@ export async function PremiumEngagementSection() {
                   { label: "TikTok", href: siteConfig.socials.tiktok },
                   { label: "WhatsApp", href: siteConfig.socials.whatsapp },
                 ].map(({ label, href }) => (
-                    <a
-                      key={label}
-                      href={href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      aria-label={label}
-                      className="grid h-10 w-10 place-items-center rounded-full border border-gold/60 text-gold transition hover:bg-gold hover:text-ink"
-                    >
-                      <SocialIcon label={label} />
-                    </a>
-                  ))}
+                  <a
+                    key={label}
+                    href={href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={label}
+                    className="grid h-10 w-10 place-items-center rounded-full border border-gold/60 text-gold transition hover:bg-gold hover:text-ink"
+                  >
+                    <SocialIcon label={label} />
+                  </a>
+                ))}
               </div>
             </div>
 

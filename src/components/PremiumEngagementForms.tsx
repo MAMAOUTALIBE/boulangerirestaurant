@@ -12,6 +12,10 @@ import {
 const fieldClass =
   "w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-2.5 text-sm text-cream placeholder:text-muted transition focus:border-gold/70 focus:outline-none";
 
+type FormIdProps = {
+  idPrefix?: string;
+};
+
 function StatusMessage({ state }: { state: ActionState | null }) {
   if (!state) return null;
   return (
@@ -52,12 +56,16 @@ function ContactSubmitButton() {
   );
 }
 
-export function PremiumReviewForm() {
+export function PremiumReviewForm({
+  idPrefix = "premium-review",
+}: FormIdProps) {
   const [state, formAction] = useActionState<ActionState | null, FormData>(
     submitReview,
     null,
   );
   const [rating, setRating] = useState(5);
+  const nameId = `${idPrefix}-name`;
+  const commentId = `${idPrefix}-comment`;
 
   return (
     <form action={formAction} className="space-y-2.5">
@@ -93,14 +101,11 @@ export function PremiumReviewForm() {
       </div>
 
       <div>
-        <label
-          htmlFor="premium-review-name"
-          className="mb-1 block text-sm text-cream/85"
-        >
+        <label htmlFor={nameId} className="mb-1 block text-sm text-cream/85">
           Nom
         </label>
         <input
-          id="premium-review-name"
+          id={nameId}
           name="name"
           required
           placeholder="Votre nom"
@@ -112,14 +117,11 @@ export function PremiumReviewForm() {
       </div>
 
       <div>
-        <label
-          htmlFor="premium-review-comment"
-          className="mb-1 block text-sm text-cream/85"
-        >
+        <label htmlFor={commentId} className="mb-1 block text-sm text-cream/85">
           Votre avis
         </label>
         <textarea
-          id="premium-review-comment"
+          id={commentId}
           name="comment"
           rows={2}
           required
@@ -137,11 +139,16 @@ export function PremiumReviewForm() {
   );
 }
 
-export function PremiumContactForm() {
+export function PremiumContactForm({
+  idPrefix = "premium-contact",
+}: FormIdProps) {
   const [state, formAction] = useActionState<ActionState | null, FormData>(
     sendContactMessage,
     null,
   );
+  const nameId = `${idPrefix}-name`;
+  const emailId = `${idPrefix}-email`;
+  const messageId = `${idPrefix}-message`;
 
   return (
     <form action={formAction} className="space-y-2.5">
@@ -155,14 +162,11 @@ export function PremiumContactForm() {
       />
 
       <div>
-        <label
-          htmlFor="premium-contact-name"
-          className="mb-1 block text-sm text-cream/85"
-        >
+        <label htmlFor={nameId} className="mb-1 block text-sm text-cream/85">
           Nom
         </label>
         <input
-          id="premium-contact-name"
+          id={nameId}
           name="name"
           required
           placeholder="Votre nom"
@@ -174,14 +178,11 @@ export function PremiumContactForm() {
       </div>
 
       <div>
-        <label
-          htmlFor="premium-contact-email"
-          className="mb-1 block text-sm text-cream/85"
-        >
+        <label htmlFor={emailId} className="mb-1 block text-sm text-cream/85">
           Email
         </label>
         <input
-          id="premium-contact-email"
+          id={emailId}
           name="email"
           type="email"
           required
@@ -194,14 +195,11 @@ export function PremiumContactForm() {
       </div>
 
       <div>
-        <label
-          htmlFor="premium-contact-message"
-          className="mb-1 block text-sm text-cream/85"
-        >
+        <label htmlFor={messageId} className="mb-1 block text-sm text-cream/85">
           Message
         </label>
         <textarea
-          id="premium-contact-message"
+          id={messageId}
           name="message"
           rows={2}
           required
