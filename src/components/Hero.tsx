@@ -149,8 +149,7 @@ export function Hero() {
               </h1>
 
               <p className="text-[#F8F3EA]/88 mt-3 max-w-[18rem] text-sm font-semibold leading-5 drop-shadow-[0_2px_5px_rgba(0,0,0,0.98)] sm:mt-5 sm:max-w-xl sm:text-xl sm:leading-8 3xl:max-w-3xl 3xl:text-2xl 3xl:leading-10">
-                Pains au levain, viennoiseries pur beurre et pâtisseries de
-                saison, à commander pour le retrait ou la livraison.
+                Frais du jour. Commandez maintenant.
               </p>
 
               <div className="mt-5 hidden flex-col gap-3 sm:mt-6 sm:flex sm:flex-row sm:flex-wrap 3xl:gap-4">
@@ -205,20 +204,21 @@ export function Hero() {
           </motion.div>
         </div>
 
-        {/* Mobile : réassurance en bandeau de chips défilant (1 ligne, swipe) */}
+        {/* Mobile : réassurance en ruban premium défilant */}
         <div
-          className="relative z-20 -mx-4 flex gap-2 overflow-x-auto px-4 pb-0.5 [scrollbar-width:none] sm:hidden [&::-webkit-scrollbar]:hidden"
-          aria-label="Services disponibles"
+          className="hero-service-marquee relative z-20 -mx-4 overflow-hidden pb-0.5 sm:hidden"
+          aria-label="Services disponibles : click and collect, livraison, café et pause, fabrication maison"
         >
-          {serviceHighlights.map(({ title, Icon }) => (
-            <span
-              key={title}
-              className="flex shrink-0 items-center gap-2 rounded-full border border-white/15 bg-black/50 px-4 py-2 text-sm font-semibold text-[#F8F3EA] backdrop-blur-[2px]"
-            >
-              <Icon className="h-4 w-4 shrink-0 text-[#D89A1C]" />
-              {title}
-            </span>
-          ))}
+          <div className="hero-service-track" aria-hidden="true">
+            {[...serviceHighlights, ...serviceHighlights].map(
+              ({ title, Icon }, index) => (
+                <span key={`${title}-${index}`} className="hero-service-chip">
+                  <Icon className="h-4 w-4 shrink-0 text-[#D89A1C]" />
+                  <span>{title}</span>
+                </span>
+              ),
+            )}
+          </div>
         </div>
 
         <motion.div

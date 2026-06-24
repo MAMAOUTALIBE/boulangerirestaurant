@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { Plus, SlidersHorizontal } from "lucide-react";
+import { Plus, SlidersHorizontal, Wheat } from "lucide-react";
 import type { Dish } from "@/types";
 import { formatPrice } from "@/lib/utils";
 import { useCart } from "@/context/CartContext";
@@ -71,9 +71,9 @@ export function DishCard({
     <motion.article
       whileHover={{ y: unavailable ? 0 : -6 }}
       transition={{ type: "spring", stiffness: 260, damping: 20 }}
-      className="group grid h-full grid-cols-[7rem_minmax(0,1fr)] overflow-hidden rounded-2xl border border-gold/15 bg-[#101010] shadow-[0_18px_42px_-34px_rgba(245,158,11,0.78)] transition-shadow duration-300 hover:shadow-[0_22px_52px_-34px_rgba(8,8,8,0.72)] min-[390px]:grid-cols-[7.5rem_minmax(0,1fr)] sm:flex sm:flex-col sm:border-ink/10 sm:bg-white sm:shadow-[0_16px_40px_-30px_rgba(8,8,8,0.62)]"
+      className="group grid h-[8.7rem] grid-cols-[9.25rem_minmax(0,1fr)] overflow-hidden rounded-2xl border border-gold/15 bg-[#101010] shadow-[0_18px_42px_-34px_rgba(245,158,11,0.78)] transition-shadow duration-300 hover:shadow-[0_22px_52px_-34px_rgba(8,8,8,0.72)] min-[390px]:h-[9rem] min-[390px]:grid-cols-[9.9rem_minmax(0,1fr)] sm:flex sm:h-full sm:flex-col sm:border-ink/10 sm:bg-white sm:shadow-[0_16px_40px_-30px_rgba(8,8,8,0.62)]"
     >
-      <div className="relative h-full min-h-[7.25rem] w-full overflow-hidden bg-ink min-[390px]:min-h-[7.75rem] sm:aspect-[5/3] sm:min-h-0 3xl:aspect-[16/10]">
+      <div className="relative h-full min-h-0 w-full overflow-hidden bg-ink sm:aspect-[5/3] sm:min-h-0 3xl:aspect-[16/10]">
         <Image
           src={dish.image}
           alt={dish.name}
@@ -104,24 +104,25 @@ export function DishCard({
             Plus que {lowStock}
           </span>
         )}
-        <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-ink/80 to-transparent" />
-        <span className="absolute bottom-2 left-2 rounded-md bg-black/45 px-2 py-0.5 font-display text-lg font-bold text-cream backdrop-blur-[2px] sm:bottom-3 sm:left-3 sm:py-1 sm:text-2xl 3xl:bottom-4 3xl:left-4 3xl:text-3xl">
+        <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-ink/85 to-transparent" />
+        <span className="absolute bottom-2 left-2 rounded-md bg-black/45 px-2.5 py-1 font-display text-lg font-bold text-cream backdrop-blur-[2px] sm:bottom-3 sm:left-3 sm:text-2xl 3xl:bottom-4 3xl:left-4 3xl:text-3xl">
           {formatPrice(dish.price)}
         </span>
       </div>
 
-      <div className="flex min-w-0 flex-1 flex-col px-3 py-2.5 sm:px-5 sm:pb-4 sm:pt-3.5 3xl:px-6 3xl:pb-5 3xl:pt-4">
-        <h3 className="font-display text-lg font-semibold leading-tight text-cream sm:text-2xl sm:text-ink 3xl:text-3xl">
+      <div className="flex min-w-0 flex-1 flex-col justify-start px-3 pb-2.5 pt-3 sm:block sm:px-5 sm:pb-4 sm:pt-3.5 3xl:px-6 3xl:pb-5 3xl:pt-4">
+        <h3 className="line-clamp-2 font-display text-[1.12rem] font-semibold leading-[1.08] text-cream min-[390px]:text-[1.18rem] sm:text-2xl sm:text-ink 3xl:text-3xl">
           {dish.name}
         </h3>
-        <div className="mt-1 flex flex-1 items-start justify-between gap-2 sm:mt-1.5 sm:gap-3">
-          <p className="line-clamp-2 text-[0.78rem] leading-4 text-cream/70 sm:text-base sm:leading-relaxed sm:text-ink/70 3xl:text-lg 3xl:leading-8">
+        <TitleUnderline />
+        <div className="mt-1 flex items-center justify-between gap-2 sm:mt-1.5 sm:items-start sm:gap-3">
+          <p className="line-clamp-2 text-[0.72rem] leading-[1.25] text-cream/70 min-[390px]:text-[0.76rem] sm:text-base sm:leading-relaxed sm:text-ink/70 3xl:text-lg 3xl:leading-8">
             {dish.description}
           </p>
           {actionButton}
         </div>
         {details.length > 0 && (
-          <div className="mt-2 flex flex-wrap gap-1.5 sm:mt-3">
+          <div className="mt-2 hidden flex-wrap gap-1.5 sm:mt-3 sm:flex">
             {details.slice(0, 4).map((detail) => (
               <span
                 key={detail}
@@ -134,5 +135,18 @@ export function DishCard({
         )}
       </div>
     </motion.article>
+  );
+}
+
+function TitleUnderline() {
+  return (
+    <div
+      aria-hidden="true"
+      className="mt-1 flex w-[5.7rem] items-center gap-1.5 text-gold/90 sm:hidden"
+    >
+      <span className="h-px flex-1 bg-gradient-to-r from-gold/0 via-gold/45 to-gold/80" />
+      <Wheat className="h-3 w-3 rotate-90" strokeWidth={2.3} />
+      <span className="h-px flex-1 bg-gradient-to-r from-gold/80 via-gold/45 to-gold/0" />
+    </div>
   );
 }

@@ -32,6 +32,8 @@ describe("social order helpers", () => {
       choice: {
         fulfillment: "livraison",
         postalCode: "91260",
+        deliveryAddress:
+          "5 rue Jules Vallès — 91260 Juvisy-sur-Orge — Complément : 2e étage",
         label: "Aujourd'hui 19:30",
       },
       subtotal: 30,
@@ -45,6 +47,9 @@ describe("social order helpers", () => {
     expect(message).toContain("2 x Sandwich baguette poulet");
     expect(message).toContain("Options : Pain complet");
     expect(message).toContain("Code postal : 91260");
+    expect(message).toContain(
+      "Adresse : 5 rue Jules Vallès — 91260 Juvisy-sur-Orge — Complément : 2e étage",
+    );
     expect(message.replace(/\s/g, " ")).toContain("Total estimé : 16,80 €");
   });
 

@@ -1,9 +1,8 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { ChevronDown, ShoppingBag, User, X } from "lucide-react";
+import { ChevronRight, ShoppingBag, User, X } from "lucide-react";
 import { Logo } from "@/components/Logo";
-import { LangToggle } from "@/components/LangToggle";
 import type { NavLink } from "@/types";
 
 interface MobileNavProps {
@@ -13,14 +12,17 @@ interface MobileNavProps {
   cartCount: number;
 }
 
-const mainLinkHrefs = new Set(["/menu", "/commander", "/reservation", "/contact"]);
+const mainLinkHrefs = new Set([
+  "/menu",
+  "/commander",
+  "/reservation",
+  "/contact",
+]);
 
 /** Panneau de navigation mobile coulissant (hamburger menu). */
 export function MobileNav({ open, onClose, links, cartCount }: MobileNavProps) {
   const mainLinks = links.filter((link) => mainLinkHrefs.has(link.href));
-  const secondaryLinks = links.filter(
-    (link) => !mainLinkHrefs.has(link.href),
-  );
+  const secondaryLinks = links.filter((link) => !mainLinkHrefs.has(link.href));
 
   return (
     <AnimatePresence>
@@ -60,16 +62,15 @@ export function MobileNav({ open, onClose, links, cartCount }: MobileNavProps) {
                 title="Pages principales"
                 links={mainLinks}
                 onClose={onClose}
-                defaultOpen
               />
               <MobileNavGroup
-                title="Autres pages"
+                title="Pages utiles"
                 links={secondaryLinks}
                 onClose={onClose}
               />
             </nav>
 
-            <div className="mt-6 space-y-4 border-t border-white/10 pt-5">
+            <div className="mt-6 border-t border-white/10 pt-5">
               <a
                 href="/compte"
                 onClick={onClose}
@@ -78,12 +79,6 @@ export function MobileNav({ open, onClose, links, cartCount }: MobileNavProps) {
                 <User className="h-4 w-4" />
                 Mon compte
               </a>
-              <div className="flex items-center justify-between gap-4">
-                <span className="text-xs font-semibold uppercase tracking-[0.2em] text-cream/45">
-                  Langue
-                </span>
-                <LangToggle />
-              </div>
             </div>
 
             {cartCount > 0 && (
@@ -107,23 +102,17 @@ function MobileNavGroup({
   title,
   links,
   onClose,
-  defaultOpen = false,
 }: {
   title: string;
   links: NavLink[];
   onClose: () => void;
-  defaultOpen?: boolean;
 }) {
   return (
-    <details
-      open={defaultOpen}
-      className="group rounded-2xl border border-white/10 bg-white/[0.025]"
-    >
-      <summary className="flex min-h-14 cursor-pointer list-none items-center justify-between gap-3 px-4 text-left text-sm font-bold uppercase tracking-[0.18em] text-cream/70 transition hover:text-gold [&::-webkit-details-marker]:hidden">
+    <section className="rounded-2xl border border-white/10 bg-white/[0.025]">
+      <h3 className="border-b border-white/10 px-4 py-3 text-sm font-bold uppercase tracking-[0.18em] text-gold">
         {title}
-        <ChevronDown className="h-4 w-4 shrink-0 text-gold transition group-open:rotate-180" />
-      </summary>
-      <div className="border-t border-white/10 py-2">
+      </h3>
+      <div className="py-1.5">
         {links.map((link, index) => (
           <motion.a
             key={link.href}
@@ -132,12 +121,13 @@ function MobileNavGroup({
             initial={{ opacity: 0, x: 12 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.03 * index }}
-            className="block px-4 py-3 text-left text-base font-medium text-cream/90 transition hover:bg-white/[0.045] hover:text-gold"
+            className="group flex min-h-12 items-center justify-between gap-3 px-4 py-2.5 text-left text-base font-medium text-cream/90 transition hover:bg-white/[0.045] hover:text-gold"
           >
-            {link.label}
+            <span>{link.label}</span>
+            <ChevronRight className="h-4 w-4 shrink-0 text-gold/70 transition group-hover:translate-x-0.5 group-hover:text-gold" />
           </motion.a>
         ))}
       </div>
-    </details>
+    </section>
   );
 }

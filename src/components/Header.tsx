@@ -11,14 +11,11 @@ import {
   ShoppingBag,
   SlidersHorizontal,
 } from "lucide-react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { Logo } from "@/components/Logo";
 import { MobileNav } from "@/components/MobileNav";
 import { navLinks } from "@/data/services";
 import { cn } from "@/lib/utils";
 import { useCart } from "@/context/CartContext";
-import { useOrderChoice } from "@/context/OrderContext";
 import { useLang } from "@/context/LangContext";
 import { siteConfig } from "@/lib/config";
 
@@ -39,9 +36,7 @@ const phoneHref = `tel:${siteConfig.contact.phone.replace(/\s/g, "")}`;
 export function Header() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
-  const pathname = usePathname();
   const { totalCount: cartCount, setOpen: setCartOpen } = useCart();
-  const { choice } = useOrderChoice();
   const { t } = useLang();
 
   useEffect(() => {
@@ -151,15 +146,6 @@ export function Header() {
           </button>
         </div>
       </div>
-
-      {choice && pathname === "/commander" && (
-        <Link
-          href="/commander"
-          className="mx-auto mt-2 flex w-fit items-center justify-center gap-2 rounded-full border border-gold/30 bg-gold/90 px-4 py-1.5 text-center text-xs font-semibold text-ink shadow-[0_10px_28px_-18px_rgba(216,154,28,0.9)] transition hover:bg-gold"
-        >
-          {choice.label} · modifier
-        </Link>
-      )}
 
       <MobileNav
         open={open}

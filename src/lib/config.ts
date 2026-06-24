@@ -20,6 +20,11 @@ export const siteConfig = {
     email: "contact@boulangerie.fr",
     address: "5 Rue Jules Vallès, 91260 Juvisy-sur-Orge",
   },
+  /** Horaires d'ouverture — source unique affichée partout (footer, contact, mobile, QR). */
+  hours: {
+    summary: "Lun – Dim : 7h00 – 19h30",
+    rows: [{ day: "Lundi – Dimanche", time: "7h00 – 19h30" }],
+  },
   messaging: {
     whatsappOrderNumber,
     telegramOrderUsername,

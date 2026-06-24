@@ -21,14 +21,16 @@ import {
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { MobileTestimonialsCompact } from "@/components/MobileTestimonialsCompact";
+import { MobileInformationPanel } from "@/components/MobileInformationPanel";
 import {
   PremiumContactForm,
   PremiumReviewForm,
 } from "@/components/PremiumEngagementForms";
 import { NewsletterForm } from "@/components/NewsletterForm";
 import { testimonials } from "@/data/testimonials";
+import { getApprovedReviews } from "@/lib/reviews";
 import { siteConfig } from "@/lib/config";
-import { emailHref, mapsHref, phoneHref } from "@/lib/contactLinks";
+import { mapsHref } from "@/lib/contactLinks";
 
 const footerServices = [
   { label: "Pains & viennoiseries du jour", Icon: Croissant },
@@ -233,56 +235,40 @@ function MobileFooter() {
         ))}
       </nav>
 
-      <div className="my-5 h-px bg-white/10" />
-
-      <FooterMobileHeading>Liens rapides</FooterMobileHeading>
-      <nav
-        aria-label="Liens rapides du pied de page"
-        className="mt-4 grid grid-cols-2 gap-x-4 gap-y-3"
-      >
-        {quickLinks.map((column, columnIndex) => (
-          <ul key={columnIndex} className="space-y-3">
-            {column.map((link) => (
-              <li key={link.href}>
-                <Link
-                  href={link.href}
-                  className="group flex min-h-7 items-center justify-between gap-2 text-sm text-cream transition hover:text-gold"
-                >
-                  <span className="min-w-0">{link.label}</span>
-                  <ChevronRight className="h-4 w-4 shrink-0 text-cream transition group-hover:translate-x-0.5 group-hover:text-gold" />
-                </Link>
-              </li>
-            ))}
-          </ul>
-        ))}
-      </nav>
-
-      <div className="my-5 h-px bg-white/10" />
-
-      <FooterMobileHeading>Informations</FooterMobileHeading>
-      <div className="mt-4 space-y-3 text-sm leading-5 text-cream/70">
-        <a
-          href={mapsHref}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex gap-3"
+      <section id="liens-utiles" className="my-7 border-y border-gold/20 py-7">
+        <h3 className="text-sm font-bold uppercase tracking-[0.5em] text-gold">
+          Liens rapides
+        </h3>
+        <nav
+          aria-label="Liens rapides du pied de page"
+          className="mt-6 grid grid-cols-2 gap-x-4"
         >
-          <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-gold" />
-          <span>{siteConfig.contact.address}</span>
-        </a>
-        <a href={phoneHref} className="flex gap-3">
-          <Phone className="mt-0.5 h-4 w-4 shrink-0 text-gold" />
-          <span>{siteConfig.contact.phone}</span>
-        </a>
-        <a href={emailHref} className="flex gap-3">
-          <Mail className="mt-0.5 h-4 w-4 shrink-0 text-gold" />
-          <span>{siteConfig.contact.email}</span>
-        </a>
-        <div className="flex gap-3">
-          <Clock className="mt-0.5 h-4 w-4 shrink-0 text-gold" />
-          <span>Lun - Dim : 7h00 - 19h30</span>
-        </div>
-      </div>
+          {quickLinks.map((column, columnIndex) => (
+            <ul key={columnIndex} className="border-t border-gold/15">
+              {column.map((link) => (
+                <li key={link.href} className="border-b border-gold/15">
+                  <Link
+                    href={link.href}
+                    className="group flex min-h-[4.45rem] items-center justify-between gap-2 py-3 text-cream transition hover:text-gold"
+                  >
+                    <span className="min-w-0 font-display text-[1.14rem] leading-[1.05] min-[390px]:text-[1.2rem]">
+                      {link.label}
+                    </span>
+                    <span
+                      aria-hidden="true"
+                      className="grid h-8 w-8 shrink-0 place-items-center rounded-full border border-gold/55 bg-black/30 text-gold shadow-[0_0_26px_-18px_rgba(245,158,11,0.95)] transition group-hover:border-gold group-hover:bg-gold group-hover:text-black group-active:scale-95"
+                    >
+                      <ChevronRight className="h-5 w-5 transition group-hover:translate-x-0.5" />
+                    </span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          ))}
+        </nav>
+      </section>
+
+      <MobileInformationPanel className="mt-7" />
 
       <section className="mt-5 rounded-2xl border border-white/10 bg-white/[0.035] p-3 shadow-[0_24px_70px_-58px_rgba(255,255,255,0.7)]">
         <FooterMobileHeading>Newsletter</FooterMobileHeading>
@@ -316,6 +302,33 @@ export async function PremiumEngagementSection() {
     margin: 1,
     color: { dark: "#050505", light: "#ffffff" },
   });
+
+  // Avis affichés : les avis approuvés depuis /admin/avis sont prioritaires ;
+  // repli sur les avis curatés tant qu'aucun avis n'a encore été modéré.
+  const { reviews: dbReviews } = await getApprovedReviews();
+  const displayReviews: {
+    id: string;
+    name: string;
+    comment: string;
+    rating: number;
+    avatar?: string;
+    city?: string;
+  }[] =
+    dbReviews.length > 0
+      ? dbReviews.slice(0, 2).map((r) => ({
+          id: r.id,
+          name: r.name,
+          comment: r.comment,
+          rating: r.rating,
+        }))
+      : testimonials.slice(0, 2).map((t) => ({
+          id: t.id,
+          name: t.name,
+          comment: t.comment,
+          rating: t.rating,
+          avatar: t.avatar,
+          city: t.city,
+        }));
 
   return (
     <section
@@ -395,20 +408,39 @@ export async function PremiumEngagementSection() {
                 </div>
 
                 <div className="space-y-2.5">
-                  {testimonials.slice(0, 2).map((item) => (
+                  {displayReviews.map((item) => (
                     <Card key={item.id} className="relative p-3.5">
                       <Quote className="absolute right-4 top-3.5 h-7 w-7 text-gold" />
                       <div className="flex gap-3.5 pr-10">
-                        <Image
-                          src={item.avatar}
-                          alt={item.name}
-                          width={64}
-                          height={64}
-                          className="h-12 w-12 rounded-full object-cover ring-2 ring-gold/50"
-                        />
+                        {item.avatar ? (
+                          <Image
+                            src={item.avatar}
+                            alt={item.name}
+                            width={64}
+                            height={64}
+                            className="h-12 w-12 rounded-full object-cover ring-2 ring-gold/50"
+                          />
+                        ) : (
+                          <span
+                            aria-hidden
+                            className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-gold/15 text-lg font-bold text-gold ring-2 ring-gold/50"
+                          >
+                            {item.name.charAt(0).toUpperCase()}
+                          </span>
+                        )}
                         <div>
                           <p className="font-bold">{item.name}</p>
-                          <Stars />
+                          <div
+                            className="flex"
+                            aria-label={`Note ${item.rating} sur 5`}
+                          >
+                            {[1, 2, 3, 4, 5].map((n) => (
+                              <Star
+                                key={n}
+                                className={`h-4 w-4 ${n <= item.rating ? "fill-gold text-gold" : "text-white/20"}`}
+                              />
+                            ))}
+                          </div>
                           <blockquote className="mt-1.5 max-w-xl text-sm leading-relaxed text-cream/80">
                             &ldquo;{item.comment}&rdquo;
                           </blockquote>
@@ -555,9 +587,9 @@ export async function PremiumEngagementSection() {
             </FooterColumn>
 
             <FooterColumn title="Horaires">
-              <TimeRow day="Lundi - Vendredi" time="7h00 - 19h30" />
-              <TimeRow day="Samedi" time="7h00 - 20h00" />
-              <TimeRow day="Dimanche" time="7h30 - 13h00" />
+              {siteConfig.hours.rows.map((h) => (
+                <TimeRow key={h.day} day={h.day} time={h.time} />
+              ))}
             </FooterColumn>
 
             <FooterColumn title="Services">

@@ -15,13 +15,18 @@ export const dynamic = "force-dynamic";
  */
 export async function GET(request: Request) {
   const secret = process.env.CRON_SECRET;
+  // Sécurité : on refuse tant que le secret n'est pas configuré (jamais ouvert par défaut).
+  if (!secret) {
+    return NextResponse.json(
+      { error: "CRON_SECRET non configuré." },
+      { status: 503 },
+    );
+  }
   const url = new URL(request.url);
   const provided =
     request.headers.get("authorization")?.replace("Bearer ", "") ??
     url.searchParams.get("secret");
-
-  // En présence d'un secret configuré, on l'exige.
-  if (secret && provided !== secret) {
+  if (provided !== secret) {
     return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
   }
 

@@ -8,6 +8,8 @@ const field =
   "w-full rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-sm text-cream placeholder:text-muted focus:border-gold/60 focus:outline-none focus:ring-1 focus:ring-gold/40";
 const compactField =
   "h-9 w-full rounded-xl border border-white/15 bg-white/5 px-3 text-[0.8rem] text-cream placeholder:text-muted focus:border-gold/60 focus:outline-none focus:ring-1 focus:ring-gold/40 min-[390px]:h-10 min-[390px]:text-[0.82rem]";
+const compactTextarea =
+  "min-h-16 w-full resize-none rounded-xl border border-white/15 bg-white/5 px-3 py-2 text-[0.8rem] text-cream placeholder:text-muted focus:border-gold/60 focus:outline-none focus:ring-1 focus:ring-gold/40";
 
 function SubmitButton({
   disabled,
@@ -23,7 +25,7 @@ function SubmitButton({
       disabled={pending || disabled}
       className={`${compact ? "min-h-9 px-4 py-2 text-sm min-[390px]:min-h-10" : ""} btn-primary w-full disabled:opacity-60`}
     >
-      {pending ? "Envoi…" : "Réserver mon panier"}
+      {pending ? "Envoi…" : "Confirmer la réservation"}
     </button>
   );
 }
@@ -98,6 +100,19 @@ export function AntiWasteReserveForm({ remaining }: { remaining: number }) {
             disabled={soldOut}
           />
         </div>
+        <div>
+          <label htmlFor="m-aw-message" className="sr-only">
+            Message optionnel
+          </label>
+          <textarea
+            id="m-aw-message"
+            name="message"
+            maxLength={300}
+            placeholder="Message optionnel"
+            disabled={soldOut}
+            className={compactTextarea}
+          />
+        </div>
         {state && !state.ok && (
           <p role="alert" className="text-xs text-red-400">
             {state.message}
@@ -149,6 +164,13 @@ export function AntiWasteReserveForm({ remaining }: { remaining: number }) {
             className={field}
           />
         </div>
+        <textarea
+          name="message"
+          maxLength={300}
+          placeholder="Message optionnel"
+          disabled={soldOut}
+          className={`${field} min-h-24 resize-none`}
+        />
         {state && !state.ok && (
           <p role="alert" className="text-sm text-red-400">
             {state.message}

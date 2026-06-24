@@ -1,16 +1,10 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import {
-  ChevronDown,
-  Clock,
-  Leaf,
-  PackageCheck,
-  Recycle,
-  ShoppingBag,
-} from "lucide-react";
+import { Clock, Leaf, Recycle } from "lucide-react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { AntiWasteReserveForm } from "@/components/AntiWasteReserveForm";
+import { AntiWasteMobileOffer } from "@/components/AntiWasteMobileOffer";
 import {
   getTodayAntiWasteOffer,
   type AntiWasteOfferView,
@@ -90,7 +84,7 @@ export default async function AntiGaspiPage() {
             </ul>
 
             {offer ? (
-              <MobileAntiWasteOffer offer={offer} />
+              <AntiWasteMobileOffer offer={offer} />
             ) : (
               <MobileNoOfferCard />
             )}
@@ -179,69 +173,6 @@ function DesktopAntiWasteOffer({ offer }: { offer: AntiWasteOfferView }) {
         <AntiWasteReserveForm remaining={offer.remaining} />
       </div>
     </div>
-  );
-}
-
-function MobileAntiWasteOffer({ offer }: { offer: AntiWasteOfferView }) {
-  return (
-    <article className="mt-3 overflow-hidden rounded-2xl border border-gold/20 bg-[radial-gradient(circle_at_top,rgba(34,197,94,0.12),transparent_42%),#111111] shadow-[0_22px_60px_-50px_rgba(245,158,11,0.75)]">
-      <div className="grid grid-cols-[7.5rem_1fr] gap-3 p-2.5">
-        <div className="relative min-h-[8.25rem] overflow-hidden rounded-xl">
-          <Image
-            src="/images/boulangerie-hero.webp"
-            alt="Pains et viennoiseries en boutique"
-            fill
-            sizes="120px"
-            className="object-cover"
-          />
-          <span className="absolute left-2 top-2 rounded-full bg-ink/85 px-2 py-1 text-[0.65rem] font-bold text-gold backdrop-blur">
-            {formatPrice(offer.price)}
-          </span>
-        </div>
-        <div className="min-w-0 py-1 pr-1">
-          <div className="flex items-start justify-between gap-2">
-            <h2 className="font-display text-lg font-bold leading-tight text-cream">
-              {offer.title}
-            </h2>
-            <PackageCheck className="mt-0.5 h-4 w-4 shrink-0 text-gold" />
-          </div>
-          <p className="mt-1 line-clamp-2 text-[0.78rem] leading-4 text-cream/70">
-            {offer.description}
-          </p>
-          <div className="mt-2 flex flex-wrap gap-1.5">
-            <span className="rounded-full border border-white/10 px-2 py-1 text-[0.66rem] font-semibold text-cream/70">
-              {offer.pickupStart}-{offer.pickupEnd}
-            </span>
-            <span
-              className={`rounded-full px-2 py-1 text-[0.66rem] font-bold ${
-                offer.soldOut
-                  ? "bg-red-500/15 text-red-200"
-                  : "bg-gold/90 text-ink"
-              }`}
-            >
-              {offer.soldOut ? "Complet" : `${offer.remaining} dispo`}
-            </span>
-          </div>
-        </div>
-      </div>
-
-      <details className="group border-t border-white/10">
-        <summary className="flex min-h-10 cursor-pointer list-none items-center justify-between gap-3 px-3 text-sm font-bold text-gold [&::-webkit-details-marker]:hidden">
-          <span className="inline-flex items-center gap-2">
-            <ShoppingBag className="h-4 w-4" />
-            Réserver
-          </span>
-          <ChevronDown className="h-4 w-4 transition group-open:rotate-180" />
-        </summary>
-        <div className="px-3 pb-3">
-          <p className="mb-2 inline-flex items-center gap-1.5 text-[0.72rem] text-muted">
-            <Clock className="h-3.5 w-3.5 text-gold" />
-            Paiement sur place au retrait.
-          </p>
-          <AntiWasteReserveForm remaining={offer.remaining} />
-        </div>
-      </details>
-    </article>
   );
 }
 

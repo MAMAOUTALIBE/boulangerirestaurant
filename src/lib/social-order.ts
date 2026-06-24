@@ -5,6 +5,7 @@ import { formatPrice } from "@/lib/utils";
 interface SocialOrderChoice {
   fulfillment: Fulfillment;
   postalCode?: string;
+  deliveryAddress?: string;
   label: string;
 }
 
@@ -62,6 +63,7 @@ export function formatSocialOrderMessage({
   ];
 
   if (choice.postalCode) lines.push(`Code postal : ${choice.postalCode}`);
+  if (choice.deliveryAddress) lines.push(`Adresse : ${choice.deliveryAddress}`);
   lines.push(`Sous-total : ${formatPrice(subtotal)}`);
   if (discount > 0) {
     lines.push(

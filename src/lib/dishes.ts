@@ -5,51 +5,32 @@ import type { Dish } from "@/types";
 import { remainingStock, isSoldOut } from "@/lib/stock";
 
 const dishImageOverrides: Record<string, string> = {
-  "baguette-tradition": "/images/boulangerie-pains.webp",
-  "brioche-tressee": "/images/boulangerie-viennoiseries.webp",
-  "cafe-allonge": "/images/boulangerie-snacking.webp",
-  "chausson-pommes": "/images/boulangerie-viennoiseries.webp",
-  "chocolat-chaud": "/images/boulangerie-snacking.webp",
-  "croissant-beurre": "/images/boulangerie-viennoiseries.webp",
-  "eclair-chocolat": "/images/boulangerie-patisseries.webp",
-  "flan-patissier": "/images/boulangerie-patisseries.webp",
-  "jus-orange-presse": "/images/boulangerie-snacking.webp",
-  "pain-chocolat": "/images/boulangerie-viennoiseries.webp",
-  "pain-complet-graines": "/images/boulangerie-pains.webp",
-  "pain-levain": "/images/boulangerie-pains.webp",
-  "paris-brest": "/images/boulangerie-patisseries.webp",
-  "quiche-lorraine": "/images/boulangerie-snacking.webp",
-  "sandwich-baguette-poulet": "/images/boulangerie-snacking.webp",
-  "tartelette-fruits": "/images/boulangerie-patisseries.webp",
+  "baguette-tradition": "/images/menu/baguette-tradition.webp",
+  "brioche-tressee": "/images/menu/brioche-tressee.webp",
+  "cafe-allonge": "/images/menu/cafe-allonge.webp",
+  "chausson-pommes": "/images/menu/chausson-pommes.webp",
+  "chocolat-chaud": "/images/menu/chocolat-chaud.webp",
+  "croissant-beurre": "/images/menu/croissant-beurre.webp",
+  "eclair-chocolat": "/images/menu/eclair-chocolat.webp",
+  "flan-patissier": "/images/menu/flan-patissier.webp",
+  "jus-orange-presse": "/images/menu/jus-orange-presse.webp",
+  "pain-chocolat": "/images/menu/pain-chocolat.webp",
+  "pain-complet-graines": "/images/menu/pain-complet-graines.webp",
+  "pain-levain": "/images/menu/pain-levain.webp",
+  "paris-brest": "/images/menu/paris-brest.webp",
+  "quiche-lorraine": "/images/menu/quiche-lorraine.webp",
+  "sandwich-baguette-poulet": "/images/menu/sandwich-baguette-poulet.webp",
+  "tartelette-fruits": "/images/menu/tartelette-fruits.webp",
 };
 
-const publicMenuCategorySlugs = [
-  "pains",
-  "viennoiseries",
-  "patisseries",
-  "snacking",
-  "boissons",
-];
+// La visibilité publique d'un produit/catégorie est désormais pilotée par le
+// CRM (champ `available`), et non plus par une liste blanche de slugs figée :
+// tout produit actif créé/édité depuis /admin/menu apparaît côté public.
 
-const publicMenuDishSlugs = [
-  "baguette-tradition",
-  "pain-levain",
-  "pain-complet-graines",
-  "croissant-beurre",
-  "pain-chocolat",
-  "chausson-pommes",
-  "brioche-tressee",
-  "tartelette-fruits",
-  "eclair-chocolat",
-  "flan-patissier",
-  "paris-brest",
-  "sandwich-baguette-poulet",
-  "quiche-lorraine",
-  "cafe-allonge",
-  "jus-orange-presse",
-  "chocolat-chaud",
-];
-
+/**
+ * Image affichée : les produits éditoriaux connus ont une photo dédiée pour
+ * éviter les inversions visuelles ; les produits créés au CRM gardent leur image.
+ */
 function resolveDishImage(row: Pick<DishRow, "slug" | "image">): string {
   return dishImageOverrides[row.slug] ?? row.image;
 }
@@ -80,8 +61,6 @@ export async function getDishes(): Promise<Dish[]> {
   const rows = await prisma.dish.findMany({
     where: {
       available: true,
-      slug: { in: publicMenuDishSlugs },
-      category: { is: { slug: { in: publicMenuCategorySlugs } } },
     },
     orderBy: [{ sortOrder: "asc" }, { id: "asc" }],
     distinct: ["slug"],
@@ -129,12 +108,11 @@ export interface MenuCategory {
 /** Menu public structuré par catégories (produits disponibles ou épuisés). */
 export async function getMenu(): Promise<MenuCategory[]> {
   const categories = await prisma.category.findMany({
-    where: { slug: { in: publicMenuCategorySlugs } },
     orderBy: [{ sortOrder: "asc" }, { id: "asc" }],
     distinct: ["slug"],
     include: {
       dishes: {
-        where: { slug: { in: publicMenuDishSlugs } },
+        where: { available: true },
         orderBy: [{ sortOrder: "asc" }, { id: "asc" }],
         distinct: ["slug"],
         include: { _count: { select: { optionGroups: true } } },
@@ -160,7 +138,6 @@ export async function getMenu(): Promise<MenuCategory[]> {
 /** Données du menu pour le browser interactif : catégories + produits à plat. */
 export async function getMenuForBrowser() {
   const categories = await prisma.category.findMany({
-    where: { slug: { in: publicMenuCategorySlugs } },
     orderBy: [{ sortOrder: "asc" }, { id: "asc" }],
     distinct: ["slug"],
   });
@@ -168,7 +145,7 @@ export async function getMenuForBrowser() {
 
   const rows = await prisma.dish.findMany({
     where: {
-      slug: { in: publicMenuDishSlugs },
+      available: true,
       categoryId: { in: categoryIds },
     },
     orderBy: [{ sortOrder: "asc" }, { id: "asc" }],
@@ -197,12 +174,10 @@ export async function getMenuForBrowser() {
 
 /** Fiche produit complète avec ses groupes d'options (pour la page détail). */
 export async function getDishWithOptions(slug: string) {
-  if (!publicMenuDishSlugs.includes(slug)) return null;
-
   const dish = await prisma.dish.findFirst({
     where: {
       slug,
-      category: { is: { slug: { in: publicMenuCategorySlugs } } },
+      available: true,
     },
     orderBy: { id: "asc" },
     include: {

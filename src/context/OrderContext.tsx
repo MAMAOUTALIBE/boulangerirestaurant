@@ -15,6 +15,10 @@ const STORAGE_KEY = "restaurant-order-ctx";
 export interface OrderChoice {
   fulfillment: Fulfillment;
   postalCode?: string;
+  deliveryStreet?: string;
+  deliveryCity?: string;
+  deliveryDetails?: string;
+  deliveryAddress?: string;
   /** ISO du créneau choisi, ou null = dès que possible. */
   scheduledAt: string | null;
   /** Libellé lisible (« Aujourd'hui 19:30 » / « Dès que possible »). */

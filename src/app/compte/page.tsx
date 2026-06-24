@@ -36,7 +36,7 @@ export default async function ComptePage({
     return (
       <>
         <Header />
-        <main className="min-h-screen bg-ink pb-20 pt-28">
+        <main className="min-h-screen bg-ink pb-64 pt-28 sm:pb-20">
           <div className="container-page max-w-md">
             <BackLink />
             <h1 className="mt-6 font-display text-3xl font-bold text-cream">
@@ -66,7 +66,7 @@ export default async function ComptePage({
   return (
     <>
       <Header />
-      <main className="min-h-screen bg-ink pb-20 pt-28">
+      <main className="min-h-screen bg-ink pb-64 pt-28 sm:pb-20">
         <div className="container-page max-w-2xl">
           <BackLink />
           <div className="mt-6 flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between">

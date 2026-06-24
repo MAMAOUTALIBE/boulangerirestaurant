@@ -13,6 +13,7 @@ const specialtySlugs = [
 /** Grille des spécialités mises en avant sur l'accueil. */
 export async function FeaturedDishes() {
   const { categories, dishes } = await getMenuForBrowser();
+  const mobileCategories = groupMobileCategories(categories);
   const availableDishes = dishes.filter((dish) => dish.available);
   const specialtyDishes = specialtySlugs
     .map((slug) => availableDishes.find((dish) => dish.id === slug))
@@ -42,14 +43,14 @@ export async function FeaturedDishes() {
               </Link>
             </div>
             <div className="grid grid-cols-2 gap-2">
-              {categories.slice(0, 6).map((category) => (
+              {mobileCategories.map((category) => (
                 <Link
                   key={category.id}
-                  href={`/menu#${category.slug}`}
+                  href={category.href}
                   className="group relative min-h-[7rem] overflow-hidden rounded-2xl border border-white/10 bg-white/[0.035]"
                 >
                   <Image
-                    src={imageForCategory(category.slug)}
+                    src={imageForCategory(category.imageSlug)}
                     alt=""
                     fill
                     sizes="50vw"
@@ -57,7 +58,7 @@ export async function FeaturedDishes() {
                   />
                   <div className="from-black/88 absolute inset-0 bg-gradient-to-t via-black/30 to-transparent" />
                   <div className="absolute inset-x-0 bottom-0 p-3">
-                    <p className="line-clamp-1 font-display text-lg font-bold leading-tight text-cream">
+                    <p className="line-clamp-2 font-display text-lg font-bold leading-tight text-cream">
                       {category.name}
                     </p>
                     <p className="mt-0.5 text-[0.68rem] font-bold uppercase tracking-[0.16em] text-gold">
@@ -119,8 +120,46 @@ function imageForCategory(slug: string) {
   if (slug.includes("patis") || slug.includes("gateau")) {
     return "/images/boulangerie-patisseries.webp";
   }
-  if (slug.includes("snack") || slug.includes("sandwich")) {
-    return "/images/boulangerie-snacking.webp";
+  if (
+    slug.includes("snack") ||
+    slug.includes("sandwich") ||
+    slug.includes("boisson")
+  ) {
+    return "/images/boulangerie-snacking-boissons.webp";
   }
   return "/images/boulangerie-hero.webp";
+}
+
+function groupMobileCategories(
+  categories: Array<{ id: string; slug: string; name: string }>,
+) {
+  let combinedAdded = false;
+
+  return categories.flatMap((category) => {
+    const isSnackOrDrink =
+      category.slug.includes("snack") || category.slug.includes("boisson");
+
+    if (!isSnackOrDrink) {
+      return [
+        {
+          ...category,
+          href: `/menu#${category.slug}`,
+          imageSlug: category.slug,
+        },
+      ];
+    }
+
+    if (combinedAdded) return [];
+    combinedAdded = true;
+
+    return [
+      {
+        id: "snacking-boissons",
+        slug: "snacking-boissons",
+        name: "Snack & boissons",
+        href: "/menu#snacking-boissons",
+        imageSlug: "snacking-boissons",
+      },
+    ];
+  });
 }

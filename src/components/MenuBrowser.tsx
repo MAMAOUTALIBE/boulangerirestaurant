@@ -28,6 +28,10 @@ export interface BrowserCategory {
   name: string;
 }
 
+interface DisplayCategory extends BrowserCategory {
+  sourceIds: string[];
+}
+
 const popularDishIds = new Set([
   "baguette-tradition",
   "croissant-beurre",
@@ -54,7 +58,7 @@ const dishDetails: Record<string, string[]> = {
   "chocolat-chaud": ["Chaud", "Lait", "Chocolat"],
 };
 
-/** Menu interactif : recherche plein-texte + filtres catégorie / dispo / prix. */
+/** Menu interactif : recherche plein-texte + filtres catégorie. */
 export function MenuBrowser({
   categories,
   dishes,
@@ -64,29 +68,28 @@ export function MenuBrowser({
 }) {
   const [q, setQ] = useState("");
   const [filter, setFilter] = useState("all");
-  const [onlyAvailable, setOnlyAvailable] = useState(true);
-  const [sort, setSort] = useState<"default" | "price-asc" | "price-desc">(
-    "default",
-  );
   const categoryById = useMemo(
     () => new Map(categories.map((category) => [category.id, category])),
     [categories],
   );
+  const displayCategories = useMemo(
+    () => groupSnackAndDrinks(categories),
+    [categories],
+  );
   const categoryFilters = useMemo(
     () =>
-      categories.map((category) => ({
+      displayCategories.map((category) => ({
         id: category.slug,
         label: category.name,
         Icon: iconForCategory(category.slug),
       })),
-    [categories],
+    [displayCategories],
   );
 
   const filtered = useMemo(() => {
-    let list = dishes.filter((d) => {
+    const list = dishes.filter((d) => {
       const category = categoryById.get(d.categoryId);
       if (!matchesQuickFilter(category?.slug, filter)) return false;
-      if (onlyAvailable && (!d.available || d.soldOut)) return false;
       if (q.trim()) {
         const n = q.toLowerCase();
         return (
@@ -96,23 +99,19 @@ export function MenuBrowser({
       }
       return true;
     });
-    if (sort === "price-asc")
-      list = [...list].sort((a, b) => a.price - b.price);
-    if (sort === "price-desc")
-      list = [...list].sort((a, b) => b.price - a.price);
     return list;
-  }, [categoryById, dishes, filter, q, onlyAvailable, sort]);
+  }, [categoryById, dishes, filter, q]);
 
-  // Regroupe par catégorie (ordre des catégories), sauf si tri prix actif.
+  // Regroupe par catégorie dans l'ordre éditorial du menu.
   const grouped = useMemo(() => {
-    if (sort !== "default" || filter !== "all" || q.trim()) return null;
-    return categories
+    if (filter !== "all" || q.trim()) return null;
+    return displayCategories
       .map((c) => ({
         cat: c,
-        items: filtered.filter((d) => d.categoryId === c.id),
+        items: filtered.filter((d) => c.sourceIds.includes(d.categoryId)),
       }))
       .filter((g) => g.items.length > 0);
-  }, [categories, filter, filtered, q, sort]);
+  }, [displayCategories, filter, filtered, q]);
 
   return (
     <div>
@@ -127,27 +126,6 @@ export function MenuBrowser({
               placeholder="Rechercher un produit…"
               className="w-full rounded-full border border-white/10 bg-white/[0.04] py-2.5 pl-10 pr-4 text-sm text-cream placeholder:text-cream/40 focus:border-gold-400 focus:outline-none sm:py-2.5 3xl:py-3.5 3xl:pl-12 3xl:text-base"
             />
-          </div>
-          <div className="flex items-center gap-2.5 lg:contents">
-            <select
-              value={sort}
-              onChange={(e) => setSort(e.target.value as typeof sort)}
-              className="min-w-0 flex-1 rounded-full border border-white/10 bg-white/[0.04] px-3 py-2.5 text-sm text-cream focus:border-gold-400 focus:outline-none sm:px-4 lg:flex-none 3xl:py-3.5 3xl:text-base [&>option]:text-ink"
-            >
-              <option value="default">Tri : par catégorie</option>
-              <option value="price-asc">Prix croissant</option>
-              <option value="price-desc">Prix décroissant</option>
-            </select>
-            <label className="flex min-h-[2.75rem] shrink-0 items-center gap-2 rounded-full border border-white/10 px-3 text-sm text-cream/75 3xl:text-base">
-              <input
-                type="checkbox"
-                checked={onlyAvailable}
-                onChange={(e) => setOnlyAvailable(e.target.checked)}
-                className="accent-gold-400"
-              />
-              <span className="hidden min-[380px]:inline">Disponibles</span>
-              <span className="min-[380px]:hidden">Dispo.</span>
-            </label>
           </div>
         </div>
 
@@ -291,6 +269,9 @@ function Chip({
 
 function matchesQuickFilter(categorySlug: string | undefined, filter: string) {
   if (filter === "all") return true;
+  if (filter === "snacking-boissons") {
+    return isSnackOrDrinkSlug(categorySlug);
+  }
   return categorySlug === filter;
 }
 
@@ -301,6 +282,41 @@ function iconForCategory(slug: string): LucideIcon {
   if (slug.includes("snack") || slug.includes("sandwich")) return Sandwich;
   if (slug.includes("boisson") || slug.includes("cafe")) return CupSoda;
   return Croissant;
+}
+
+function isSnackOrDrinkSlug(slug: string | undefined) {
+  return Boolean(
+    slug &&
+      (slug.includes("snack") ||
+        slug.includes("sandwich") ||
+        slug.includes("boisson") ||
+        slug.includes("cafe")),
+  );
+}
+
+function groupSnackAndDrinks(categories: BrowserCategory[]): DisplayCategory[] {
+  const snackDrinkIds = categories
+    .filter((category) => isSnackOrDrinkSlug(category.slug))
+    .map((category) => category.id);
+  let combinedAdded = false;
+
+  return categories.flatMap((category) => {
+    if (!isSnackOrDrinkSlug(category.slug)) {
+      return [{ ...category, sourceIds: [category.id] }];
+    }
+
+    if (combinedAdded) return [];
+    combinedAdded = true;
+
+    return [
+      {
+        id: "snacking-boissons",
+        slug: "snacking-boissons",
+        name: "Snack & boissons",
+        sourceIds: snackDrinkIds,
+      },
+    ];
+  });
 }
 
 function withDisplayTag(dish: BrowserDish): BrowserDish {

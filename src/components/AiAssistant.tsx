@@ -43,7 +43,10 @@ export function AiAssistant() {
   const [hasOpened, setHasOpened] = useState(false);
   const [added, setAdded] = useState<Record<string, boolean>>({});
   const scrollRef = useRef<HTMLDivElement>(null);
-  const hidden = useMemo(() => pathname?.startsWith("/admin"), [pathname]);
+  const hidden = useMemo(
+    () => pathname?.startsWith("/admin") || pathname?.startsWith("/commander"),
+    [pathname],
+  );
 
   if (hidden) return null;
 

@@ -25,18 +25,19 @@ export function LangProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     try {
-      const saved = window.localStorage.getItem(STORAGE_KEY) as Locale | null;
-      if (saved === "fr" || saved === "en") setLocaleState(saved);
+      window.localStorage.removeItem(STORAGE_KEY);
+      document.documentElement.lang = "fr";
     } catch {
       /* ignore */
     }
   }, []);
 
   const setLocale = useCallback((l: Locale) => {
-    setLocaleState(l);
+    void l;
+    setLocaleState("fr");
     try {
-      window.localStorage.setItem(STORAGE_KEY, l);
-      document.documentElement.lang = l;
+      window.localStorage.removeItem(STORAGE_KEY);
+      document.documentElement.lang = "fr";
     } catch {
       /* ignore */
     }

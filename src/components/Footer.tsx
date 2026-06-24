@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Logo } from "@/components/Logo";
 import { footerLinks } from "@/data/services";
 import { NewsletterForm } from "@/components/NewsletterForm";
+import { MobileInformationPanel } from "@/components/MobileInformationPanel";
 import { siteConfig } from "@/lib/config";
 import { emailHref, mapsHref, phoneHref } from "@/lib/contactLinks";
 
@@ -109,7 +110,7 @@ const contact = [
   },
   { Icon: Phone, lines: [siteConfig.contact.phone], href: phoneHref },
   { Icon: Mail, lines: [siteConfig.contact.email], href: emailHref },
-  { Icon: Clock, lines: ["Lun – Dim : 7h00 – 19h30"] },
+  { Icon: Clock, lines: [siteConfig.hours.summary] },
 ];
 
 const payments = ["VISA", "Mastercard", "PayPal", "Apple Pay"];
@@ -302,50 +303,43 @@ function MobileFooter() {
           ))}
         </div>
 
-        <div className="my-5 h-px bg-white/10" />
-
-        <FooterMobileHeading>Liens rapides</FooterMobileHeading>
-        <nav
-          aria-label="Liens rapides du pied de page"
-          className="mt-4 grid grid-cols-2 gap-x-4 gap-y-3"
+        <section
+          id="liens-utiles"
+          className="my-7 border-y border-gold/20 py-7"
         >
-          {mobileQuickLinks.map((column, columnIndex) => (
-            <ul key={columnIndex} className="space-y-3">
-              {column.map((link) => (
-                <li key={link.href}>
-                  <a
-                    href={link.href}
-                    className="group flex min-h-7 items-center justify-between gap-2 text-sm text-cream transition hover:text-gold"
-                  >
-                    <span className="min-w-0">{link.label}</span>
-                    <ChevronRight className="h-4 w-4 shrink-0 text-cream transition group-hover:translate-x-0.5 group-hover:text-gold" />
-                  </a>
-                </li>
-              ))}
-            </ul>
-          ))}
-        </nav>
-
-        <div className="my-5 h-px bg-white/10" />
-
-        <FooterMobileHeading>Informations</FooterMobileHeading>
-        <ul className="mt-4 space-y-3">
-          {contact.map(({ Icon, lines, href, external }, i) => (
-            <li
-              key={i}
-              className="flex items-start gap-3 text-sm text-cream/70"
-            >
-              <Icon className="mt-0.5 h-4 w-4 shrink-0 text-gold" />
-              <ContactText href={href} external={external}>
-                {lines.map((l) => (
-                  <span key={l} className="block leading-5">
-                    {l}
-                  </span>
+          <h4 className="text-sm font-bold uppercase tracking-[0.5em] text-gold">
+            Liens rapides
+          </h4>
+          <nav
+            aria-label="Liens rapides du pied de page"
+            className="mt-6 grid grid-cols-2 gap-x-4"
+          >
+            {mobileQuickLinks.map((column, columnIndex) => (
+              <ul key={columnIndex} className="border-t border-gold/15">
+                {column.map((link) => (
+                  <li key={link.href} className="border-b border-gold/15">
+                    <a
+                      href={link.href}
+                      className="group flex min-h-[4.45rem] items-center justify-between gap-2 py-3 text-cream transition hover:text-gold"
+                    >
+                      <span className="min-w-0 font-display text-[1.14rem] leading-[1.05] min-[390px]:text-[1.2rem]">
+                        {link.label}
+                      </span>
+                      <span
+                        aria-hidden="true"
+                        className="grid h-8 w-8 shrink-0 place-items-center rounded-full border border-gold/55 bg-black/30 text-gold shadow-[0_0_26px_-18px_rgba(245,158,11,0.95)] transition group-hover:border-gold group-hover:bg-gold group-hover:text-black group-active:scale-95"
+                      >
+                        <ChevronRight className="h-5 w-5 transition group-hover:translate-x-0.5" />
+                      </span>
+                    </a>
+                  </li>
                 ))}
-              </ContactText>
-            </li>
-          ))}
-        </ul>
+              </ul>
+            ))}
+          </nav>
+        </section>
+
+        <MobileInformationPanel className="mt-7" />
 
         <section className="mt-5 rounded-2xl border border-white/10 bg-white/[0.035] p-3 shadow-[0_24px_70px_-58px_rgba(255,255,255,0.7)]">
           <FooterMobileHeading>Newsletter</FooterMobileHeading>

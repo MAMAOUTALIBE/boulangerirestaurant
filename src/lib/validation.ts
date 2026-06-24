@@ -29,22 +29,61 @@ export const orderLineSchema = z.object({
   note: z.string().optional(),
 });
 
-/** Validation de la création d'une commande. */
-export const orderSchema = z.object({
-  name: z.string().min(2, "Nom trop court."),
-  email: z.string().email("Adresse email invalide."),
-  phone: z.string().min(6, "Numéro de téléphone invalide."),
-  address: z.string().optional(),
-  notes: z.string().optional(),
-  promoCode: z.string().optional(),
-  fulfillment: z
-    .enum(["livraison", "emporter", "surplace"])
-    .default("emporter"),
-  postalCode: z.string().optional(),
-  scheduledAt: z.string().optional(),
-  tip: z.coerce.number().min(0).default(0),
-  items: z.array(orderLineSchema).min(1, "Le panier est vide."),
+/** Validation du suivi panier (POST /api/cart) — tolérant, non bloquant. */
+export const cartTrackingSchema = z.object({
+  cartId: z.string().min(1).max(200),
+  email: z.string().max(320).optional(),
+  name: z.string().max(200).optional(),
+  phone: z.string().max(50).optional(),
+  items: z
+    .array(
+      z
+        .object({
+          // Coercition robuste : toute valeur non numérique retombe à 0.
+          quantity: z.coerce.number().int().min(0).catch(0),
+          unitPrice: z.coerce.number().min(0).catch(0),
+        })
+        .passthrough(),
+    )
+    .max(200),
 });
+
+/** Validation de la création d'une commande. */
+export const orderSchema = z
+  .object({
+    name: z.string().min(2, "Nom trop court."),
+    email: z.string().email("Adresse email invalide."),
+    phone: z.string().min(6, "Numéro de téléphone invalide."),
+    address: z.string().trim().optional(),
+    notes: z.string().optional(),
+    promoCode: z.string().optional(),
+    fulfillment: z
+      .enum(["livraison", "emporter", "surplace"])
+      .default("emporter"),
+    postalCode: z.string().trim().optional(),
+    scheduledAt: z.string().optional(),
+    tip: z.coerce.number().min(0).default(0),
+    items: z.array(orderLineSchema).min(1, "Le panier est vide."),
+  })
+  .superRefine((data, ctx) => {
+    if (data.fulfillment !== "livraison") return;
+
+    if (!data.postalCode || data.postalCode.length < 4) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["postalCode"],
+        message: "Code postal de livraison requis.",
+      });
+    }
+
+    if (!data.address || data.address.length < 8) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["address"],
+        message: "Adresse complète de livraison requise.",
+      });
+    }
+  });
 
 /** Validation d'une réservation de table. */
 export const reservationSchema = z.object({
@@ -123,6 +162,7 @@ export const antiWasteSchema = z.object({
   name: z.string().min(2, "Nom trop court."),
   email: z.string().email("Adresse email invalide."),
   phone: z.string().min(6, "Numéro de téléphone invalide."),
+  message: z.string().max(300, "Message trop long.").optional(),
 });
 
 /** Validation d'un plat (back-office menu). */

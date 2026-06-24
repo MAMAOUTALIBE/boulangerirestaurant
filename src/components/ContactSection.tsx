@@ -12,7 +12,7 @@ const infos = [
   },
   { Icon: Phone, label: siteConfig.contact.phone, href: phoneHref },
   { Icon: Mail, label: siteConfig.contact.email, href: emailHref },
-  { Icon: Clock, label: "Lun – Dim : 7h00 – 19h30", id: "horaires" },
+  { Icon: Clock, label: siteConfig.hours.summary, id: "horaires" },
 ];
 
 /** Section Contact : coordonnées + formulaire connecté. */

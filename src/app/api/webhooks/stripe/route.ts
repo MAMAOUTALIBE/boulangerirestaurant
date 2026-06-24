@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { updateOrderStatus } from "@/lib/orders";
+import { updateOrderStatus, getOrderByReference } from "@/lib/orders";
 
 // Le webhook a besoin du corps brut (raw body) pour vérifier la signature.
 export const dynamic = "force-dynamic";
@@ -47,15 +47,25 @@ export async function POST(request: Request) {
         .object as import("stripe").Stripe.Checkout.Session;
       const reference = session.client_reference_id;
       if (reference) {
-        await updateOrderStatus(reference, "payée");
+        const order = await getOrderByReference(reference);
+        // Idempotence : on ne confirme le paiement que si la commande est encore
+        // en attente, pour ne pas régresser une commande déjà avancée (replay du webhook).
+        if (order && order.status === "en attente") {
+          await updateOrderStatus(reference, "payée");
+        }
       }
       break;
     }
     case "checkout.session.expired": {
       const session = event.data
         .object as import("stripe").Stripe.Checkout.Session;
-      if (session.client_reference_id) {
-        await updateOrderStatus(session.client_reference_id, "annulée");
+      const reference = session.client_reference_id;
+      if (reference) {
+        const order = await getOrderByReference(reference);
+        // On n'annule que si la commande n'a pas déjà été payée/avancée.
+        if (order && order.status === "en attente") {
+          await updateOrderStatus(reference, "annulée");
+        }
       }
       break;
     }

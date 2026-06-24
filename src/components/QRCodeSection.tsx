@@ -191,7 +191,7 @@ export async function QRCodeSection() {
               <p className="text-2xl font-bold tracking-wide">
                 {siteConfig.contact.phone}
               </p>
-              <p className="text-sm text-cream/70">Lun - Dim : 7h00 - 19h30</p>
+              <p className="text-sm text-cream/70">{siteConfig.hours.summary}</p>
             </div>
           </div>
 

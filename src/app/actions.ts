@@ -53,6 +53,15 @@ function isBot(formData: FormData): boolean {
   return Boolean(formData.get("company"));
 }
 
+function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
 const TOO_MANY: ActionState = {
   ok: false,
   message: "Trop de tentatives. Réessayez dans une minute.",
@@ -437,6 +446,7 @@ export async function reserveAntiWaste(
     name: formData.get("name"),
     email: formData.get("email"),
     phone: formData.get("phone"),
+    message: formData.get("message") || undefined,
   });
   if (!parsed.success) {
     return {
@@ -474,13 +484,18 @@ export async function reserveAntiWaste(
       to: siteConfig.contact.email,
       subject: `Nouvelle réservation anti-gaspi (${reservation.reference})`,
       html: `<p>${parsed.data.name} (${parsed.data.email}, ${parsed.data.phone})
-        a réservé ${reservation.quantity} panier(s) pour ce soir.</p>`,
+        a réservé ${reservation.quantity} panier(s) pour ce soir.</p>
+        ${
+          parsed.data.message
+            ? `<p><strong>Message client :</strong> ${escapeHtml(parsed.data.message)}</p>`
+            : ""
+        }`,
     });
 
     revalidatePath("/anti-gaspi");
     return {
       ok: true,
-      message: `Réservé (réf. ${reservation.reference}) ! Retrait ce soir entre ${offer.pickupStart} et ${offer.pickupEnd}, paiement sur place.`,
+      message: `Votre demande de réservation a bien été envoyée. Nous vous confirmerons la disponibilité rapidement. Référence ${reservation.reference}. Retrait ce soir entre ${offer.pickupStart} et ${offer.pickupEnd}.`,
     };
   } catch (error) {
     if (error instanceof AntiWasteError) {

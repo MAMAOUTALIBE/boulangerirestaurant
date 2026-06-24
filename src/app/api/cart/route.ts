@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getDefaultRestaurant } from "@/lib/restaurants";
+import { cartTrackingSchema } from "@/lib/validation";
 
 export const dynamic = "force-dynamic";
 
@@ -72,30 +73,31 @@ async function upsertCartLegacyComposite(params: {
  * Appelé (fire-and-forget) par le panier client et au checkout.
  */
 export async function POST(request: Request) {
-  const body = await request.json().catch(() => null);
-  if (!body?.cartId || !Array.isArray(body.items)) {
+  const parsed = cartTrackingSchema.safeParse(await request.json().catch(() => null));
+  if (!parsed.success) {
     return NextResponse.json({ error: "Données invalides" }, { status: 400 });
   }
+  const body = parsed.data;
 
-  const items = body.items as { quantity: number; unitPrice: number }[];
-  const itemCount = items.reduce((s, i) => s + (i.quantity ?? 0), 0);
-  const total = items.reduce(
-    (s, i) => s + (i.unitPrice ?? 0) * (i.quantity ?? 0),
-    0,
-  );
+  const items = body.items;
+  const itemCount = items.reduce((s, i) => s + i.quantity, 0);
+  const total = items.reduce((s, i) => s + i.unitPrice * i.quantity, 0);
+  // Valeur JSON simple pour la colonne `items` (compatible Prisma).
+  const itemsJson = JSON.parse(JSON.stringify(items));
+
+  const cartId = body.cartId;
 
   // Panier vidé → on retire le suivi (sauf s'il a déjà converti).
   if (itemCount === 0) {
     await prisma.abandonedCart
-      .deleteMany({ where: { cartId: body.cartId, status: "actif" } })
+      .deleteMany({ where: { cartId, status: "actif" } })
       .catch(() => {});
     return NextResponse.json({ ok: true });
   }
 
-  const cartId = String(body.cartId);
-  const email = body.email ? String(body.email).toLowerCase() : undefined;
-  const name = body.name ? String(body.name) : undefined;
-  const phone = body.phone ? String(body.phone) : undefined;
+  const email = body.email ? body.email.toLowerCase() : undefined;
+  const name = body.name ? body.name : undefined;
+  const phone = body.phone ? body.phone : undefined;
 
   try {
     const mode = await resolveCartWriteMode();
@@ -105,7 +107,7 @@ export async function POST(request: Request) {
         email,
         name,
         phone,
-        items: body.items,
+        items: itemsJson,
         itemCount,
         total,
       });
@@ -113,7 +115,7 @@ export async function POST(request: Request) {
       await prisma.abandonedCart.upsert({
         where: { cartId },
         update: {
-          items: body.items,
+          items: itemsJson,
           itemCount,
           total,
           ...(email ? { email } : {}),
@@ -122,7 +124,7 @@ export async function POST(request: Request) {
         },
         create: {
           cartId,
-          items: body.items,
+          items: itemsJson,
           itemCount,
           total,
           email,
