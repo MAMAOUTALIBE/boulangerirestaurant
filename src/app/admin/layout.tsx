@@ -33,7 +33,7 @@ export default async function AdminLayout({
       </aside>
 
       {/* Contenu */}
-      <div className="flex-1">
+      <div className="min-w-0 flex-1">
         <header className="flex items-center justify-between gap-4 border-b border-white/10 px-6 py-4 print:hidden">
           <CommandPalette />
           <div className="flex items-center gap-3">

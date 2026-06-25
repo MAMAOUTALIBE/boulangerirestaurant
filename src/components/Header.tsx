@@ -2,11 +2,15 @@
 
 import { useEffect, useState } from "react";
 import {
+  BookOpen,
   CakeSlice,
-  CalendarDays,
+  ChefHat,
+  ChevronDown,
   Croissant,
+  Gift,
   Menu,
   Phone,
+  Recycle,
   Search,
   ShoppingBag,
   SlidersHorizontal,
@@ -19,17 +23,46 @@ import { useCart } from "@/context/CartContext";
 import { useLang } from "@/context/LangContext";
 import { siteConfig } from "@/lib/config";
 
-/** Liens masqués dans l'en-tête pour l'aérer (restent accessibles via footer). */
-const HEADER_HIDDEN_HREFS = [
-  "/commander",
-  "/traiteur",
-  "/contact",
-  "/boutique-de-saison",
-  "/anti-gaspi",
+const desktopLinks = [
+  {
+    labelKey: "nav./menu.desktop",
+    label: "Notre carte",
+    href: "/menu",
+    Icon: BookOpen,
+  },
+  { labelKey: "nav./contact", label: "Contact", href: "/contact", Icon: Phone },
 ];
-const headerLinks = navLinks.filter(
-  (link) => !HEADER_HIDDEN_HREFS.includes(link.href),
-);
+
+const offerLinks = [
+  {
+    labelKey: "nav./sur-mesure",
+    label: "Sur-mesure",
+    href: "/sur-mesure",
+    description: "Gâteaux personnalisés et pièces d'exception",
+    Icon: CakeSlice,
+  },
+  {
+    labelKey: "nav./boutique-de-saison",
+    label: "Boutique de saison",
+    href: "/boutique-de-saison",
+    description: "Galettes, bûches et séries limitées",
+    Icon: Gift,
+  },
+  {
+    labelKey: "nav./anti-gaspi",
+    label: "Anti-gaspi",
+    href: "/anti-gaspi",
+    description: "Paniers du soir à prix doux",
+    Icon: Recycle,
+  },
+  {
+    labelKey: "nav./traiteur",
+    label: "Traiteur",
+    href: "/traiteur",
+    description: "Plateaux, brunchs et réceptions",
+    Icon: ChefHat,
+  },
+];
 const phoneHref = `tel:${siteConfig.contact.phone.replace(/\s/g, "")}`;
 
 /** En-tête sticky avec navigation desktop, panier et menu mobile. */
@@ -65,24 +98,60 @@ export function Header() {
           <span className="hidden h-12 w-px bg-gold/25 lg:block" aria-hidden />
         </div>
 
-        <nav className="hidden items-center justify-center gap-4 lg:flex xl:gap-5 2xl:gap-7 3xl:gap-9">
-          {headerLinks.map((link) => (
+        <nav
+          className="hidden items-center justify-center gap-3 lg:flex xl:gap-4 2xl:gap-6 3xl:gap-8"
+          aria-label="Navigation principale"
+        >
+          {desktopLinks.map(({ href, labelKey, label, Icon }) => (
             <a
-              key={link.href}
-              href={link.href}
+              key={href}
+              href={href}
               className="text-cream/88 group relative inline-flex items-center gap-2 text-sm font-semibold transition hover:text-white 2xl:gap-2.5 2xl:text-base 3xl:text-lg"
             >
-              {link.href === "/reservation" ? (
-                <CalendarDays className="h-[1.125rem] w-[1.125rem] text-[#D89A1C] 2xl:h-5 2xl:w-5" />
-              ) : link.href === "/sur-mesure" ? (
-                <CakeSlice className="h-[1.125rem] w-[1.125rem] text-[#D89A1C] 2xl:h-5 2xl:w-5" />
-              ) : (
-                <Croissant className="h-[1.125rem] w-[1.125rem] text-[#D89A1C] 2xl:h-5 2xl:w-5" />
-              )}
-              {t(`nav.${link.href}`, link.label)}
+              <Icon className="h-[1.125rem] w-[1.125rem] text-[#D89A1C] 2xl:h-5 2xl:w-5" />
+              {t(labelKey, label)}
               <span className="absolute -bottom-2 left-1/2 h-px w-0 -translate-x-1/2 bg-[#D89A1C] transition-all duration-300 group-hover:w-full" />
             </a>
           ))}
+
+          <div className="group/offers relative">
+            <button
+              type="button"
+              className="text-cream/88 relative inline-flex items-center gap-2 text-sm font-semibold transition hover:text-white focus:outline-none 2xl:gap-2.5 2xl:text-base 3xl:text-lg"
+              aria-haspopup="true"
+            >
+              <Croissant className="h-[1.125rem] w-[1.125rem] text-[#D89A1C] 2xl:h-5 2xl:w-5" />
+              {t("nav.offers", "Nos offres")}
+              <ChevronDown className="h-4 w-4 text-[#D89A1C] transition group-focus-within/offers:rotate-180 group-hover/offers:rotate-180" />
+              <span className="absolute -bottom-2 left-1/2 h-px w-0 -translate-x-1/2 bg-[#D89A1C] transition-all duration-300 group-focus-within/offers:w-full group-hover/offers:w-full" />
+            </button>
+
+            <div className="pointer-events-none invisible absolute left-1/2 top-full z-50 mt-5 w-[34rem] -translate-x-1/2 translate-y-2 rounded-[22px] border border-gold/30 bg-[linear-gradient(135deg,rgba(8,8,8,0.98)_0%,rgba(24,18,12,0.98)_62%,rgba(62,42,12,0.98)_100%)] p-3 opacity-0 shadow-[0_30px_90px_-45px_rgba(0,0,0,0.95)] backdrop-blur-2xl transition duration-200 group-focus-within/offers:pointer-events-auto group-focus-within/offers:visible group-focus-within/offers:translate-y-0 group-focus-within/offers:opacity-100 group-hover/offers:pointer-events-auto group-hover/offers:visible group-hover/offers:translate-y-0 group-hover/offers:opacity-100 3xl:w-[38rem]">
+              <div className="grid grid-cols-2 gap-2">
+                {offerLinks.map(
+                  ({ href, labelKey, label, description, Icon }) => (
+                    <a
+                      key={href}
+                      href={href}
+                      className="group/item rounded-[16px] border border-white/10 bg-white/[0.035] p-4 text-left transition hover:-translate-y-0.5 hover:border-gold/55 hover:bg-white/[0.065] focus:outline-none focus:ring-2 focus:ring-gold/60 3xl:p-5"
+                    >
+                      <span className="flex items-center gap-3">
+                        <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full border border-gold/35 bg-gold/10 text-gold transition group-hover/item:bg-gold group-hover/item:text-[#050505]">
+                          <Icon className="h-5 w-5" />
+                        </span>
+                        <span className="text-sm font-bold text-cream transition group-hover/item:text-white 3xl:text-base">
+                          {t(labelKey, label)}
+                        </span>
+                      </span>
+                      <span className="text-cream/58 mt-2 block text-xs font-medium leading-5 3xl:text-sm">
+                        {description}
+                      </span>
+                    </a>
+                  ),
+                )}
+              </div>
+            </div>
+          </div>
         </nav>
 
         <form

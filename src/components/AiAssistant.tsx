@@ -47,6 +47,17 @@ export function AiAssistant() {
     () => pathname?.startsWith("/admin") || pathname?.startsWith("/commander"),
     [pathname],
   );
+  const desktopHidden = useMemo(
+    () =>
+      pathname === "/contact" ||
+      pathname === "/reservation" ||
+      pathname === "/sur-mesure" ||
+      pathname === "/boutique-de-saison" ||
+      pathname === "/anti-gaspi" ||
+      pathname === "/traiteur" ||
+      pathname === "/compte",
+    [pathname],
+  );
 
   if (hidden) return null;
 
@@ -112,7 +123,9 @@ export function AiAssistant() {
   }
 
   return (
-    <div className="fixed bottom-4 right-4 z-40 flex flex-col items-end print:hidden sm:bottom-5 sm:right-5">
+    <div
+      className={`fixed bottom-4 right-4 z-40 flex flex-col items-end sm:bottom-7 sm:right-7 print:hidden ${desktopHidden ? "sm:hidden" : ""}`}
+    >
       {open && (
         <section
           aria-label={`Assistant ${siteConfig.name}`}

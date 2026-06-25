@@ -5,24 +5,15 @@ import { useFormStatus } from "react-dom";
 import { requestCustomCake, type ActionState } from "@/app/actions";
 
 const field =
-  "w-full rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-sm text-cream placeholder:text-muted focus:border-gold/60 focus:outline-none focus:ring-1 focus:ring-gold/40";
+  "w-full rounded-xl border border-white/15 bg-white/5 px-4 py-2.5 text-sm text-cream placeholder:text-muted focus:border-gold/60 focus:outline-none focus:ring-1 focus:ring-gold/40";
 const compactField =
   "h-9 w-full rounded-xl border border-white/15 bg-white/5 px-3 text-[0.8rem] text-cream placeholder:text-muted focus:border-gold/60 focus:outline-none focus:ring-1 focus:ring-gold/40 min-[390px]:h-10 min-[390px]:text-[0.82rem]";
 const compactTextarea =
   "min-h-14 w-full rounded-xl border border-white/15 bg-white/5 px-3 py-2 text-[0.8rem] text-cream placeholder:text-muted focus:border-gold/60 focus:outline-none focus:ring-1 focus:ring-gold/40 min-[390px]:min-h-[4.25rem] min-[390px]:text-[0.82rem]";
-const mobileHiddenDefaults = {
+const hiddenCakeDefaults = {
   occasion: "Sur-mesure",
   flavor: "À définir avec la boulangerie",
 };
-
-const occasions = [
-  "Anniversaire",
-  "Mariage",
-  "Baptême / Communion",
-  "Fête / Événement",
-  "Entreprise",
-  "Autre",
-];
 
 function SubmitButton({ compact = false }: { compact?: boolean }) {
   const { pending } = useFormStatus();
@@ -64,13 +55,9 @@ export function CustomCakeForm() {
         <input
           type="hidden"
           name="occasion"
-          value={mobileHiddenDefaults.occasion}
+          value={hiddenCakeDefaults.occasion}
         />
-        <input
-          type="hidden"
-          name="flavor"
-          value={mobileHiddenDefaults.flavor}
-        />
+        <input type="hidden" name="flavor" value={hiddenCakeDefaults.flavor} />
 
         <div className="grid grid-cols-2 gap-2">
           <CompactField
@@ -149,104 +136,56 @@ export function CustomCakeForm() {
         <p className="text-center text-[0.72rem] text-muted">Réponse rapide</p>
       </form>
 
-      <form action={formAction} className="hidden space-y-4 sm:block">
+      <form action={formAction} className="hidden space-y-2.5 sm:block">
         <AntiSpamInput />
+        <input
+          type="hidden"
+          name="occasion"
+          value={hiddenCakeDefaults.occasion}
+        />
+        <input type="hidden" name="flavor" value={hiddenCakeDefaults.flavor} />
+
         <div className="grid gap-4 sm:grid-cols-2">
-          <Field id="name" label="Votre nom" error={state?.errors?.name} />
+          <Field
+            id="name"
+            label="Votre nom"
+            autoComplete="name"
+            error={state?.errors?.name}
+          />
           <Field
             id="phone"
             label="Téléphone"
             type="tel"
+            autoComplete="tel"
+            inputMode="tel"
             error={state?.errors?.phone}
           />
         </div>
-        <Field
-          id="email"
-          label="Email"
-          type="email"
-          error={state?.errors?.email}
-        />
 
         <div className="grid gap-4 sm:grid-cols-2">
-          <div>
-            <label
-              htmlFor="occasion"
-              className="mb-1.5 block text-sm text-cream/80"
-            >
-              Occasion
-            </label>
-            <select id="occasion" name="occasion" required className={field}>
-              {occasions.map((o) => (
-                <option key={o} value={o} className="text-ink">
-                  {o}
-                </option>
-              ))}
-            </select>
-            {state?.errors?.occasion && (
-              <p className="mt-1 text-xs text-red-400">
-                {state.errors.occasion}
-              </p>
-            )}
-          </div>
           <Field
-            id="servings"
-            label="Nombre de parts"
-            type="number"
-            error={state?.errors?.servings}
+            id="email"
+            label="Email"
+            type="email"
+            autoComplete="email"
+            inputMode="email"
+            error={state?.errors?.email}
           />
-        </div>
-
-        <Field
-          id="flavor"
-          label="Parfum / base souhaité (ex : chocolat, fraisier…)"
-          error={state?.errors?.flavor}
-        />
-
-        <div className="grid gap-4 sm:grid-cols-2">
           <Field
             id="pickupDate"
-            label="Date de retrait"
+            label="Date de retrait souhaitée"
             type="date"
             error={state?.errors?.pickupDate}
           />
-          <Field
-            id="pickupTime"
-            label="Heure de retrait (optionnel)"
-            type="time"
-            required={false}
-            error={state?.errors?.pickupTime}
-          />
         </div>
 
         <Field
-          id="messageOnCake"
-          label="Message à écrire sur le gâteau (optionnel)"
-          required={false}
-          error={state?.errors?.messageOnCake}
-        />
-
-        <div className="grid gap-4 sm:grid-cols-2">
-          <Field
-            id="budget"
-            label="Budget indicatif (optionnel)"
-            required={false}
-            error={state?.errors?.budget}
-          />
-          <Field
-            id="allergies"
-            label="Allergies (optionnel)"
-            required={false}
-            error={state?.errors?.allergies}
-          />
-        </div>
-
-        <Field
-          id="inspirationUrl"
-          label="Lien d'une photo d'inspiration (Pinterest, Instagram…)"
-          type="url"
-          required={false}
-          placeholder="https://…"
-          error={state?.errors?.inspirationUrl}
+          id="servings"
+          label="Nombre de parts"
+          type="number"
+          autoComplete="off"
+          inputMode="numeric"
+          error={state?.errors?.servings}
         />
 
         <div>
@@ -254,13 +193,14 @@ export function CustomCakeForm() {
             htmlFor="details"
             className="mb-1.5 block text-sm text-cream/80"
           >
-            Décrivez le gâteau de vos rêves
+            Décrivez votre gâteau
           </label>
           <textarea
             id="details"
             name="details"
-            rows={4}
+            rows={2}
             required
+            placeholder="Occasion, parfum, décor, message, allergies si besoin..."
             className={field}
           />
           {state?.errors?.details && (
@@ -352,6 +292,8 @@ function Field({
   type = "text",
   required = true,
   placeholder,
+  autoComplete,
+  inputMode,
   error,
 }: {
   id: string;
@@ -359,6 +301,16 @@ function Field({
   type?: string;
   required?: boolean;
   placeholder?: string;
+  autoComplete?: string;
+  inputMode?:
+    | "none"
+    | "text"
+    | "tel"
+    | "url"
+    | "email"
+    | "numeric"
+    | "decimal"
+    | "search";
   error?: string;
 }) {
   return (
@@ -373,6 +325,8 @@ function Field({
         required={required}
         placeholder={placeholder}
         min={type === "number" ? 1 : undefined}
+        autoComplete={autoComplete}
+        inputMode={inputMode}
         className={field}
       />
       {error && <p className="mt-1 text-xs text-red-400">{error}</p>}

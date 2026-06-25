@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { Header } from "@/components/Header";
+import { Footer } from "@/components/Footer";
 
 /** Gabarit commun aux pages légales (titre + contenu prose). */
 export function LegalLayout({
@@ -35,6 +36,7 @@ export function LegalLayout({
           </div>
         </div>
       </main>
+      <Footer />
     </>
   );
 }

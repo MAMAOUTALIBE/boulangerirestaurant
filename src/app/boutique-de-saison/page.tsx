@@ -55,6 +55,16 @@ const saisonSuggestions = [
   },
 ];
 
+function formatDateLong(value: string) {
+  const date = new Date(`${value}T12:00:00`);
+  if (Number.isNaN(date.getTime())) return value;
+  return new Intl.DateTimeFormat("fr-FR", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  }).format(date);
+}
+
 export default async function BoutiqueDeSaisonPage() {
   const products = await getActiveSeasonalProducts();
 
@@ -140,12 +150,9 @@ export default async function BoutiqueDeSaisonPage() {
             </p>
 
             {products.length === 0 ? (
-              <p className="mt-10 rounded-2xl border border-white/10 bg-ink-soft p-12 text-center text-muted">
-                Aucune offre de saison en ce moment. Revenez bientôt pour la
-                galette des rois et les bûches de fin d&apos;année !
-              </p>
+              <DesktopSeasonalEmpty />
             ) : (
-              <div className="mt-8 grid gap-6 lg:grid-cols-2">
+              <div className="mt-8 space-y-6">
                 {products.map((product) => (
                   <DesktopSeasonalProduct key={product.id} product={product} />
                 ))}
@@ -161,14 +168,15 @@ export default async function BoutiqueDeSaisonPage() {
 
 function DesktopSeasonalProduct({ product }: { product: SeasonalProductView }) {
   return (
-    <article className="overflow-hidden rounded-2xl border border-white/10 bg-ink-soft">
-      <div className="relative aspect-[16/9] w-full">
+    <article className="overflow-hidden rounded-[28px] border border-white/10 bg-ink-soft shadow-[0_28px_85px_-62px_rgba(0,0,0,0.95)] lg:grid lg:grid-cols-[minmax(0,0.94fr)_minmax(360px,1.06fr)]">
+      <div className="relative aspect-[16/9] w-full lg:aspect-auto lg:min-h-[26rem]">
         <Image
           src={product.image}
           alt={product.name}
           fill
-          sizes="(max-width: 1024px) 100vw, 50vw"
+          sizes="(max-width: 1024px) 100vw, 42vw"
           className="object-cover"
+          priority
         />
         <span className="absolute left-3 top-3 rounded-full bg-ink/85 px-3 py-1 text-xs font-semibold text-gold backdrop-blur">
           {formatPrice(product.price)}
@@ -185,14 +193,15 @@ function DesktopSeasonalProduct({ product }: { product: SeasonalProductView }) {
           )
         )}
       </div>
-      <div className="p-5 sm:p-6">
+      <div className="flex flex-col p-5 sm:p-6">
         <h2 className="font-display text-2xl font-bold text-cream">
           {product.name}
         </h2>
         <p className="mt-1.5 text-sm text-cream/75">{product.description}</p>
         <p className="mt-2 text-xs text-muted">
           Précommandes jusqu&apos;au {product.salesEndLabel} · retrait du{" "}
-          {product.pickupStart} au {product.pickupEnd}
+          {formatDateLong(product.pickupStart)} au{" "}
+          {formatDateLong(product.pickupEnd)}
         </p>
         <div className="mt-4 border-t border-white/10 pt-4">
           <SeasonalPreorderForm
@@ -204,6 +213,64 @@ function DesktopSeasonalProduct({ product }: { product: SeasonalProductView }) {
         </div>
       </div>
     </article>
+  );
+}
+
+function DesktopSeasonalEmpty() {
+  return (
+    <div className="mt-8 overflow-hidden rounded-[28px] border border-white/10 bg-[radial-gradient(circle_at_top_left,rgba(216,154,28,0.12),transparent_38%),#111111] shadow-[0_28px_85px_-62px_rgba(0,0,0,0.95)]">
+      <div className="grid gap-5 p-5 lg:grid-cols-[0.9fr_1.1fr] lg:p-6">
+        <div className="relative min-h-[24rem] overflow-hidden rounded-3xl border border-white/10">
+          <Image
+            src="/images/boulangerie-patisseries.webp"
+            alt="Pâtisseries et spécialités de saison"
+            fill
+            sizes="40vw"
+            className="object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/20 to-transparent" />
+          <div className="absolute bottom-5 left-5 right-5">
+            <p className="text-xs font-bold uppercase tracking-[0.24em] text-gold">
+              Collection en préparation
+            </p>
+            <h2 className="mt-1 font-display text-3xl font-bold text-cream">
+              Les prochaines pièces de saison arrivent bientôt.
+            </h2>
+          </div>
+        </div>
+
+        <div className="grid content-center gap-3 sm:grid-cols-2">
+          {saisonSuggestions.map((item) => (
+            <article
+              key={item.name}
+              className="overflow-hidden rounded-2xl border border-white/10 bg-white/[0.035]"
+            >
+              <div className="relative aspect-[16/10]">
+                <Image
+                  src={item.image}
+                  alt={item.name}
+                  fill
+                  sizes="22vw"
+                  className="object-cover"
+                />
+                <span className="absolute left-3 top-3 rounded-full bg-ink/85 px-3 py-1 text-xs font-bold text-gold backdrop-blur">
+                  {item.badge}
+                </span>
+              </div>
+              <div className="p-4">
+                <h3 className="font-display text-xl font-bold text-cream">
+                  {item.name}
+                </h3>
+                <p className="mt-1 text-sm leading-5 text-cream/65">
+                  {item.description}
+                </p>
+                <p className="mt-3 text-sm font-bold text-gold">{item.price}</p>
+              </div>
+            </article>
+          ))}
+        </div>
+      </div>
+    </div>
   );
 }
 

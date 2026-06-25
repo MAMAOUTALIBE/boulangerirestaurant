@@ -3,11 +3,14 @@ export type Locale = "fr" | "en";
 /** Dictionnaire des chaînes d'interface (chrome public). */
 export const dict: Record<Locale, Record<string, string>> = {
   fr: {
+    "nav./": "Accueil",
     "nav.#accueil": "Accueil",
     "nav.#a-propos": "À propos",
     "nav./menu": "Menu",
+    "nav./menu.desktop": "Notre carte",
     "nav./commander": "Commander",
     "nav./reservation": "Réservation",
+    "nav.offers": "Nos offres",
     "nav./sur-mesure": "Sur-mesure",
     "nav./boutique-de-saison": "Boutique de saison",
     "nav./anti-gaspi": "Anti-gaspi",
@@ -23,11 +26,14 @@ export const dict: Record<Locale, Record<string, string>> = {
     "cart.title": "Votre panier",
   },
   en: {
+    "nav./": "Home",
     "nav.#accueil": "Home",
     "nav.#a-propos": "About",
     "nav./menu": "Menu",
+    "nav./menu.desktop": "Our menu",
     "nav./commander": "Order",
     "nav./reservation": "Booking",
+    "nav.offers": "Our offers",
     "nav./sur-mesure": "Custom cakes",
     "nav./boutique-de-saison": "Seasonal shop",
     "nav./anti-gaspi": "Anti-waste",

@@ -3,6 +3,7 @@ import { Hero } from "@/components/Hero";
 import { HomeShortcuts } from "@/components/HomeShortcuts";
 import { FeaturedDishes } from "@/components/FeaturedDishes";
 import { PremiumEngagementSection } from "@/components/PremiumEngagementSection";
+import { Footer } from "@/components/Footer";
 
 // Rendu dynamique : la page lit la base (produits, avis) → pas de prérendu au build.
 export const dynamic = "force-dynamic";
@@ -17,6 +18,7 @@ export default function Home() {
         <FeaturedDishes />
         <PremiumEngagementSection />
       </main>
+      <Footer />
     </>
   );
 }

@@ -36,11 +36,12 @@ export function CookieConsent() {
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: 100, opacity: 0 }}
           transition={{ duration: 0.3, ease: "easeOut" }}
-          className="fixed inset-x-3 bottom-3 z-[60] mx-auto max-w-md rounded-2xl border border-white/10 bg-ink-soft p-3 shadow-card sm:max-w-3xl sm:flex sm:items-center sm:gap-5 sm:p-5"
+          className="fixed inset-x-3 bottom-3 z-[60] mx-auto max-w-md rounded-2xl border border-white/10 bg-ink-soft p-3 shadow-card sm:inset-x-auto sm:bottom-6 sm:left-6 sm:mx-0 sm:max-w-[34rem] sm:p-4 lg:max-w-[38rem]"
         >
           <p className="text-xs leading-relaxed text-cream/85 sm:text-sm">
             <span className="sm:hidden">
-              Cookie nécessaire au site. Mesure d&apos;audience avec accord.{" "}
+              Cookie nécessaire au site. Mesure d&apos;audience avec
+              accord.{" "}
             </span>
             <span className="hidden sm:inline">
               Nous utilisons un cookie strictement nécessaire au fonctionnement
@@ -52,7 +53,7 @@ export function CookieConsent() {
             </a>
             .
           </p>
-          <div className="mt-3 flex shrink-0 gap-2 sm:mt-0">
+          <div className="mt-3 flex shrink-0 gap-2">
             <button
               onClick={() => decide("refused")}
               className="min-h-11 flex-1 rounded-full border border-white/15 px-4 text-sm text-cream transition hover:border-white/40 sm:flex-none"

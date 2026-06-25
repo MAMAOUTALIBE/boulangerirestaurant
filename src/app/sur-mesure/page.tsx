@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import { CakeSlice, Check } from "lucide-react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
@@ -7,7 +8,7 @@ import { CustomCakeForm } from "@/components/CustomCakeForm";
 export const metadata: Metadata = {
   title: "Gâteaux personnalisés",
   description:
-    "Commandez un gâteau sur mesure pour vos anniversaires, mariages et événements : occasion, parts, parfum, message et photo d'inspiration. Devis personnalisé.",
+    "Commandez un gâteau sur mesure pour vos anniversaires, mariages et événements : décrivez l'essentiel, recevez un devis personnalisé.",
 };
 
 const atouts = [
@@ -19,12 +20,18 @@ const atouts = [
 
 const atoutsMobile = ["Sur-mesure", "Maison", "Devis rapide"];
 
+const inspirations = [
+  "Anniversaire fruité",
+  "Mariage floral",
+  "Chocolat prestige",
+];
+
 export default function SurMesurePage() {
   return (
     <>
       <Header />
       <main className="bg-ink pb-0 pt-20 sm:pt-28">
-        <div className="container-page max-w-4xl">
+        <div className="container-page max-w-6xl">
           <section className="flex flex-col justify-start pt-5 min-[390px]:pt-7 sm:hidden">
             <h1 className="flex items-center gap-2 font-display text-[1.72rem] font-bold leading-tight text-cream">
               <CakeSlice className="h-6 w-6 shrink-0 text-gold" />
@@ -56,24 +63,63 @@ export default function SurMesurePage() {
               <CakeSlice className="h-8 w-8 text-gold" />
               Gâteaux personnalisés
             </h1>
-            <p className="mt-3 max-w-2xl text-muted">
+            <p className="mt-3 max-w-3xl text-muted">
               Pour un anniversaire, un mariage ou un événement, créons ensemble
-              le gâteau de vos rêves. Décrivez votre projet et joignez une photo
-              d&apos;inspiration : nous vous envoyons un devis sur mesure.
+              le gâteau de vos rêves. Décrivez l&apos;essentiel en quelques
+              lignes : nous vous envoyons un devis sur mesure.
             </p>
 
-            <div className="mt-8 grid gap-8 lg:grid-cols-2">
-              <ul className="space-y-3">
-                {atouts.map((a) => (
-                  <li key={a} className="flex items-center gap-3 text-cream/85">
-                    <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-gold/15 text-gold">
-                      <Check className="h-4 w-4" />
-                    </span>
-                    {a}
-                  </li>
-                ))}
-              </ul>
-              <div className="rounded-2xl border border-white/10 bg-ink-soft p-6 sm:p-8">
+            <div className="mt-8 grid items-start gap-8 lg:grid-cols-[minmax(0,1.08fr)_minmax(360px,0.92fr)]">
+              <div className="space-y-5">
+                <figure className="overflow-hidden rounded-[28px] border border-gold/25 bg-white/[0.03] shadow-[0_28px_90px_-60px_rgba(245,158,11,0.75)]">
+                  <div className="relative aspect-[16/9]">
+                    <Image
+                      src="/images/gateaux-sur-mesure-pinterest.webp"
+                      alt="Trois exemples de gâteaux personnalisés : fruits rouges, mariage floral et chocolat"
+                      fill
+                      priority
+                      sizes="(min-width: 1024px) 54vw, 100vw"
+                      className="object-cover"
+                    />
+                    <div className="from-black/72 absolute inset-0 bg-gradient-to-t via-black/10 to-transparent" />
+                    <div className="absolute inset-x-5 bottom-5 flex flex-wrap gap-2">
+                      {inspirations.map((item) => (
+                        <span
+                          key={item}
+                          className="rounded-full border border-white/20 bg-black/45 px-3 py-1.5 text-xs font-bold text-cream backdrop-blur-md"
+                        >
+                          {item}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                </figure>
+
+                <ul className="grid gap-3 md:grid-cols-2">
+                  {atouts.map((a) => (
+                    <li
+                      key={a}
+                      className="flex min-h-14 items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.035] px-4 py-3 text-sm font-medium leading-5 text-cream/85"
+                    >
+                      <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-gold/15 text-gold">
+                        <Check className="h-4 w-4" />
+                      </span>
+                      {a}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <div className="rounded-[28px] border border-white/10 bg-ink-soft p-6 shadow-[0_28px_85px_-62px_rgba(0,0,0,0.95)]">
+                <div className="mb-3 border-b border-white/10 pb-3">
+                  <p className="text-sm font-bold uppercase tracking-[0.24em] text-gold">
+                    Devis rapide
+                  </p>
+                  <p className="mt-1 text-sm leading-5 text-muted">
+                    Quelques informations suffisent pour préparer une réponse
+                    personnalisée.
+                  </p>
+                </div>
                 <CustomCakeForm />
               </div>
             </div>

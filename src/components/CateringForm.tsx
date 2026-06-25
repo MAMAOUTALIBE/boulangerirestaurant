@@ -5,7 +5,9 @@ import { useFormStatus } from "react-dom";
 import { requestCatering, type ActionState } from "@/app/actions";
 
 const field =
-  "w-full rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-sm text-cream placeholder:text-muted focus:border-gold/60 focus:outline-none focus:ring-1 focus:ring-gold/40";
+  "h-10 w-full rounded-xl border border-white/15 bg-white/5 px-3 text-sm text-cream placeholder:text-muted focus:border-gold/60 focus:outline-none focus:ring-1 focus:ring-gold/40";
+const textareaField =
+  "min-h-14 w-full rounded-xl border border-white/15 bg-white/5 px-3 py-2 text-sm text-cream placeholder:text-muted focus:border-gold/60 focus:outline-none focus:ring-1 focus:ring-gold/40";
 const compactField =
   "h-9 w-full rounded-xl border border-white/15 bg-white/5 px-3 text-[0.8rem] text-cream placeholder:text-muted focus:border-gold/60 focus:outline-none focus:ring-1 focus:ring-gold/40 min-[390px]:h-10 min-[390px]:text-[0.82rem]";
 const compactTextarea =
@@ -17,7 +19,7 @@ function SubmitButton({ compact = false }: { compact?: boolean }) {
     <button
       type="submit"
       disabled={pending}
-      className={`${compact ? "min-h-9 px-4 py-2 text-sm min-[390px]:min-h-10" : ""} btn-primary w-full disabled:opacity-60`}
+      className={`${compact ? "min-h-9 px-4 py-2 text-sm min-[390px]:min-h-10" : "sm:min-h-10 sm:px-5 sm:py-2"} btn-primary w-full disabled:opacity-60`}
     >
       {pending ? "Envoi…" : compact ? "Envoyer" : "Demander un devis"}
     </button>
@@ -119,55 +121,56 @@ export function CateringForm() {
         </p>
       </form>
 
-      <form action={formAction} className="hidden space-y-4 sm:block">
+      <form action={formAction} className="hidden space-y-1.5 sm:block">
         <AntiSpamInput />
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid gap-3 sm:grid-cols-2">
           <Field
             id="name"
             label="Nom / organisation"
+            autoComplete="name"
             error={state?.errors?.name}
           />
           <Field
             id="phone"
             label="Téléphone"
             type="tel"
+            autoComplete="tel"
+            inputMode="tel"
             error={state?.errors?.phone}
           />
         </div>
-        <Field
-          id="email"
-          label="Email"
-          type="email"
-          error={state?.errors?.email}
-        />
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid gap-3 sm:grid-cols-2">
           <Field
-            id="eventDate"
-            label="Date de l'événement (optionnel)"
-            type="date"
-            required={false}
-            error={state?.errors?.eventDate}
+            id="email"
+            label="Email"
+            type="email"
+            autoComplete="email"
+            inputMode="email"
+            error={state?.errors?.email}
           />
           <Field
             id="guests"
             label="Nombre de convives"
             type="number"
+            autoComplete="off"
+            inputMode="numeric"
             error={state?.errors?.guests}
           />
         </div>
         <div>
           <label
             htmlFor="message"
-            className="mb-1.5 block text-sm text-cream/80"
+            className="mb-1 block text-xs font-medium text-cream/80"
           >
             Votre projet
           </label>
           <textarea
             id="message"
             name="message"
-            rows={4}
+            rows={2}
             required
-            className={field}
+            placeholder="Projet : date, formule, lieu, horaires..."
+            className={textareaField}
           />
           <FieldError error={state?.errors?.message} />
         </div>
@@ -200,17 +203,32 @@ function Field({
   label,
   type = "text",
   required = true,
+  autoComplete,
+  inputMode,
   error,
 }: {
   id: string;
   label: string;
   type?: string;
   required?: boolean;
+  autoComplete?: string;
+  inputMode?:
+    | "none"
+    | "text"
+    | "tel"
+    | "url"
+    | "email"
+    | "numeric"
+    | "decimal"
+    | "search";
   error?: string;
 }) {
   return (
     <div>
-      <label htmlFor={id} className="mb-1.5 block text-sm text-cream/80">
+      <label
+        htmlFor={id}
+        className="mb-1 block text-xs font-medium text-cream/80"
+      >
         {label}
       </label>
       <input
@@ -219,6 +237,8 @@ function Field({
         type={type}
         required={required}
         min={type === "number" ? 1 : undefined}
+        autoComplete={autoComplete}
+        inputMode={inputMode}
         className={field}
       />
       {error && <p className="mt-1 text-xs text-red-400">{error}</p>}

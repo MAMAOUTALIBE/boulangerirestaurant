@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import { ChefHat, Check } from "lucide-react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
@@ -11,10 +12,10 @@ export const metadata: Metadata = {
 };
 
 const atouts = [
-  "Plateaux viennoiseries, pains, pâtisseries et snacking",
-  "Produits frais fabriqués en boutique",
-  "Devis personnalisé sous 48 h",
-  "De 10 à plusieurs centaines de convives",
+  "Plateaux sucrés & salés",
+  "Produits frais maison",
+  "Devis sous 48 h",
+  "10 à 300+ convives",
 ];
 
 const atoutsMobile = ["Entreprise", "Événement", "Devis 48h"];
@@ -24,7 +25,7 @@ export default function TraiteurPage() {
     <>
       <Header />
       <main className="bg-ink pb-0 pt-20 sm:pt-28">
-        <div className="container-page max-w-4xl">
+        <div className="container-page max-w-4xl sm:max-w-5xl">
           <section className="flex flex-col justify-start pt-5 min-[390px]:pt-7 sm:hidden">
             <h1 className="flex items-center gap-2 font-display text-[1.72rem] font-bold leading-tight text-cream">
               <ChefHat className="h-6 w-6 shrink-0 text-gold" />
@@ -51,31 +52,60 @@ export default function TraiteurPage() {
             </div>
           </section>
 
-          <section className="hidden sm:block">
-            <h1 className="mt-2 flex items-center gap-3 font-display text-3xl font-bold text-cream sm:text-4xl">
+          <section className="hidden sm:block sm:pb-8 sm:pt-2">
+            <h1 className="flex items-center gap-3 font-display text-3xl font-bold text-cream sm:text-4xl">
               <ChefHat className="h-8 w-8 text-gold" />
               Service traiteur
             </h1>
-            <p className="mt-3 max-w-2xl text-muted">
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-muted lg:text-base">
               Pour vos mariages, événements d&apos;entreprise ou fêtes de
               famille, nous préparons pains, viennoiseries, pâtisseries et
               pièces salées. Décrivez votre projet, nous vous envoyons un devis
               sur mesure.
             </p>
 
-            <div className="mt-8 grid gap-8 lg:grid-cols-2">
-              <ul className="space-y-3">
-                {atouts.map((a) => (
-                  <li key={a} className="flex items-center gap-3 text-cream/85">
-                    <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-gold/15 text-gold">
-                      <Check className="h-4 w-4" />
-                    </span>
-                    {a}
-                  </li>
-                ))}
-              </ul>
-              <div className="rounded-2xl border border-white/10 bg-ink-soft p-6 sm:p-8">
-                <CateringForm />
+            <div className="mt-5 overflow-hidden rounded-[24px] border border-white/10 bg-[radial-gradient(circle_at_top_left,rgba(216,154,28,0.12),transparent_38%),#111111] shadow-[0_28px_85px_-62px_rgba(0,0,0,0.95)] lg:grid lg:h-[calc(100svh-17rem)] lg:max-h-[31rem] lg:min-h-[28rem] lg:grid-cols-[0.92fr_1.08fr]">
+              <div className="relative min-h-[20rem] lg:min-h-0">
+                <Image
+                  src="/images/boulangerie-snacking.webp"
+                  alt="Plateaux traiteur, pains, pâtisseries et pièces salées"
+                  fill
+                  sizes="(max-width: 1024px) 100vw, 44vw"
+                  className="object-cover"
+                  priority
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/20 to-transparent" />
+                <div className="absolute bottom-4 left-4 right-4 rounded-2xl border border-white/10 bg-black/55 p-4 backdrop-blur">
+                  <p className="text-[0.68rem] font-bold uppercase tracking-[0.24em] text-gold">
+                    Réceptions & entreprises
+                  </p>
+                  <p className="mt-1 font-display text-lg font-bold leading-tight text-cream lg:text-xl">
+                    Formats prêts à servir, sur mesure.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex flex-col justify-between p-4 lg:p-5">
+                <ul className="grid gap-2.5 sm:grid-cols-2">
+                  {atouts.map((a) => (
+                    <li
+                      key={a}
+                      className="flex min-h-11 items-center gap-2.5 rounded-2xl border border-white/10 bg-white/[0.035] p-3 text-sm leading-5 text-cream/85"
+                    >
+                      <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-gold/15 text-gold">
+                        <Check className="h-3.5 w-3.5" />
+                      </span>
+                      {a}
+                    </li>
+                  ))}
+                </ul>
+
+                <div className="mt-3.5 rounded-2xl border border-white/10 bg-black/20 p-3.5 lg:p-4">
+                  <p className="mb-2.5 text-xs font-bold uppercase tracking-[0.24em] text-gold">
+                    Devis rapide
+                  </p>
+                  <CateringForm />
+                </div>
               </div>
             </div>
           </section>

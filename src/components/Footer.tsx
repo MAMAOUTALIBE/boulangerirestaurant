@@ -1,8 +1,20 @@
 import type { ReactNode } from "react";
-import { ChevronRight, Clock, Lock, Mail, MapPin, Phone } from "lucide-react";
+import {
+  CakeSlice,
+  ChefHat,
+  ChevronRight,
+  Clock,
+  Gift,
+  Lock,
+  Mail,
+  MapPin,
+  Phone,
+  Recycle,
+  ShoppingBag,
+} from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import Link from "next/link";
 import { Logo } from "@/components/Logo";
-import { footerLinks } from "@/data/services";
 import { NewsletterForm } from "@/components/NewsletterForm";
 import { MobileInformationPanel } from "@/components/MobileInformationPanel";
 import { siteConfig } from "@/lib/config";
@@ -113,17 +125,109 @@ const contact = [
   { Icon: Clock, lines: [siteConfig.hours.summary] },
 ];
 
+const footerHighlights = [
+  {
+    label: "Commander en ligne",
+    description: "Pain, viennoiseries et pâtisseries à retirer ou livrer.",
+    href: "/commander",
+    Icon: ShoppingBag,
+  },
+  {
+    label: "Gâteau sur-mesure",
+    description: "Une demande simple pour recevoir un devis personnalisé.",
+    href: "/sur-mesure",
+    Icon: CakeSlice,
+  },
+  {
+    label: "Service traiteur",
+    description: "Plateaux et formats événementiels pour vos invités.",
+    href: "/traiteur",
+    Icon: ChefHat,
+  },
+] as const;
+
+type FooterLinkGroup = {
+  title: string;
+  links: Array<{
+    label: string;
+    href: string;
+    Icon?: LucideIcon;
+  }>;
+};
+
+const footerLinkGroups: FooterLinkGroup[] = [
+  {
+    title: "Commander",
+    links: [
+      { label: "Notre carte", href: "/menu" },
+      { label: "Commander", href: "/commander" },
+      { label: "Réservation", href: "/reservation" },
+      { label: "Espace client", href: "/compte" },
+    ],
+  },
+  {
+    title: "Nos offres",
+    links: [
+      { label: "Sur-mesure", href: "/sur-mesure", Icon: CakeSlice },
+      { label: "Boutique de saison", href: "/boutique-de-saison", Icon: Gift },
+      { label: "Anti-gaspi", href: "/anti-gaspi", Icon: Recycle },
+      { label: "Traiteur", href: "/traiteur", Icon: ChefHat },
+    ],
+  },
+  {
+    title: "Maison",
+    links: [
+      { label: "À propos", href: "/#a-propos" },
+      { label: "Avis clients", href: "/#avis-clients" },
+      { label: "Contact", href: "/contact" },
+    ],
+  },
+  {
+    title: "Informations",
+    links: [
+      { label: "Mentions légales", href: "/mentions-legales" },
+      { label: "CGV", href: "/cgv" },
+      { label: "Confidentialité", href: "/confidentialite" },
+    ],
+  },
+];
+
 const payments = ["VISA", "Mastercard", "PayPal", "Apple Pay"];
 
 /** Pied de page complet : logo, réseaux, liens, contact, newsletter, paiements. */
 export function Footer() {
   return (
-    <footer className="border-t border-white/10 bg-ink-soft">
+    <footer className="border-t border-gold/15 bg-[radial-gradient(circle_at_top,rgba(245,158,11,0.08),transparent_34%),linear-gradient(180deg,#111111,#070707)]">
       <MobileFooter />
-      <div className="container-page hidden py-14 sm:block">
-        <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-4">
-          {/* Marque + socials */}
-          <div>
+      <div className="container-page hidden py-12 sm:block">
+        <nav
+          aria-label="Accès rapides premium"
+          className="grid gap-3 lg:grid-cols-3"
+        >
+          {footerHighlights.map(({ label, description, href, Icon }) => (
+            <Link
+              key={href}
+              href={href}
+              className="group flex min-h-24 items-center gap-4 rounded-[22px] border border-white/10 bg-white/[0.035] p-4 transition hover:-translate-y-0.5 hover:border-gold/55 hover:bg-white/[0.06]"
+            >
+              <span className="grid h-12 w-12 shrink-0 place-items-center rounded-full border border-gold/35 bg-gold/10 text-gold transition group-hover:bg-gold group-hover:text-ink">
+                <Icon className="h-5 w-5" />
+              </span>
+              <span className="min-w-0">
+                <span className="block font-display text-xl font-bold leading-tight text-cream transition group-hover:text-white">
+                  {label}
+                </span>
+                <span className="mt-1 block text-sm leading-5 text-cream/60">
+                  {description}
+                </span>
+              </span>
+              <ChevronRight className="ml-auto h-5 w-5 shrink-0 text-gold transition group-hover:translate-x-1" />
+            </Link>
+          ))}
+        </nav>
+
+        <div className="mt-10 grid gap-10 lg:grid-cols-[0.9fr_1.6fr_1fr]">
+          <div className="pr-4">
             <Logo />
             <p className="mt-4 max-w-xs text-sm leading-relaxed text-muted">
               Pain frais, viennoiseries pur beurre et pâtisseries maison.
@@ -148,76 +252,74 @@ export function Footer() {
             </div>
           </div>
 
-          {/* Liens rapides */}
-          <div>
-            <h4 className="font-display text-lg font-semibold text-cream">
-              Liens rapides
+          <nav aria-label="Liens du pied de page">
+            <h4 className="font-display text-xl font-semibold text-cream">
+              Explorer
             </h4>
-            <ul className="mt-4 space-y-2.5">
-              {footerLinks.map((link) => (
-                <li key={link.href}>
-                  <a
-                    href={link.href}
-                    className="text-sm text-muted transition hover:text-gold"
-                  >
-                    {link.label}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Contact */}
-          <div>
-            <h4 className="font-display text-lg font-semibold text-cream">
-              Informations
-            </h4>
-            <ul className="mt-4 space-y-3">
-              {contact.map(({ Icon, lines, href, external }, i) => (
-                <li key={i} className="flex gap-3 text-sm text-muted">
-                  <Icon className="mt-0.5 h-4 w-4 shrink-0 text-gold" />
-                  <ContactText href={href} external={external}>
-                    {lines.map((l) => (
-                      <span key={l} className="block">
-                        {l}
-                      </span>
+            <div className="mt-5 grid gap-x-8 gap-y-7 md:grid-cols-2">
+              {footerLinkGroups.map((group) => (
+                <section
+                  key={group.title}
+                  className="border-t border-gold/25 pt-4"
+                >
+                  <h5 className="text-xs font-bold uppercase tracking-[0.24em] text-gold">
+                    {group.title}
+                  </h5>
+                  <ul className="mt-3 space-y-2.5">
+                    {group.links.map(({ label, href, Icon }) => (
+                      <li key={href}>
+                        <Link
+                          href={href}
+                          className="text-cream/68 group inline-flex items-center gap-2 text-sm font-medium transition hover:text-gold"
+                        >
+                          {Icon && (
+                            <Icon className="h-4 w-4 text-gold/80 transition group-hover:text-gold" />
+                          )}
+                          <span>{label}</span>
+                          <ChevronRight className="h-3.5 w-3.5 opacity-0 transition group-hover:translate-x-0.5 group-hover:opacity-100" />
+                        </Link>
+                      </li>
                     ))}
-                  </ContactText>
-                </li>
+                  </ul>
+                </section>
               ))}
-            </ul>
-          </div>
+            </div>
+          </nav>
 
-          {/* Newsletter */}
-          <div>
-            <h4 className="font-display text-lg font-semibold text-cream">
-              Newsletter
-            </h4>
-            <p className="mt-4 text-sm text-muted">
-              Recevez nos offres, fournées spéciales et nouveautés
-            </p>
-            <NewsletterForm />
+          <div className="space-y-8">
+            <section>
+              <h4 className="font-display text-xl font-semibold text-cream">
+                Informations
+              </h4>
+              <ul className="mt-4 space-y-3">
+                {contact.map(({ Icon, lines, href, external }, i) => (
+                  <li key={i} className="flex gap-3 text-sm text-muted">
+                    <Icon className="mt-0.5 h-4 w-4 shrink-0 text-gold" />
+                    <ContactText href={href} external={external}>
+                      {lines.map((l) => (
+                        <span key={l} className="block">
+                          {l}
+                        </span>
+                      ))}
+                    </ContactText>
+                  </li>
+                ))}
+              </ul>
+            </section>
+
+            <section className="rounded-[22px] border border-white/10 bg-black/20 p-5">
+              <h4 className="font-display text-xl font-semibold text-cream">
+                Newsletter
+              </h4>
+              <p className="mt-3 text-sm leading-5 text-muted">
+                Recevez nos offres, fournées spéciales et nouveautés.
+              </p>
+              <NewsletterForm />
+            </section>
           </div>
         </div>
 
-        {/* Liens légaux */}
-        <div className="mt-10 flex flex-wrap gap-x-6 gap-y-2 border-t border-white/10 pt-6 text-xs text-muted">
-          <a href="/mentions-legales" className="transition hover:text-gold">
-            Mentions légales
-          </a>
-          <a href="/cgv" className="transition hover:text-gold">
-            CGV
-          </a>
-          <a href="/confidentialite" className="transition hover:text-gold">
-            Politique de confidentialité
-          </a>
-          <a href="/compte" className="transition hover:text-gold">
-            Espace client
-          </a>
-        </div>
-
-        {/* Bas de footer */}
-        <div className="mt-6 flex flex-col items-center justify-between gap-4 border-t border-white/10 pt-6 sm:flex-row">
+        <div className="mt-10 flex flex-col items-center justify-between gap-4 border-t border-white/10 pt-6 sm:flex-row">
           <p className="text-xs text-muted">
             © 2026 {siteConfig.name}. Tous droits réservés.
           </p>

@@ -5,7 +5,7 @@ import { useFormStatus } from "react-dom";
 import { reserveAntiWaste, type ActionState } from "@/app/actions";
 
 const field =
-  "w-full rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-sm text-cream placeholder:text-muted focus:border-gold/60 focus:outline-none focus:ring-1 focus:ring-gold/40";
+  "w-full rounded-xl border border-white/15 bg-white/5 px-4 py-2.5 text-sm text-cream placeholder:text-muted focus:border-gold/60 focus:outline-none focus:ring-1 focus:ring-gold/40";
 const compactField =
   "h-9 w-full rounded-xl border border-white/15 bg-white/5 px-3 text-[0.8rem] text-cream placeholder:text-muted focus:border-gold/60 focus:outline-none focus:ring-1 focus:ring-gold/40 min-[390px]:h-10 min-[390px]:text-[0.82rem]";
 const compactTextarea =
@@ -121,56 +121,63 @@ export function AntiWasteReserveForm({ remaining }: { remaining: number }) {
         <SubmitButton disabled={soldOut} compact />
       </form>
 
-      <form action={formAction} className="hidden space-y-3 sm:block">
+      <form action={formAction} className="hidden space-y-2.5 sm:block">
         <BotField />
-        <div>
-          <label htmlFor="aw-qty" className="mb-1 block text-xs text-cream/70">
-            Nombre de paniers
-          </label>
+        <div className="grid gap-3 sm:grid-cols-2">
           <input
-            id="aw-qty"
-            name="quantity"
-            type="number"
-            min={1}
-            max={Math.max(1, Math.min(10, remaining))}
-            defaultValue={1}
+            name="name"
+            aria-label="Votre nom"
+            placeholder="Votre nom"
             required
             disabled={soldOut}
+            autoComplete="name"
             className={field}
           />
-        </div>
-        <input
-          name="name"
-          placeholder="Votre nom"
-          required
-          disabled={soldOut}
-          className={field}
-        />
-        <div className="grid gap-3 sm:grid-cols-2">
           <input
             name="phone"
             type="tel"
+            aria-label="Téléphone"
             placeholder="Téléphone"
             required
             disabled={soldOut}
-            className={field}
-          />
-          <input
-            name="email"
-            type="email"
-            placeholder="Email"
-            required
-            disabled={soldOut}
+            autoComplete="tel"
+            inputMode="tel"
             className={field}
           />
         </div>
-        <textarea
-          name="message"
-          maxLength={300}
-          placeholder="Message optionnel"
-          disabled={soldOut}
-          className={`${field} min-h-24 resize-none`}
-        />
+        <div className="grid gap-3 sm:grid-cols-2">
+          <input
+            name="email"
+            type="email"
+            aria-label="Email"
+            placeholder="Email"
+            required
+            disabled={soldOut}
+            autoComplete="email"
+            inputMode="email"
+            className={field}
+          />
+          <div>
+            <label
+              htmlFor="aw-qty"
+              className="mb-1 block text-xs text-cream/70"
+            >
+              Nombre de paniers
+            </label>
+            <input
+              id="aw-qty"
+              name="quantity"
+              type="number"
+              min={1}
+              max={Math.max(1, Math.min(10, remaining))}
+              defaultValue={1}
+              required
+              disabled={soldOut}
+              inputMode="numeric"
+              className={field}
+            />
+          </div>
+        </div>
         {state && !state.ok && (
           <p role="alert" className="text-sm text-red-400">
             {state.message}

@@ -6,6 +6,7 @@ import { payOrder } from "@/app/actions";
 import { formatPrice } from "@/lib/utils";
 import { AutoRefresh } from "@/components/admin/AutoRefresh";
 import { Header } from "@/components/Header";
+import { Footer } from "@/components/Footer";
 import { OrderStatusNotifier } from "@/components/OrderStatusNotifier";
 import type { OrderStatus } from "@/types";
 
@@ -194,6 +195,7 @@ export default async function OrderPage({ params, searchParams }: PageProps) {
           </div>
         </div>
       </main>
+      <Footer />
     </>
   );
 }

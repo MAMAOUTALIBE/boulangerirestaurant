@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowLeft, LogOut, Package, ShieldCheck, Star } from "lucide-react";
 import { getSessionEmail } from "@/lib/session";
 import { isAdminEmail } from "@/lib/auth";
@@ -7,6 +8,7 @@ import { prisma } from "@/lib/prisma";
 import { logout, redeemLoyalty } from "@/app/actions";
 import { AdminLoginForm, LoginForm } from "@/components/LoginForm";
 import { Header } from "@/components/Header";
+import { Footer } from "@/components/Footer";
 import { ReorderButton } from "@/components/ReorderButton";
 import { formatPrice } from "@/lib/utils";
 import {
@@ -27,29 +29,78 @@ const statusStyles: Record<string, string> = {
 export default async function ComptePage({
   searchParams,
 }: {
-  searchParams: Promise<{ error?: string; fid?: string }>;
+  searchParams: Promise<{ error?: string; fid?: string; admin?: string }>;
 }) {
-  const { error, fid } = await searchParams;
+  const { error, fid, admin: adminParam } = await searchParams;
   const email = await getSessionEmail();
+  const showAdminLogin = adminParam === "1";
 
   if (!email) {
     return (
       <>
         <Header />
         <main className="min-h-screen bg-ink pb-64 pt-28 sm:pb-20">
-          <div className="container-page max-w-md">
+          <div className="container-page max-w-md sm:max-w-4xl">
             <BackLink />
-            <h1 className="mt-6 font-display text-3xl font-bold text-cream">
-              Espace client
-            </h1>
-            <p className="mt-2 text-muted">
-              Saisissez votre email : vous recevrez un lien de connexion
-              sécurisé.
-            </p>
-            <LoginForm initialError={Boolean(error)} />
-            <AdminLoginForm />
+
+            <div className="sm:hidden">
+              <h1 className="mt-6 font-display text-3xl font-bold text-cream">
+                Espace client
+              </h1>
+              <p className="mt-2 text-muted">
+                Saisissez votre email : vous recevrez un lien de connexion
+                sécurisé.
+              </p>
+              <LoginForm initialError={Boolean(error)} />
+              {showAdminLogin && <AdminLoginForm />}
+            </div>
+
+            <div className="mt-6 hidden overflow-hidden rounded-[28px] border border-white/10 bg-[radial-gradient(circle_at_top_left,rgba(216,154,28,0.12),transparent_38%),#111111] shadow-[0_28px_85px_-62px_rgba(0,0,0,0.95)] sm:grid sm:grid-cols-[0.92fr_1.08fr]">
+              <section className="p-6 lg:p-8">
+                <p className="text-xs font-bold uppercase tracking-[0.24em] text-gold">
+                  Connexion sécurisée
+                </p>
+                <h1 className="mt-2 font-display text-4xl font-bold text-cream">
+                  Espace client
+                </h1>
+                <p className="mt-3 text-muted">
+                  Retrouvez vos commandes, vos points fidélité et vos
+                  informations sans créer de mot de passe.
+                </p>
+                <LoginForm initialError={Boolean(error)} />
+                {showAdminLogin && <AdminLoginForm />}
+              </section>
+
+              <aside className="relative min-h-[28rem] border-l border-white/10">
+                <Image
+                  src="/images/boulangerie-viennoiseries.webp"
+                  alt="Viennoiseries et commandes de la boulangerie"
+                  fill
+                  sizes="42vw"
+                  className="object-cover"
+                  priority
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/30 to-transparent" />
+                <div className="absolute bottom-5 left-5 right-5 grid gap-3">
+                  {[
+                    "Lien magique envoyé par email",
+                    "Historique de commandes",
+                    "Programme fidélité intégré",
+                  ].map((item) => (
+                    <div
+                      key={item}
+                      className="flex items-center gap-3 rounded-2xl border border-white/10 bg-black/55 p-3 text-sm font-semibold text-cream backdrop-blur"
+                    >
+                      <ShieldCheck className="h-4 w-4 text-gold" />
+                      {item}
+                    </div>
+                  ))}
+                </div>
+              </aside>
+            </div>
           </div>
         </main>
+        <Footer />
       </>
     );
   }
@@ -197,6 +248,7 @@ export default async function ComptePage({
           )}
         </div>
       </main>
+      <Footer />
     </>
   );
 }
