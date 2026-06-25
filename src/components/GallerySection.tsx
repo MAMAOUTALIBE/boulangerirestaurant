@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { Camera, Play, X, ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -38,9 +38,35 @@ const filters: { id: Filter; label: string }[] = [
 export function GallerySection() {
   const [filter, setFilter] = useState<Filter>("all");
   const [active, setActive] = useState<number | null>(null);
+  const [canPrev, setCanPrev] = useState(false);
+  const [canNext, setCanNext] = useState(false);
+  const trackRef = useRef<HTMLDivElement>(null);
 
   const visible = items.filter((it) => filter === "all" || it.type === filter);
   const current = active !== null ? (visible[active] ?? null) : null;
+
+  // Active/désactive les flèches selon la position de défilement.
+  const updateArrows = useCallback(() => {
+    const el = trackRef.current;
+    if (!el) return;
+    setCanPrev(el.scrollLeft > 4);
+    setCanNext(el.scrollLeft < el.scrollWidth - el.clientWidth - 4);
+  }, []);
+
+  const scrollByPage = (dir: number) => {
+    const el = trackRef.current;
+    if (!el) return;
+    el.scrollBy({ left: dir * el.clientWidth, behavior: "smooth" });
+  };
+
+  // Recalcule les flèches au montage, au changement de filtre et au resize.
+  useEffect(() => {
+    const el = trackRef.current;
+    if (el) el.scrollTo({ left: 0 });
+    updateArrows();
+    window.addEventListener("resize", updateArrows);
+    return () => window.removeEventListener("resize", updateArrows);
+  }, [filter, updateArrows]);
 
   const close = useCallback(() => setActive(null), []);
   const go = useCallback(
@@ -70,11 +96,6 @@ export function GallerySection() {
     };
   }, [current, close, go]);
 
-  const selectFilter = (id: Filter) => {
-    setActive(null);
-    setFilter(id);
-  };
-
   return (
     <section className="container-page pb-16 pt-6 sm:pb-24 sm:pt-10">
       {/* En-tête */}
@@ -91,41 +112,73 @@ export function GallerySection() {
         </p>
       </div>
 
-      {/* Filtres */}
-      <div className="mt-6 flex flex-wrap gap-2 sm:mt-8">
-        {filters.map((f) => (
-          <button
-            key={f.id}
-            type="button"
-            onClick={() => selectFilter(f.id)}
-            className={cn(
-              "rounded-full border px-4 py-2 text-sm font-semibold transition",
-              filter === f.id
-                ? "border-gold bg-gold text-ink"
-                : "border-white/15 text-cream/75 hover:border-gold/50 hover:text-cream",
-            )}
-          >
-            {f.label}
-          </button>
-        ))}
+      {/* Filtres (gauche) + flèches de défilement (droite) */}
+      <div className="mt-6 flex flex-wrap items-center justify-between gap-3 sm:mt-8">
+        <div className="flex flex-wrap gap-2">
+          {filters.map((f) => (
+            <button
+              key={f.id}
+              type="button"
+              onClick={() => {
+                setActive(null);
+                setFilter(f.id);
+              }}
+              className={cn(
+                "rounded-full border px-4 py-2 text-sm font-semibold transition",
+                filter === f.id
+                  ? "border-gold bg-gold text-ink"
+                  : "border-white/15 text-cream/75 hover:border-gold/50 hover:text-cream",
+              )}
+            >
+              {f.label}
+            </button>
+          ))}
+        </div>
+
+        {visible.length > 0 && (
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={() => scrollByPage(-1)}
+              disabled={!canPrev}
+              aria-label="Médias précédents"
+              className="grid h-11 w-11 place-items-center rounded-full border border-white/15 text-cream transition enabled:hover:border-gold enabled:hover:text-gold disabled:cursor-not-allowed disabled:opacity-35"
+            >
+              <ChevronLeft className="h-5 w-5" />
+            </button>
+            <button
+              type="button"
+              onClick={() => scrollByPage(1)}
+              disabled={!canNext}
+              aria-label="Médias suivants"
+              className="grid h-11 w-11 place-items-center rounded-full border border-white/15 text-cream transition enabled:hover:border-gold enabled:hover:text-gold disabled:cursor-not-allowed disabled:opacity-35"
+            >
+              <ChevronRight className="h-5 w-5" />
+            </button>
+          </div>
+        )}
       </div>
 
-      {/* Grille */}
+      {/* Carrousel : 3 cartes par vue (desktop), défilement par flèches ou swipe */}
       {visible.length > 0 ? (
-        <div className="mt-6 grid grid-cols-2 gap-3 sm:mt-8 sm:gap-4 lg:grid-cols-3">
+        <div
+          ref={trackRef}
+          onScroll={updateArrows}
+          className="mt-6 flex snap-x snap-mandatory items-start gap-4 overflow-x-auto scroll-smooth pb-2 sm:mt-8 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        >
           {visible.map((item, i) => (
             <button
               key={item.src}
               type="button"
               onClick={() => setActive(i)}
               aria-label={`Agrandir : ${item.alt}`}
-              className="group relative aspect-[4/3] overflow-hidden rounded-2xl border border-white/10 bg-ink-soft"
+              className="group relative aspect-[4/3] w-[80%] shrink-0 snap-start overflow-hidden rounded-2xl border border-white/10 bg-ink-soft min-[480px]:w-[60%] sm:w-[calc((100%-1rem)/2)] lg:w-[calc((100%-2rem)/3)]"
             >
               <Image
                 src={item.type === "video" ? item.poster : item.src}
                 alt={item.alt}
                 fill
-                sizes="(max-width: 1024px) 50vw, 33vw"
+                sizes="(max-width: 1024px) 60vw, 33vw"
                 className="object-cover transition duration-500 group-hover:scale-105"
               />
               <span
