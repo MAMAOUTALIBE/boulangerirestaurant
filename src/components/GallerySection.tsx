@@ -1,0 +1,238 @@
+"use client";
+
+import { useCallback, useEffect, useState } from "react";
+import Image from "next/image";
+import { Camera, Play, X, ChevronLeft, ChevronRight } from "lucide-react";
+import { cn } from "@/lib/utils";
+
+type GalleryItem =
+  | { type: "image"; src: string; alt: string; tag: string }
+  | { type: "video"; src: string; poster: string; alt: string; tag: string };
+
+// Médias de la galerie.
+//
+// Pour AJOUTER UNE VIDÉO : dépose ton fichier dans `public/videos/`
+// (ex. `public/videos/fournee.mp4`) puis ajoute une entrée :
+//   { type: "video", src: "/videos/fournee.mp4",
+//     poster: "/images/boulangerie-pains.webp", alt: "La fournée du matin",
+//     tag: "Coulisses" },
+// Le poster est l'image affichée avant lecture.
+const items: GalleryItem[] = [
+  { type: "image", src: "/images/boulangerie-hero.webp", alt: "Notre vitrine du matin", tag: "Maison" },
+  { type: "image", src: "/images/boulangerie-pains.webp", alt: "Pains au levain", tag: "Pains" },
+  { type: "image", src: "/images/boulangerie-viennoiseries.webp", alt: "Viennoiseries pur beurre", tag: "Viennoiseries" },
+  { type: "image", src: "/images/boulangerie-patisseries.webp", alt: "Pâtisseries de saison", tag: "Pâtisseries" },
+  { type: "image", src: "/images/gateaux-sur-mesure-pinterest.webp", alt: "Gâteaux sur-mesure", tag: "Sur-mesure" },
+  { type: "image", src: "/images/boulangerie-snacking.webp", alt: "Snacking maison", tag: "Snacking" },
+  { type: "image", src: "/images/boulangerie-snacking-boissons.webp", alt: "Snacking & boissons", tag: "Boissons" },
+];
+
+type Filter = "all" | "image" | "video";
+
+const filters: { id: Filter; label: string }[] = [
+  { id: "all", label: "Tout" },
+  { id: "image", label: "Photos" },
+  { id: "video", label: "Vidéos" },
+];
+
+export function GallerySection() {
+  const [filter, setFilter] = useState<Filter>("all");
+  const [active, setActive] = useState<number | null>(null);
+
+  const visible = items.filter((it) => filter === "all" || it.type === filter);
+  const current = active !== null ? (visible[active] ?? null) : null;
+
+  const close = useCallback(() => setActive(null), []);
+  const go = useCallback(
+    (dir: number) =>
+      setActive((cur) => {
+        if (cur === null) return cur;
+        const n = visible.length;
+        return n ? (cur + dir + n) % n : null;
+      }),
+    [visible.length],
+  );
+
+  // Verrou de défilement de l'arrière-plan + navigation clavier (lightbox).
+  useEffect(() => {
+    if (current === null) return;
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") close();
+      else if (e.key === "ArrowRight") go(1);
+      else if (e.key === "ArrowLeft") go(-1);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = previous;
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [current, close, go]);
+
+  const selectFilter = (id: Filter) => {
+    setActive(null);
+    setFilter(id);
+  };
+
+  return (
+    <section className="container-page pb-16 pt-6 sm:pb-24 sm:pt-10">
+      {/* En-tête */}
+      <div className="max-w-2xl">
+        <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.25em] text-gold">
+          <Camera className="h-4 w-4" /> Galerie
+        </p>
+        <h1 className="mt-2 font-display text-[1.9rem] font-bold leading-tight text-cream sm:text-4xl lg:text-5xl">
+          Nos créations en images
+        </h1>
+        <p className="mt-3 text-sm leading-relaxed text-cream/65 sm:text-base">
+          Pains au levain, viennoiseries, pâtisseries et gâteaux sur-mesure : un
+          aperçu de ce que l&apos;on prépare chaque jour à l&apos;atelier.
+        </p>
+      </div>
+
+      {/* Filtres */}
+      <div className="mt-6 flex flex-wrap gap-2 sm:mt-8">
+        {filters.map((f) => (
+          <button
+            key={f.id}
+            type="button"
+            onClick={() => selectFilter(f.id)}
+            className={cn(
+              "rounded-full border px-4 py-2 text-sm font-semibold transition",
+              filter === f.id
+                ? "border-gold bg-gold text-ink"
+                : "border-white/15 text-cream/75 hover:border-gold/50 hover:text-cream",
+            )}
+          >
+            {f.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Grille */}
+      {visible.length > 0 ? (
+        <div className="mt-6 grid grid-cols-2 gap-3 sm:mt-8 sm:gap-4 lg:grid-cols-3">
+          {visible.map((item, i) => (
+            <button
+              key={item.src}
+              type="button"
+              onClick={() => setActive(i)}
+              aria-label={`Agrandir : ${item.alt}`}
+              className="group relative aspect-[4/3] overflow-hidden rounded-2xl border border-white/10 bg-ink-soft"
+            >
+              <Image
+                src={item.type === "video" ? item.poster : item.src}
+                alt={item.alt}
+                fill
+                sizes="(max-width: 1024px) 50vw, 33vw"
+                className="object-cover transition duration-500 group-hover:scale-105"
+              />
+              <span
+                className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/5 to-transparent"
+                aria-hidden
+              />
+              {item.type === "video" && (
+                <span className="absolute inset-0 grid place-items-center" aria-hidden>
+                  <span className="grid h-12 w-12 place-items-center rounded-full bg-black/55 text-cream backdrop-blur transition group-hover:bg-gold group-hover:text-ink">
+                    <Play className="h-5 w-5 translate-x-0.5" />
+                  </span>
+                </span>
+              )}
+              <span className="absolute inset-x-2 bottom-2 flex items-center gap-2">
+                <span className="rounded-full bg-black/50 px-2 py-0.5 text-[0.65rem] font-bold uppercase tracking-wide text-gold backdrop-blur">
+                  {item.tag}
+                </span>
+                <span className="truncate text-left text-xs font-semibold text-cream/90">
+                  {item.alt}
+                </span>
+              </span>
+            </button>
+          ))}
+        </div>
+      ) : (
+        <div className="mt-8 rounded-2xl border border-dashed border-white/15 bg-white/[0.02] px-6 py-14 text-center">
+          <p className="text-sm text-cream/60">
+            {filter === "video"
+              ? "Les vidéos arrivent très bientôt."
+              : "Aucun média pour le moment."}
+          </p>
+        </div>
+      )}
+
+      {/* Lightbox */}
+      {current && (
+        <div
+          className="fixed inset-0 z-[60] flex items-center justify-center bg-black/90 p-4 backdrop-blur-sm"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Aperçu du média"
+          onClick={close}
+        >
+          <button
+            type="button"
+            onClick={close}
+            aria-label="Fermer"
+            className="absolute right-3 top-3 z-10 grid h-11 w-11 place-items-center rounded-full border border-white/20 bg-black/40 text-cream transition hover:border-gold hover:text-gold sm:right-5 sm:top-5"
+          >
+            <X className="h-5 w-5" />
+          </button>
+
+          {visible.length > 1 && (
+            <>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  go(-1);
+                }}
+                aria-label="Média précédent"
+                className="absolute left-2 top-1/2 z-10 grid h-11 w-11 -translate-y-1/2 place-items-center rounded-full border border-white/20 bg-black/40 text-cream transition hover:border-gold hover:text-gold sm:left-4"
+              >
+                <ChevronLeft className="h-5 w-5" />
+              </button>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  go(1);
+                }}
+                aria-label="Média suivant"
+                className="absolute right-2 top-1/2 z-10 grid h-11 w-11 -translate-y-1/2 place-items-center rounded-full border border-white/20 bg-black/40 text-cream transition hover:border-gold hover:text-gold sm:right-4"
+              >
+                <ChevronRight className="h-5 w-5" />
+              </button>
+            </>
+          )}
+
+          <div
+            className="flex max-h-[86vh] w-full max-w-3xl items-center justify-center"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {current.type === "video" ? (
+              <video
+                key={current.src}
+                src={current.src}
+                poster={current.poster}
+                controls
+                autoPlay
+                playsInline
+                className="max-h-[86vh] w-auto max-w-full rounded-2xl"
+              />
+            ) : (
+              <div className="relative h-[78vh] w-full">
+                <Image
+                  src={current.src}
+                  alt={current.alt}
+                  fill
+                  sizes="100vw"
+                  className="rounded-2xl object-contain"
+                />
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+    </section>
+  );
+}

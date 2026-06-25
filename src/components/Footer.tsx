@@ -5,6 +5,7 @@ import {
   ChevronRight,
   Clock,
   Gift,
+  Images,
   Lock,
   Mail,
   MapPin,
@@ -108,6 +109,7 @@ const mobileQuickLinks = [
     { label: "Boutique de saison", href: "/boutique-de-saison" },
     { label: "Sur-mesure", href: "/sur-mesure" },
     { label: "Traiteur", href: "/traiteur" },
+    { label: "Galerie", href: "/galerie" },
     { label: "Avis", href: "/#avis-clients" },
     { label: "À propos", href: "/#a-propos" },
   ],
@@ -172,6 +174,7 @@ const footerLinkGroups: FooterLinkGroup[] = [
       { label: "Boutique de saison", href: "/boutique-de-saison", Icon: Gift },
       { label: "Anti-gaspi", href: "/anti-gaspi", Icon: Recycle },
       { label: "Traiteur", href: "/traiteur", Icon: ChefHat },
+      { label: "Galerie", href: "/galerie", Icon: Images },
     ],
   },
   {

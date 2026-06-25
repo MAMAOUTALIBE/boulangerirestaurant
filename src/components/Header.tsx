@@ -8,6 +8,7 @@ import {
   ChevronDown,
   Croissant,
   Gift,
+  Images,
   Menu,
   Phone,
   Recycle,
@@ -61,6 +62,13 @@ const offerLinks = [
     href: "/traiteur",
     description: "Plateaux, brunchs et réceptions",
     Icon: ChefHat,
+  },
+  {
+    labelKey: "nav./galerie",
+    label: "Galerie",
+    href: "/galerie",
+    description: "Nos créations en photos et vidéos",
+    Icon: Images,
   },
 ];
 const phoneHref = `tel:${siteConfig.contact.phone.replace(/\s/g, "")}`;
