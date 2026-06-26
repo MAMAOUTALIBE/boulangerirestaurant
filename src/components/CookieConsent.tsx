@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 
-const STORAGE_KEY = "boulangerie-cookie-consent";
+const STORAGE_KEY = "restaurant-turc-cookie-consent";
 
 /** Bandeau de consentement cookies (RGPD), persisté en localStorage. */
 export function CookieConsent() {

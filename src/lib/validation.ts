@@ -110,8 +110,8 @@ export const cateringSchema = z.object({
   message: z.string().min(10, "Décrivez votre projet (10 caractères min)."),
 });
 
-/** Validation d'une demande de gâteau personnalisé (sur-mesure). */
-export const customCakeSchema = z.object({
+/** Validation d'une demande de devis sur-mesure. */
+export const customQuoteSchema = z.object({
   name: z.string().min(2, "Nom trop court."),
   email: z.string().email("Adresse email invalide."),
   phone: z.string().min(6, "Numéro de téléphone invalide."),
@@ -119,10 +119,10 @@ export const customCakeSchema = z.object({
   servings: z.coerce
     .number()
     .int()
-    .min(1, "Au moins 1 part.")
-    .max(500, "Nombre de parts trop élevé."),
-  flavor: z.string().min(2, "Indiquez un parfum / une base."),
-  messageOnCake: z
+    .min(1, "Au moins 1 convive.")
+    .max(500, "Nombre de convives trop élevé."),
+  preferences: z.string().min(2, "Indiquez vos préférences."),
+  message: z
     .string()
     .max(120, "Message trop long (120 caractères max).")
     .optional(),
@@ -134,7 +134,7 @@ export const customCakeSchema = z.object({
     .optional(),
   budget: z.string().optional(),
   allergies: z.string().optional(),
-  details: z.string().min(10, "Décrivez votre gâteau (10 caractères min)."),
+  details: z.string().min(10, "Décrivez votre demande (10 caractères min)."),
 });
 
 /** Validation d'une précommande de produit de saison. */
@@ -188,6 +188,6 @@ export type ContactInput = z.infer<typeof contactSchema>;
 export type OrderInput = z.infer<typeof orderSchema>;
 export type ReservationInput = z.infer<typeof reservationSchema>;
 export type CateringInput = z.infer<typeof cateringSchema>;
-export type CustomCakeInput = z.infer<typeof customCakeSchema>;
+export type CustomQuoteInput = z.infer<typeof customQuoteSchema>;
 export type SeasonalPreorderInput = z.infer<typeof seasonalPreorderSchema>;
 export type AntiWasteInput = z.infer<typeof antiWasteSchema>;

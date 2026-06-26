@@ -1,29 +1,29 @@
 const whatsappOrderNumber =
   process.env.NEXT_PUBLIC_WHATSAPP_ORDER_NUMBER ?? "+33775787825";
 const telegramOrderUsername =
-  process.env.NEXT_PUBLIC_TELEGRAM_ORDER_USERNAME ?? "boulangerie";
+  process.env.NEXT_PUBLIC_TELEGRAM_ORDER_USERNAME ?? "anatoliagrill";
 const telegramUrl = telegramOrderUsername
   ? `https://t.me/${telegramOrderUsername.replace(/^@/, "")}`
   : "";
 
 /** Configuration centrale du site (SEO, QR code, emails, coordonnées). */
 export const siteConfig = {
-  name: "Boulangerie Artisanale",
-  shortName: "Boulangerie",
+  name: "Anatolia Grill",
+  shortName: "Anatolia",
   description:
-    "Boulangerie artisanale avec pains au levain, viennoiseries pur beurre, pâtisseries de saison et commande en ligne.",
+    "Restaurant turc : grillades au charbon, kebabs, pide, lahmacun, mezze et desserts maison. Sur place, à emporter ou en livraison.",
   /** URL publique (override en prod via NEXT_PUBLIC_SITE_URL). */
   url: process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000",
   locale: "fr_FR",
   contact: {
     phone: "07 75 78 78 25",
-    email: "contact@boulangerie.fr",
+    email: "contact@anatolia-grill.fr",
     address: "5 Rue Jules Vallès, 91260 Juvisy-sur-Orge",
   },
   /** Horaires d'ouverture — source unique affichée partout (footer, contact, mobile, QR). */
   hours: {
-    summary: "Lun – Dim : 7h00 – 19h30",
-    rows: [{ day: "Lundi – Dimanche", time: "7h00 – 19h30" }],
+    summary: "Lun – Dim : 11h30 – 23h00",
+    rows: [{ day: "Lundi – Dimanche", time: "11h30 – 23h00" }],
   },
   messaging: {
     whatsappOrderNumber,

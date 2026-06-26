@@ -1,30 +1,26 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import { CakeSlice, Check } from "lucide-react";
+import { Check, UsersRound } from "lucide-react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { CustomCakeForm } from "@/components/CustomCakeForm";
+import { CustomQuoteForm } from "@/components/CustomQuoteForm";
 
 export const metadata: Metadata = {
-  title: "Gâteaux personnalisés",
+  title: "Plateaux & menus de groupe",
   description:
-    "Commandez un gâteau sur mesure pour vos anniversaires, mariages et événements : décrivez l'essentiel, recevez un devis personnalisé.",
+    "Composez un plateau ou un menu de groupe sur-mesure pour vos fêtes, repas de famille et événements d'entreprise : décrivez l'essentiel, recevez un devis personnalisé.",
 };
 
 const atouts = [
-  "Anniversaires, mariages, baptêmes et événements d'entreprise",
-  "Parfums et décors personnalisés, message sur le gâteau",
-  "Fabrication artisanale, produits frais",
+  "Anniversaires, fêtes de famille et événements d'entreprise",
+  "Plateaux de grillades, mezze et desserts au choix",
+  "Cuisine maison, produits frais et viandes marinées",
   "Devis personnalisé après votre demande",
 ];
 
 const atoutsMobile = ["Sur-mesure", "Maison", "Devis rapide"];
 
-const inspirations = [
-  "Anniversaire fruité",
-  "Mariage floral",
-  "Chocolat prestige",
-];
+const inspirations = ["Plateau grillades", "Menu mezze", "Buffet de fête"];
 
 export default function SurMesurePage() {
   return (
@@ -34,8 +30,8 @@ export default function SurMesurePage() {
         <div className="container-page max-w-6xl">
           <section className="flex flex-col justify-start pt-5 min-[390px]:pt-7 sm:hidden">
             <h1 className="flex items-center gap-2 font-display text-[1.72rem] font-bold leading-tight text-cream">
-              <CakeSlice className="h-6 w-6 shrink-0 text-gold" />
-              Gâteaux personnalisés
+              <UsersRound className="h-6 w-6 shrink-0 text-gold" />
+              Plateaux & menus de groupe
             </h1>
             <p className="mt-1.5 text-[0.82rem] leading-5 text-muted min-[390px]:mt-2 min-[390px]:text-sm">
               Décrivez l&apos;essentiel, devis sur mesure.
@@ -54,19 +50,20 @@ export default function SurMesurePage() {
             </ul>
 
             <div className="mt-2.5 rounded-2xl border border-gold/20 bg-[radial-gradient(circle_at_top,rgba(245,158,11,0.08),transparent_42%),#111111] p-2.5 shadow-[0_22px_60px_-50px_rgba(245,158,11,0.75)] min-[390px]:mt-3 min-[390px]:p-3">
-              <CustomCakeForm />
+              <CustomQuoteForm />
             </div>
           </section>
 
           <section className="hidden sm:block">
             <h1 className="mt-2 flex items-center gap-3 font-display text-3xl font-bold text-cream sm:text-4xl">
-              <CakeSlice className="h-8 w-8 text-gold" />
-              Gâteaux personnalisés
+              <UsersRound className="h-8 w-8 text-gold" />
+              Plateaux & menus de groupe
             </h1>
             <p className="mt-3 max-w-3xl text-muted">
-              Pour un anniversaire, un mariage ou un événement, créons ensemble
-              le gâteau de vos rêves. Décrivez l&apos;essentiel en quelques
-              lignes : nous vous envoyons un devis sur mesure.
+              Pour un anniversaire, un repas de famille ou un événement
+              d&apos;entreprise, composons ensemble votre plateau ou menu de
+              groupe. Décrivez l&apos;essentiel en quelques lignes : nous vous
+              envoyons un devis sur mesure.
             </p>
 
             <div className="mt-8 grid items-start gap-8 lg:grid-cols-[minmax(0,1.08fr)_minmax(360px,0.92fr)]">
@@ -74,8 +71,8 @@ export default function SurMesurePage() {
                 <figure className="overflow-hidden rounded-[28px] border border-gold/25 bg-white/[0.03] shadow-[0_28px_90px_-60px_rgba(245,158,11,0.75)]">
                   <div className="relative aspect-[16/9]">
                     <Image
-                      src="/images/gateaux-sur-mesure-pinterest.webp"
-                      alt="Trois exemples de gâteaux personnalisés : fruits rouges, mariage floral et chocolat"
+                      src="/images/hero-plateau-turc-premium.png"
+                      alt="Grand plateau de grillades turques à partager : kebabs, brochettes et accompagnements"
                       fill
                       priority
                       sizes="(min-width: 1024px) 54vw, 100vw"
@@ -120,7 +117,7 @@ export default function SurMesurePage() {
                     personnalisée.
                   </p>
                 </div>
-                <CustomCakeForm />
+                <CustomQuoteForm />
               </div>
             </div>
           </section>

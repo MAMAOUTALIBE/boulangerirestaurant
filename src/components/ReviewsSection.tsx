@@ -17,7 +17,7 @@ export async function ReviewsSection() {
           dangerouslySetInnerHTML={{
             __html: JSON.stringify({
               "@context": "https://schema.org",
-              "@type": "Bakery",
+              "@type": "Restaurant",
               name: siteConfig.name,
               aggregateRating: {
                 "@type": "AggregateRating",

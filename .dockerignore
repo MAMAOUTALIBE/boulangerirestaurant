@@ -7,7 +7,7 @@ node_modules
 npm-debug.log*
 README.md
 DEPLOYMENT.md
-HOSTINGER.md
+DEPLOIEMENT-VPS.md
 *.md
 coverage
 .DS_Store

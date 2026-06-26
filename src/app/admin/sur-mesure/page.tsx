@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
-import { adminSetCustomCakeStatus } from "@/app/actions";
+import { adminSetCustomQuoteStatus } from "@/app/actions";
 
 export const dynamic = "force-dynamic";
 
@@ -21,8 +21,8 @@ const statusStyles: Record<string, string> = {
   annulé: "bg-red-500/15 text-red-300",
 };
 
-export default async function AdminGateauxPage() {
-  const requests = await prisma.customCakeRequest.findMany({
+export default async function AdminSurMesurePage() {
+  const requests = await prisma.customRequest.findMany({
     orderBy: { createdAt: "desc" },
     take: 200,
   });
@@ -35,7 +35,7 @@ export default async function AdminGateauxPage() {
   return (
     <div className="space-y-6">
       <h1 className="font-display text-3xl font-bold text-cream">
-        Gâteaux personnalisés
+        Demandes sur-mesure
       </h1>
 
       <div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-6">
@@ -56,7 +56,7 @@ export default async function AdminGateauxPage() {
 
       {requests.length === 0 ? (
         <p className="rounded-2xl border border-white/10 bg-ink-soft p-12 text-center text-muted">
-          Aucune demande de gâteau personnalisé.
+          Aucune demande sur-mesure.
         </p>
       ) : (
         <ul className="space-y-3">
@@ -89,13 +89,13 @@ export default async function AdminGateauxPage() {
 
               <dl className="mt-3 grid gap-x-6 gap-y-1 text-xs text-muted sm:grid-cols-2">
                 <div>
-                  <span className="text-cream/60">Parfum / base :</span>{" "}
-                  {c.flavor}
+                  <span className="text-cream/60">Préférences :</span>{" "}
+                  {c.preferences}
                 </div>
-                {c.messageOnCake && (
+                {c.message && (
                   <div>
                     <span className="text-cream/60">Message :</span> “
-                    {c.messageOnCake}”
+                    {c.message}”
                   </div>
                 )}
                 {c.budget && (
@@ -129,7 +129,7 @@ export default async function AdminGateauxPage() {
                   {c.reference} · {c.email} · {c.phone}
                 </span>
                 <form
-                  action={adminSetCustomCakeStatus}
+                  action={adminSetCustomQuoteStatus}
                   className="flex items-center gap-2"
                 >
                   <input type="hidden" name="id" value={c.id} />

@@ -1,8 +1,8 @@
 # Mettre à jour le site en ligne
 
-Runbook de mise à jour de la boulangerie sur le VPS Hostinger **partagé**
-(`boulangerie.lodene.cloud`, projet Docker Compose `boulangerie`, port 3200).
-La première mise en ligne est décrite dans `HOSTINGER.md`.
+Runbook de mise à jour du restaurant turc sur le serveur de production
+(`votre-domaine.fr`, projet Docker Compose `restaurant-turc`, port 3200).
+La première mise en ligne est décrite dans `DEPLOIEMENT-VPS.md`.
 
 ## Le plus simple (recommandé)
 
@@ -19,11 +19,11 @@ Une seule commande, tous les paramètres pré-remplis :
 Depuis la racine du projet (sur ce Mac) :
 
 ```bash
-DEPLOY_VPS="root@IP_DU_VPS" \
-DEPLOY_REMOTE_DIR="/root/boulangerie" \
-DEPLOY_SITE_URL="https://boulangerie.lodene.cloud" \
+DEPLOY_VPS="root@VOTRE_IP_SERVEUR" \
+DEPLOY_REMOTE_DIR="/root/restaurant-turc" \
+DEPLOY_SITE_URL="https://votre-domaine.fr" \
 DEPLOY_KEY="$HOME/.ssh/deploy_key" \
-DEPLOY_COMPOSE_PROJECT="boulangerie" \
+DEPLOY_COMPOSE_PROJECT="restaurant-turc" \
 ./deploy/update-production.sh
 ```
 
@@ -38,7 +38,7 @@ migrations Prisma automatiques, puis vérification `/api/health`.
 | `DEPLOY_REMOTE_DIR` | Dossier du projet sur le serveur |
 | `DEPLOY_SITE_URL` | URL publique du nouveau site |
 | `DEPLOY_KEY` | Clé SSH à utiliser, optionnelle |
-| `DEPLOY_COMPOSE_PROJECT` | Nom du projet Docker Compose, défaut `boulangerie` |
+| `DEPLOY_COMPOSE_PROJECT` | Nom du projet Docker Compose, défaut `restaurant-turc` |
 
 ## Vérifications locales
 
@@ -51,7 +51,7 @@ npm run build
 
 ## Notes
 
-- Aucun remote GitHub n'est configuré tant que le nouveau dépôt n'est pas donné.
+- Aucun remote GitHub n'est configuré (nouveau dépôt propre à créer). Ne pas `git push`.
 - Les secrets restent exclus de `rsync` : `.env`, `.env.local`, `.env*.local`.
 - Ne lancer le script de déploiement qu'après avoir confirmé le nouveau serveur
   et le nouveau domaine.

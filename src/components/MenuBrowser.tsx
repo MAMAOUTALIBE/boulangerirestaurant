@@ -2,13 +2,14 @@
 
 import { useMemo, useState } from "react";
 import {
-  CakeSlice,
-  Croissant,
   CupSoda,
-  Sandwich,
+  Flame,
+  IceCreamBowl,
+  Pizza,
   Search,
+  Soup,
   Star,
-  Wheat,
+  UtensilsCrossed,
   type LucideIcon,
 } from "lucide-react";
 import { DishCard } from "@/components/DishCard";
@@ -33,29 +34,28 @@ interface DisplayCategory extends BrowserCategory {
 }
 
 const popularDishIds = new Set([
-  "baguette-tradition",
-  "croissant-beurre",
-  "pain-chocolat",
-  "tartelette-fruits",
+  "adana-kebab",
+  "iskender-kebab",
+  "lahmacun",
+  "baklava",
 ]);
 
 const dishDetails: Record<string, string[]> = {
-  "baguette-tradition": ["Levain", "Cuisson du jour", "Gluten"],
-  "pain-levain": ["Levain naturel", "Tranchage possible", "Gluten"],
-  "pain-complet-graines": ["Graines", "Farine complète", "Gluten"],
-  "croissant-beurre": ["Pur beurre", "Feuilletage maison", "Lait/gluten"],
-  "pain-chocolat": ["Chocolat noir", "Pur beurre", "Lait/gluten"],
-  "chausson-pommes": ["Pommes", "Pur beurre", "Gluten"],
-  "brioche-tressee": ["Moelleuse", "Beurre", "Lait/gluten"],
-  "tartelette-fruits": ["Fruits de saison", "Crème légère", "Gluten/lait"],
-  "eclair-chocolat": ["Chocolat", "Pâte à choux", "Lait/gluten"],
-  "flan-patissier": ["Vanille", "Pâte croustillante", "Lait/gluten"],
-  "paris-brest": ["Praliné", "Amandes", "Fruits à coque"],
-  "sandwich-baguette-poulet": ["Pain au choix", "Suppléments", "Gluten"],
-  "quiche-lorraine": ["Part déjeuner", "À réchauffer", "Lait/gluten"],
-  "cafe-allonge": ["Chaud", "Café moulu", "Sans alcool"],
-  "jus-orange-presse": ["Pressé minute", "Frais", "Sans alcool"],
-  "chocolat-chaud": ["Chaud", "Lait", "Chocolat"],
+  "adana-kebab": ["Agneau", "Grillé au charbon", "Épicé"],
+  "iskender-kebab": ["Sur pain pide", "Sauce tomate", "Yaourt"],
+  "kebab-grille": ["Mariné", "Grillé au charbon", "Accompagnement"],
+  kofte: ["Boulettes", "Grillé", "Épices"],
+  lahmacun: ["Viande hachée", "Croustillant", "À rouler"],
+  "pide-sucuk": ["Sucuk", "Fromage", "Au four"],
+  manti: ["Raviolis", "Yaourt à l'ail", "Beurre paprika"],
+  "mercimek-corbasi": ["Lentilles corail", "Cumin", "Chaud"],
+  houmous: ["Pois chiches", "Tahini", "Végétarien"],
+  "borek-fromage": ["Yufka", "Fromage", "Croustillant"],
+  baklava: ["Pistaches", "Pâte filo", "Miel"],
+  sutlac: ["Riz au lait", "Vanille", "Gratiné"],
+  ayran: ["Yaourt", "Frais", "Sans alcool"],
+  "the-turc": ["Thé noir", "Verre tulipe", "Sans alcool"],
+  "sodas-frais": ["33 cl", "Frais", "Sans alcool"],
 };
 
 /** Menu interactif : recherche plein-texte + filtres catégorie. */
@@ -73,7 +73,7 @@ export function MenuBrowser({
     [categories],
   );
   const displayCategories = useMemo(
-    () => groupSnackAndDrinks(categories),
+    () => toDisplayCategories(categories),
     [categories],
   );
   const categoryFilters = useMemo(
@@ -269,54 +269,24 @@ function Chip({
 
 function matchesQuickFilter(categorySlug: string | undefined, filter: string) {
   if (filter === "all") return true;
-  if (filter === "snacking-boissons") {
-    return isSnackOrDrinkSlug(categorySlug);
-  }
   return categorySlug === filter;
 }
 
 function iconForCategory(slug: string): LucideIcon {
-  if (slug.includes("pain")) return Wheat;
-  if (slug.includes("viennoiser")) return Croissant;
-  if (slug.includes("patis") || slug.includes("gateau")) return CakeSlice;
-  if (slug.includes("snack") || slug.includes("sandwich")) return Sandwich;
-  if (slug.includes("boisson") || slug.includes("cafe")) return CupSoda;
-  return Croissant;
+  if (slug.includes("grillade") || slug.includes("kebab")) return Flame;
+  if (slug.includes("pide") || slug.includes("lahmacun")) return Pizza;
+  if (slug.includes("entree") || slug.includes("mezze")) return Soup;
+  if (slug.includes("dessert")) return IceCreamBowl;
+  if (slug.includes("boisson")) return CupSoda;
+  return UtensilsCrossed;
 }
 
-function isSnackOrDrinkSlug(slug: string | undefined) {
-  return Boolean(
-    slug &&
-      (slug.includes("snack") ||
-        slug.includes("sandwich") ||
-        slug.includes("boisson") ||
-        slug.includes("cafe")),
-  );
-}
-
-function groupSnackAndDrinks(categories: BrowserCategory[]): DisplayCategory[] {
-  const snackDrinkIds = categories
-    .filter((category) => isSnackOrDrinkSlug(category.slug))
-    .map((category) => category.id);
-  let combinedAdded = false;
-
-  return categories.flatMap((category) => {
-    if (!isSnackOrDrinkSlug(category.slug)) {
-      return [{ ...category, sourceIds: [category.id] }];
-    }
-
-    if (combinedAdded) return [];
-    combinedAdded = true;
-
-    return [
-      {
-        id: "snacking-boissons",
-        slug: "snacking-boissons",
-        name: "Snack & boissons",
-        sourceIds: snackDrinkIds,
-      },
-    ];
-  });
+// Restaurant : chaque catégorie a son propre onglet (pas de regroupement).
+function toDisplayCategories(categories: BrowserCategory[]): DisplayCategory[] {
+  return categories.map((category) => ({
+    ...category,
+    sourceIds: [category.id],
+  }));
 }
 
 function withDisplayTag(dish: BrowserDish): BrowserDish {
@@ -334,6 +304,6 @@ function getDishBadges(dish: BrowserDish) {
 function getDishDetails(dish: BrowserDish) {
   return (
     dishDetails[dish.id] ??
-    (dish.hasOptions ? ["Pain", "Boisson", "Supplément"] : [])
+    (dish.hasOptions ? ["Accompagnement", "Sauce", "Boisson"] : [])
   );
 }

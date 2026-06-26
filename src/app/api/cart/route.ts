@@ -73,7 +73,9 @@ async function upsertCartLegacyComposite(params: {
  * Appelé (fire-and-forget) par le panier client et au checkout.
  */
 export async function POST(request: Request) {
-  const parsed = cartTrackingSchema.safeParse(await request.json().catch(() => null));
+  const parsed = cartTrackingSchema.safeParse(
+    await request.json().catch(() => null),
+  );
   if (!parsed.success) {
     return NextResponse.json({ error: "Données invalides" }, { status: 400 });
   }

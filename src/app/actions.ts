@@ -6,7 +6,7 @@ import {
   antiWasteSchema,
   cateringSchema,
   contactSchema,
-  customCakeSchema,
+  customQuoteSchema,
   dishSchema,
   newsletterSchema,
   orderSchema,
@@ -102,7 +102,7 @@ export async function subscribeNewsletter(
     subject: `Bienvenue chez ${siteConfig.shortName}`,
     html: `<h1>Bienvenue !</h1>
       <p>Merci de rejoindre la communauté ${siteConfig.name}.</p>
-      <p>Profitez de <strong>-10%</strong> sur votre première commande avec le code <strong>BOULANGERIE10</strong>.</p>`,
+      <p>Profitez de <strong>-10%</strong> sur votre première commande avec le code <strong>BIENVENUE10</strong>.</p>`,
   });
 
   return { ok: true, message: "Merci ! Votre inscription est confirmée." };
@@ -286,23 +286,23 @@ export async function requestCatering(
   };
 }
 
-/** Demande de gâteau personnalisé (sur-mesure). */
-export async function requestCustomCake(
+/** Demande de devis sur-mesure. */
+export async function requestCustomQuote(
   _prev: ActionState | null,
   formData: FormData,
 ): Promise<ActionState> {
   if (isBot(formData)) return { ok: true, message: "Demande envoyée !" };
-  if (!(await rateLimit(`cake:${await clientIp()}`, 5, 60_000)))
+  if (!(await rateLimit(`custom-quote:${await clientIp()}`, 5, 60_000)))
     return TOO_MANY;
 
-  const parsed = customCakeSchema.safeParse({
+  const parsed = customQuoteSchema.safeParse({
     name: formData.get("name"),
     email: formData.get("email"),
     phone: formData.get("phone"),
     occasion: formData.get("occasion"),
     servings: formData.get("servings"),
-    flavor: formData.get("flavor"),
-    messageOnCake: formData.get("messageOnCake") || undefined,
+    preferences: formData.get("preferences"),
+    message: formData.get("message") || undefined,
     pickupDate: formData.get("pickupDate"),
     pickupTime: formData.get("pickupTime") || undefined,
     inspirationUrl: formData.get("inspirationUrl") || undefined,
@@ -318,8 +318,8 @@ export async function requestCustomCake(
     };
   }
 
-  const ref = `CC-${Date.now().toString(36).toUpperCase()}`;
-  await prisma.customCakeRequest.create({
+  const ref = `SM-${Date.now().toString(36).toUpperCase()}`;
+  await prisma.customRequest.create({
     data: { reference: ref, ...parsed.data },
   });
   await upsertCustomer(parsed.data.email, {
@@ -329,14 +329,14 @@ export async function requestCustomCake(
 
   await sendEmail({
     to: siteConfig.contact.email,
-    subject: `Nouvelle demande de gâteau de ${parsed.data.name} (${ref})`,
+    subject: `Nouvelle demande sur-mesure de ${parsed.data.name} (${ref})`,
     html: `<p><strong>${parsed.data.name}</strong> (${parsed.data.email}, ${parsed.data.phone})</p>
       <ul>
         <li>Occasion : ${parsed.data.occasion}</li>
-        <li>Parts : ${parsed.data.servings}</li>
-        <li>Parfum / base : ${parsed.data.flavor}</li>
+        <li>Convives : ${parsed.data.servings}</li>
+        <li>Préférences : ${parsed.data.preferences}</li>
         <li>Retrait : ${parsed.data.pickupDate}${parsed.data.pickupTime ? ` à ${parsed.data.pickupTime}` : ""}</li>
-        ${parsed.data.messageOnCake ? `<li>Message sur le gâteau : ${parsed.data.messageOnCake}</li>` : ""}
+        ${parsed.data.message ? `<li>Message : ${parsed.data.message}</li>` : ""}
         ${parsed.data.budget ? `<li>Budget indicatif : ${parsed.data.budget}</li>` : ""}
         ${parsed.data.allergies ? `<li>Allergies : ${parsed.data.allergies}</li>` : ""}
         ${parsed.data.inspirationUrl ? `<li>Inspiration : <a href="${parsed.data.inspirationUrl}">${parsed.data.inspirationUrl}</a></li>` : ""}
@@ -345,9 +345,9 @@ export async function requestCustomCake(
   });
   await sendEmail({
     to: parsed.data.email,
-    subject: `Votre demande de gâteau ${ref}`,
+    subject: `Votre demande sur-mesure ${ref}`,
     html: `<h1>Merci ${parsed.data.name} !</h1>
-      <p>Votre demande de gâteau personnalisé pour le ${parsed.data.pickupDate}
+      <p>Votre demande sur-mesure pour le ${parsed.data.pickupDate}
       (réf. ${ref}) a bien été reçue. Nous revenons vers vous avec un devis
       sur mesure.</p>`,
   });
@@ -660,7 +660,7 @@ export async function getReorderItems(reference: string): Promise<
     name: i.name,
     price: i.price,
     quantity: i.quantity,
-    image: imageBySlug.get(i.id) ?? "/images/boulangerie-hero.webp",
+    image: imageBySlug.get(i.id) ?? "/images/hero-plateau-turc-premium.png",
     options: i.options,
     note: i.note,
   }));
@@ -863,7 +863,7 @@ export async function advanceOrderStatus(formData: FormData): Promise<void> {
 
 const RESERVATION_STATUSES = ["en attente", "confirmée", "annulée"];
 const CATERING_STATUSES = ["nouveau", "devis envoyé", "gagné", "perdu"];
-const CAKE_STATUSES = [
+const CUSTOM_QUOTE_STATUSES = [
   "nouveau",
   "devis envoyé",
   "confirmé",
@@ -908,18 +908,18 @@ export async function adminSetCateringStatus(
   redirect("/admin/traiteur");
 }
 
-/** Back-office : change le statut d'une demande de gâteau personnalisé. */
-export async function adminSetCustomCakeStatus(
+/** Back-office : change le statut d'une demande sur-mesure. */
+export async function adminSetCustomQuoteStatus(
   formData: FormData,
 ): Promise<void> {
   if (!isAdminEmail(await getSessionEmail())) redirect("/compte");
   const id = String(formData.get("id") ?? "");
   const status = String(formData.get("status") ?? "");
-  if (id && CAKE_STATUSES.includes(status)) {
-    await prisma.customCakeRequest.update({ where: { id }, data: { status } });
-    revalidatePath("/admin/gateaux");
+  if (id && CUSTOM_QUOTE_STATUSES.includes(status)) {
+    await prisma.customRequest.update({ where: { id }, data: { status } });
+    revalidatePath("/admin/sur-mesure");
   }
-  redirect("/admin/gateaux");
+  redirect("/admin/sur-mesure");
 }
 
 /** Back-office : crée une offre de saison (précommandes). */
@@ -954,7 +954,7 @@ export async function adminCreateSeasonalProduct(
       slug,
       name,
       description,
-      image: image || "/images/boulangerie-patisseries.webp",
+      image: image || "/images/hero-slide-desserts-turcs.png",
       price,
       salesStart: new Date(salesStart),
       salesEnd: new Date(salesEnd),
@@ -982,7 +982,7 @@ export async function adminUpdateSeasonalProduct(
       description: String(formData.get("description") ?? "").trim(),
       image:
         String(formData.get("image") ?? "").trim() ||
-        "/images/boulangerie-patisseries.webp",
+        "/images/hero-slide-desserts-turcs.png",
       price: Number(formData.get("price") ?? 0),
       salesStart: new Date(String(formData.get("salesStart") ?? "")),
       salesEnd: new Date(String(formData.get("salesEnd") ?? "")),
@@ -1536,7 +1536,7 @@ export async function adminRelaunchCart(formData: FormData): Promise<void> {
       subject: `Votre panier vous attend chez ${siteConfig.shortName}`,
       html: `<h1>Vous avez oublié quelque chose ?</h1>
         <p>Votre panier (${cart.itemCount} article·s) est toujours là.</p>
-        <p>Finalisez votre commande avec <strong>-10%</strong> grâce au code <strong>BOULANGERIE10</strong>.</p>
+        <p>Finalisez votre commande avec <strong>-10%</strong> grâce au code <strong>BIENVENUE10</strong>.</p>
         <p><a href="${siteConfig.url}/commander">Reprendre ma commande</a></p>`,
     });
     await prisma.abandonedCart.update({

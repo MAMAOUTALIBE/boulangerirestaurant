@@ -2,14 +2,14 @@ import Link from "next/link";
 import {
   CalendarCheck,
   ShoppingBag,
-  Croissant,
+  UtensilsCrossed,
   type LucideIcon,
 } from "lucide-react";
 
 const shortcuts: { href: string; label: string; Icon: LucideIcon }[] = [
   { href: "/commander", label: "Commander", Icon: ShoppingBag },
   { href: "/reservation", label: "Réserver", Icon: CalendarCheck },
-  { href: "/menu", label: "Voir le menu", Icon: Croissant },
+  { href: "/menu", label: "Voir le menu", Icon: UtensilsCrossed },
 ];
 
 /**

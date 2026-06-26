@@ -1,9 +1,9 @@
-# Boulangerie Artisanale
+# Anatolia Grill
 
-Application **full-stack** pour une boulangerie artisanale : vitrine, menu,
+Application **full-stack** pour un restaurant turc : vitrine, carte,
 commande en ligne, paiement Stripe-ready, espace client et back-office.
 
-Le dépôt local est prêt pour un nouveau dépôt GitHub dédié à la boulangerie.
+Le dépôt local est prêt pour un nouveau dépôt GitHub dédié au restaurant.
 Aucun push ne doit être fait avant d'avoir configuré ce nouveau remote.
 
 ## Fonctionnalités
@@ -11,12 +11,12 @@ Aucun push ne doit être fait avant d'avoir configuré ce nouveau remote.
 | Domaine  | Implémentation                                            |
 | -------- | --------------------------------------------------------- |
 | Vitrine  | Hero, spécialités, avis, contact, QR code et SEO          |
-| Menu     | Pains, viennoiseries, pâtisseries, snacking et boissons   |
+| Menu     | Mezze, grillades, kebabs, pide, desserts et boissons      |
 | Commande | Panier persistant, créneau, retrait/livraison/sur place   |
 | Paiement | Stripe Checkout si configuré, simulation sinon            |
 | Client   | Connexion par lien magique et historique des commandes    |
 | Admin    | Commandes, statuts, menu, clients, livraisons, rapports   |
-| Traiteur | Demandes de devis pour entreprises, brunchs et événements |
+| Traiteur | Demandes de devis pour entreprises, buffets et événements |
 
 ## Stack
 
@@ -31,10 +31,10 @@ Aucun push ne doit être fait avant d'avoir configuré ce nouveau remote.
 
 ```bash
 # Base de données PostgreSQL locale
-docker run --name boulangerie-pg \
-  -e POSTGRES_PASSWORD=boulangerie \
-  -e POSTGRES_USER=boulangerie \
-  -e POSTGRES_DB=boulangerie \
+docker run --name restaurant-turc-pg \
+  -e POSTGRES_PASSWORD=restaurant_turc \
+  -e POSTGRES_USER=restaurant_turc \
+  -e POSTGRES_DB=restaurant_turc \
   -p 5440:5432 -d postgres:16
 
 cp .env.example .env.local
@@ -63,11 +63,11 @@ npm run db:seed
 
 Le seed crée :
 
-- l'établissement `boulangerie`,
-- les catégories pains, viennoiseries, pâtisseries, snacking et boissons,
-- le code promo `BOULANGERIE10`,
-- les horaires 7h00-19h30,
+- l'établissement `anatolia-grill`,
+- les catégories entrées & mezze, grillades, pide, spécialités, desserts et boissons,
+- le code promo `BIENVENUE10`,
+- les horaires 11h30-23h00,
 - les zones de livraison existantes autour de Juvisy-sur-Orge.
 
-Les anciennes données de démonstration turques sont rendues indisponibles par
-le seed si elles existent encore dans la base.
+Le seed archive les anciennes entrées qui ne font pas partie de la carte turque
+de référence.

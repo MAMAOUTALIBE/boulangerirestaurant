@@ -4,119 +4,96 @@ import { seedDishes } from "../src/data/dishes";
 const prisma = new PrismaClient();
 
 const categories = [
-  { slug: "pains", name: "Pains artisanaux", sortOrder: 1 },
-  { slug: "viennoiseries", name: "Viennoiseries", sortOrder: 2 },
-  { slug: "patisseries", name: "Pâtisseries", sortOrder: 3 },
-  { slug: "snacking", name: "Snacking", sortOrder: 4 },
-  { slug: "boissons", name: "Boissons", sortOrder: 5 },
+  { slug: "entrees", name: "Entrées & Mezze", sortOrder: 1 },
+  { slug: "grillades", name: "Grillades & Kebabs", sortOrder: 2 },
+  { slug: "pide", name: "Pide & Lahmacun", sortOrder: 3 },
+  { slug: "specialites", name: "Spécialités", sortOrder: 4 },
+  { slug: "desserts", name: "Desserts", sortOrder: 5 },
+  { slug: "boissons", name: "Boissons", sortOrder: 6 },
 ];
 
 const extraDishes = [
   {
-    slug: "pain-complet-graines",
-    name: "Pain complet aux graines",
-    description: "Farine complète, graines torréfiées et levain naturel",
-    price: 4.8,
-    image: "/images/menu/pain-complet-graines.webp",
-    category: "pains",
+    slug: "mercimek-corbasi",
+    name: "Mercimek çorbası",
+    description: "Soupe crémeuse de lentilles corail, cumin et filet de citron",
+    price: 5.5,
+    image: "/images/about-3.jpg",
+    category: "entrees",
     sortOrder: 1,
   },
   {
-    slug: "chausson-pommes",
-    name: "Chausson aux pommes",
-    description: "Compotée de pommes, feuilletage pur beurre et dorure légère",
-    price: 2.6,
-    image: "/images/menu/chausson-pommes.webp",
-    category: "viennoiseries",
-    sortOrder: 2,
-  },
-  {
-    slug: "brioche-tressee",
-    name: "Brioche tressée",
-    description: "Brioche moelleuse au beurre, idéale pour le goûter",
+    slug: "houmous",
+    name: "Houmous maison",
+    description:
+      "Purée de pois chiches au tahini, citron et huile d'olive, servie avec du pide chaud",
     price: 6.5,
-    image: "/images/menu/brioche-tressee.webp",
-    category: "viennoiseries",
-    sortOrder: 3,
-  },
-  {
-    slug: "flan-patissier",
-    name: "Flan pâtissier",
-    description: "Crème vanillée, pâte croustillante et cuisson bien dorée",
-    price: 4.4,
-    image: "/images/menu/flan-patissier.webp",
-    category: "patisseries",
-    sortOrder: 1,
-  },
-  {
-    slug: "paris-brest",
-    name: "Paris-Brest",
-    description: "Pâte à choux, crème pralinée et amandes effilées",
-    price: 5.2,
-    image: "/images/menu/paris-brest.webp",
-    category: "patisseries",
+    image: "/images/about-3.jpg",
+    category: "entrees",
     sortOrder: 2,
   },
   {
-    slug: "cafe-allonge",
-    name: "Café allongé",
-    description: "Café fraîchement moulu, servi chaud",
-    price: 2.2,
-    image: "/images/menu/cafe-allonge.webp",
-    category: "boissons",
-    sortOrder: 1,
-  },
-  {
-    slug: "jus-orange-presse",
-    name: "Jus d'orange pressé",
-    description: "Oranges pressées à la commande",
-    price: 3.9,
-    image: "/images/menu/jus-orange-presse.webp",
-    category: "boissons",
-    sortOrder: 2,
-  },
-  {
-    slug: "chocolat-chaud",
-    name: "Chocolat chaud",
-    description: "Chocolat onctueux au lait, préparé minute",
-    price: 3.4,
-    image: "/images/menu/chocolat-chaud.webp",
-    category: "boissons",
+    slug: "borek-fromage",
+    name: "Börek au fromage",
+    description:
+      "Feuilles de yufka croustillantes garnies de fromage et de persil",
+    price: 6.9,
+    image: "/images/hero-slide-pide-lahmacun.png",
+    category: "entrees",
     sortOrder: 3,
   },
-];
-
-const legacyDishSlugs = [
-  "adana-kebab",
-  "ayran",
-  "baklava",
-  "borek-fromage",
-  "houmous",
-  "iskender-kebab",
-  "kebab-grille",
-  "kofte",
-  "lahmacun",
-  "manti",
-  "mercimek-corbasi",
-  "pide-sucuk",
-  "sodas-frais",
-  "sutlac",
-  "the-turc",
+  {
+    slug: "kofte",
+    name: "Köfte",
+    description: "Boulettes de viande grillées aux épices, riz pilaf et salade",
+    price: 13.5,
+    image: "/images/hero-plateau-turc-premium.png",
+    category: "grillades",
+    sortOrder: 4,
+  },
+  {
+    slug: "sutlac",
+    name: "Sütlaç",
+    description:
+      "Riz au lait turc parfumé à la vanille, légèrement gratiné au four",
+    price: 4.9,
+    image: "/images/hero-slide-desserts-turcs.png",
+    category: "desserts",
+    sortOrder: 5,
+  },
+  {
+    slug: "the-turc",
+    name: "Thé turc (çay)",
+    description: "Thé noir infusé, servi dans le verre tulipe traditionnel",
+    price: 2.0,
+    image: "/images/hero-slide-boissons-turques.png",
+    category: "boissons",
+    sortOrder: 6,
+  },
+  {
+    slug: "sodas-frais",
+    name: "Sodas",
+    description: "Canettes 33 cl au choix, bien fraîches",
+    price: 2.5,
+    image: "/images/boisson-sodas.png",
+    category: "boissons",
+    sortOrder: 7,
+  },
 ];
 
 async function main() {
   // Établissement par défaut (base mono-site aujourd'hui, prêt multi-sites).
   const defaultRestaurant = await prisma.restaurant.upsert({
-    where: { slug: "boulangerie" },
-    update: { name: "Boulangerie Artisanale", active: true },
+    where: { slug: "anatolia-grill" },
+    update: { name: "Anatolia Grill", active: true },
     create: {
-      slug: "boulangerie",
-      name: "Boulangerie Artisanale",
+      slug: "anatolia-grill",
+      name: "Anatolia Grill",
       active: true,
     },
   });
   await prisma.restaurant.updateMany({
-    where: { slug: "restaurant" },
+    where: { slug: { not: "anatolia-grill" } },
     data: { active: false },
   });
 
@@ -190,37 +167,40 @@ async function main() {
     });
   }
 
-  // Options de démonstration sur le sandwich.
-  const sandwich = await prisma.dish.findUnique({
-    where: { slug: "sandwich-baguette-poulet" },
+  // Options de démonstration sur le kebab grillé.
+  const kebab = await prisma.dish.findUnique({
+    where: { slug: "kebab-grille" },
   });
-  if (sandwich) {
-    await resetDemoOptionGroup(sandwich.id, {
-      name: "Pain",
+  if (kebab) {
+    await resetDemoOptionGroup(kebab.id, {
+      name: "Accompagnement",
       type: "single",
       required: true,
       sortOrder: 1,
       options: [
-        { name: "Baguette tradition", priceDelta: 0, sortOrder: 1 },
-        { name: "Pain complet", priceDelta: 0.5, sortOrder: 2 },
-        { name: "Focaccia", priceDelta: 0.8, sortOrder: 3 },
+        { name: "Riz pilaf", priceDelta: 0, sortOrder: 1 },
+        { name: "Bulgur", priceDelta: 0, sortOrder: 2 },
+        { name: "Frites maison", priceDelta: 1, sortOrder: 3 },
+        { name: "Salade", priceDelta: 0, sortOrder: 4 },
       ],
     });
-    await resetDemoOptionGroup(sandwich.id, {
-      name: "Suppléments",
+    await resetDemoOptionGroup(kebab.id, {
+      name: "Sauces & suppléments",
       type: "multi",
       required: false,
       sortOrder: 2,
       options: [
-        { name: "Comté", priceDelta: 1, sortOrder: 1 },
-        { name: "Avocat", priceDelta: 1.5, sortOrder: 2 },
-        { name: "Boisson 33 cl", priceDelta: 2, sortOrder: 3 },
+        { name: "Sauce blanche", priceDelta: 0.5, sortOrder: 1 },
+        { name: "Sauce piquante", priceDelta: 0.5, sortOrder: 2 },
+        { name: "Fromage", priceDelta: 1.5, sortOrder: 3 },
+        { name: "Boisson 33 cl", priceDelta: 2, sortOrder: 4 },
       ],
     });
   }
 
+  const activeDishSlugs = [...seedDishes, ...extraDishes].map((d) => d.slug);
   await prisma.dish.updateMany({
-    where: { slug: { in: legacyDishSlugs } },
+    where: { slug: { notIn: activeDishSlugs } },
     data: { available: false },
   });
 
@@ -237,15 +217,15 @@ async function main() {
     });
   }
 
-  // Horaires d'ouverture (7h–19h30 tous les jours) + réglages de commande.
+  // Horaires d'ouverture (11h30–23h tous les jours) + réglages de commande.
   for (let day = 0; day < 7; day++) {
     await prisma.openingHour.upsert({
       where: { dayOfWeek: day },
-      update: { openMinutes: 7 * 60, closeMinutes: 19 * 60 + 30 },
+      update: { openMinutes: 11 * 60 + 30, closeMinutes: 23 * 60 },
       create: {
         dayOfWeek: day,
-        openMinutes: 7 * 60,
-        closeMinutes: 19 * 60 + 30,
+        openMinutes: 11 * 60 + 30,
+        closeMinutes: 23 * 60,
       },
     });
   }
@@ -262,14 +242,14 @@ async function main() {
 
   // Code promo affiché sur le site.
   await prisma.promoCode.updateMany({
-    where: { code: "RESTAURANT10" },
+    where: { code: { not: "BIENVENUE10" } },
     data: { active: false },
   });
   await prisma.promoCode.upsert({
-    where: { code: "BOULANGERIE10" },
+    where: { code: "BIENVENUE10" },
     update: { type: "percent", value: 10, active: true },
     create: {
-      code: "BOULANGERIE10",
+      code: "BIENVENUE10",
       type: "percent",
       value: 10,
       active: true,
@@ -277,10 +257,10 @@ async function main() {
   });
   // Stock du jour de démonstration (limité, pour illustrer les ruptures).
   const demoStock: Record<string, number> = {
-    "paris-brest": 6,
-    "tartelette-fruits": 8,
-    "eclair-chocolat": 10,
-    "baguette-tradition": 40,
+    "adana-kebab": 20,
+    "iskender-kebab": 15,
+    lahmacun: 30,
+    baklava: 24,
   };
   for (const [slug, dailyStock] of Object.entries(demoStock)) {
     await prisma.dish.updateMany({ where: { slug }, data: { dailyStock } });
@@ -298,16 +278,20 @@ async function main() {
     pickupEnd: isoDay(30),
     active: true,
   };
+  await prisma.seasonalProduct.updateMany({
+    where: { slug: { not: "plateau-baklava" } },
+    data: { active: false },
+  });
   await prisma.seasonalProduct.upsert({
-    where: { slug: "galette-des-rois" },
+    where: { slug: "plateau-baklava" },
     update: seasonalWindow,
     create: {
-      slug: "galette-des-rois",
-      name: "Galette des Rois (frangipane)",
+      slug: "plateau-baklava",
+      name: "Plateau de baklava assorti",
       description:
-        "Galette pur beurre à la frangipane, fève incluse. En précommande, quantités limitées.",
-      image: "/images/boulangerie-patisseries.webp",
-      price: 18.5,
+        "Assortiment de baklava pistache et noix, fait maison. En précommande, quantités limitées.",
+      image: "/images/hero-slide-desserts-turcs.png",
+      price: 24.9,
       quota: 50,
       ...seasonalWindow,
     },
@@ -322,11 +306,11 @@ async function main() {
     update: { quantity: 8, active: true },
     create: {
       date: todayParis,
-      title: "Panier surprise du soir",
+      title: "Plateau surprise du soir",
       description:
-        "Assortiment d'invendus du jour : pains, viennoiseries et pâtisseries.",
-      price: 5,
-      originalValue: 15,
+        "Assortiment de spécialités du jour : grillades, pide, mezze et accompagnements.",
+      price: 8,
+      originalValue: 22,
       quantity: 8,
       pickupStart: "18:00",
       pickupEnd: "19:30",
@@ -336,7 +320,7 @@ async function main() {
   const dishes = await prisma.dish.count();
   const zones = await prisma.deliveryZone.count();
   console.log(
-    `✓ Seed : ${dishes} produits, ${categories.length} catégories, ${zones} zones, BOULANGERIE10, établissement ${defaultRestaurant.slug}.`,
+    `✓ Seed : ${dishes} produits, ${categories.length} catégories, ${zones} zones, BIENVENUE10, établissement ${defaultRestaurant.slug}.`,
   );
 }
 
@@ -389,10 +373,11 @@ async function resetDemoOptionGroup(
 
 function prepMinutesForCategory(category: string): number {
   const prepByCat: Record<string, number> = {
-    pains: 5,
-    viennoiseries: 5,
-    patisseries: 5,
-    snacking: 12,
+    entrees: 8,
+    grillades: 18,
+    pide: 14,
+    specialites: 15,
+    desserts: 4,
     boissons: 2,
   };
   return prepByCat[category] ?? 10;

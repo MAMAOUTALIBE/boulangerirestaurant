@@ -37,22 +37,22 @@ const fieldClass =
   "w-full rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-sm text-cream placeholder:text-muted focus:border-gold/60 focus:outline-none focus:ring-1 focus:ring-gold/40";
 const starterLinks = [
   {
-    href: "/menu/baguette-tradition",
-    name: "Baguette tradition",
+    href: "/menu/adana-kebab",
+    name: "Adana kebab",
     text: "Signature",
-    image: "/images/boulangerie-pains.webp",
+    image: "/images/hero-slide-adana-kebab.png",
   },
   {
-    href: "/menu/croissant-beurre",
-    name: "Croissant pur beurre",
+    href: "/menu/iskender-kebab",
+    name: "İskender kebab",
     text: "Populaire",
-    image: "/images/boulangerie-viennoiseries.webp",
+    image: "/images/hero-premium-kebab.png",
   },
   {
-    href: "/menu/tartelette-fruits",
-    name: "Tartelette aux fruits",
-    text: "Pâtisserie",
-    image: "/images/boulangerie-patisseries.webp",
+    href: "/menu/baklava",
+    name: "Baklava",
+    text: "Dessert",
+    image: "/images/baklava.png",
   },
 ];
 const checkoutHighlights: {
@@ -194,7 +194,9 @@ export default function CommanderPage() {
             <section className="min-w-0 rounded-2xl border border-white/10 bg-ink-soft p-4 sm:p-6">
               <OrderStarter
                 subtotal={totalPrice}
-                onConfirmed={() => window.scrollTo({ top: 0, behavior: "auto" })}
+                onConfirmed={() =>
+                  window.scrollTo({ top: 0, behavior: "auto" })
+                }
               />
             </section>
             <div className="hidden lg:block">
@@ -226,7 +228,10 @@ export default function CommanderPage() {
 
             <div className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] lg:gap-10 3xl:grid-cols-[minmax(0,0.9fr)_minmax(0,1.15fr)] 3xl:gap-12">
               {/* Récap */}
-              <section aria-label="Récapitulatif" className="order-2 lg:order-1">
+              <section
+                aria-label="Récapitulatif"
+                className="order-2 lg:order-1"
+              >
                 <h2 className="font-display text-xl font-semibold text-cream">
                   Récapitulatif
                 </h2>
@@ -366,7 +371,10 @@ export default function CommanderPage() {
               </section>
 
               {/* Coordonnées */}
-              <section aria-label="Vos coordonnées" className="order-1 lg:order-2">
+              <section
+                aria-label="Vos coordonnées"
+                className="order-1 lg:order-2"
+              >
                 <h2 className="font-display text-xl font-semibold text-cream">
                   Vos coordonnées
                 </h2>

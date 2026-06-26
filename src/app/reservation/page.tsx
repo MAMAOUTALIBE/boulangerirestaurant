@@ -7,14 +7,15 @@ import { ReservationForm } from "@/components/ReservationForm";
 
 export const metadata: Metadata = {
   title: "Réserver une table",
-  description: "Réservez votre table à la boulangerie en quelques clics.",
+  description:
+    "Réservez votre table dans notre restaurant turc en quelques clics.",
 };
 
 const atoutsMobile = ["Confirmé", "Rapide", "Sans CB"];
 
 const atoutsDesktop = [
   "Confirmation par email",
-  "Créneau matin, midi ou pause",
+  "Créneau midi ou soir",
   "Sans paiement en ligne",
 ];
 
@@ -83,8 +84,8 @@ export default async function ReservationPage({
             <div className="mt-8 overflow-hidden rounded-[28px] border border-white/10 bg-[radial-gradient(circle_at_top_left,rgba(216,154,28,0.12),transparent_38%),#111111] shadow-[0_28px_85px_-62px_rgba(0,0,0,0.95)] lg:grid lg:grid-cols-[0.9fr_1.1fr]">
               <div className="relative min-h-[28rem]">
                 <Image
-                  src="/images/boulangerie-hero.webp"
-                  alt="Espace boulangerie pour une pause sur place"
+                  src="/images/about-1.jpg"
+                  alt="Salle de notre restaurant turc pour un repas sur place"
                   fill
                   sizes="(max-width: 1024px) 100vw, 42vw"
                   className="object-cover"
@@ -96,7 +97,7 @@ export default async function ReservationPage({
                     Sur place
                   </p>
                   <p className="mt-1 font-display text-2xl font-bold text-cream">
-                    Une table pour votre pause gourmande.
+                    Une table pour un bon repas turc.
                   </p>
                   <ul className="mt-3 grid gap-2 sm:grid-cols-3 lg:grid-cols-1">
                     {atoutsDesktop.map((atout) => (

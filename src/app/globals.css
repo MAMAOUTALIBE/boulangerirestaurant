@@ -83,7 +83,11 @@ body {
     z-index: 0;
     border-radius: calc(1rem - 1px);
     border: 1px solid rgba(255, 210, 112, 0.08);
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.055), transparent);
+    background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.055),
+      transparent
+    );
     opacity: 0.86;
     pointer-events: none;
   }
@@ -139,11 +143,15 @@ body {
     animation-duration: 2.65s;
   }
 
-  .home-shortcuts-grid .home-quick-action:nth-child(2) .home-quick-icon::before {
+  .home-shortcuts-grid
+    .home-quick-action:nth-child(2)
+    .home-quick-icon::before {
     animation-delay: 0.55s;
   }
 
-  .home-shortcuts-grid .home-quick-action:nth-child(3) .home-quick-icon::before {
+  .home-shortcuts-grid
+    .home-quick-action:nth-child(3)
+    .home-quick-icon::before {
     animation-delay: 1.1s;
   }
 

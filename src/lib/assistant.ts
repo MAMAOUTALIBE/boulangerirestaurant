@@ -197,11 +197,11 @@ export async function buildSystemPrompt(
       .join("\n\n");
   }
 
-  return `Tu es l'assistant virtuel de « ${siteConfig.name} », boulangerie artisanale située au ${siteConfig.contact.address}. Tu réponds en JSON.
+  return `Tu es l'assistant virtuel de « ${siteConfig.name} », restaurant turc spécialisé dans les grillades au charbon, kebabs, pide, lahmacun, mezze et desserts orientaux, situé au ${siteConfig.contact.address}. Tu réponds en JSON.
 
 TON RÔLE :
 - Aider chaleureusement les clients en français, de façon concise et naturelle.
-- Conseiller pains, viennoiseries, pâtisseries, snacking et boissons, composer une sélection cohérente et ajouter les produits au panier.
+- Conseiller grillades, kebabs, pide, lahmacun, mezze et desserts turcs, composer un repas cohérent (entrée, plat, dessert, boisson) et ajouter les produits au panier.
 - Renseigner sur les horaires, la livraison (codes postaux desservis), les réservations de table et le service traiteur.
 - Quand c'est utile, proposer d'ouvrir une page (réservation, commander, traiteur…) via une action.
 
@@ -214,13 +214,13 @@ FORMAT DE RÉPONSE (JSON strict, rien d'autre) :
   ]
 }
 - "actions" est optionnel (tableau vide si aucune action). "prefill" est optionnel et ne s'applique qu'à "reservation".
-- add_to_cart : QUE des produits du menu ci-dessous. Le "dishId" est le slug entre crochets SANS les crochets (ex : "[croissant-beurre]" → "croissant-beurre").
+- add_to_cart : QUE des produits du menu ci-dessous. Le "dishId" est le slug entre crochets SANS les crochets (ex : "[adana-kebab]" → "adana-kebab").
 - Dès que le client veut un produit (ou que tu proposes une sélection), émets une action add_to_cart pour CHAQUE produit — MÊME s'il est "(options à choisir)" : le site affichera alors un lien vers sa page au lieu de l'ajouter directement.
-- Pour une sélection petit-déjeuner, déjeuner ou goûter, propose des produits cohérents et ajoute-les tous.
+- Pour un repas complet (entrée, plat, dessert, boisson), propose des produits cohérents et ajoute-les tous.
 - open_page : réserver une table → "reservation" ; finaliser la commande → "commander" ; un événement → "traiteur".
 - RÉSERVATION : si le client donne des détails (date, heure, nombre de personnes…), émets open_page "reservation" avec un objet "prefill" rempli (date au format AAAA-MM-JJ, heure HH:MM, guests = nombre) pour préremplir le formulaire. Ne demande pas une info déjà donnée.
 - BUDGET : si le client donne un budget (ex : « pour 25 € »), propose une sélection dont le TOTAL reste sous ce budget, indique le total calculé dans "reply", et ajoute les produits via add_to_cart.
-- Dans "reply", mentionne ce que tu ajoutes (ex : « J'ai ajouté le croissant pur beurre à votre panier. »). Pour un produit à options, invite à choisir les options via le lien.
+- Dans "reply", mentionne ce que tu ajoutes (ex : « J'ai ajouté l'adana kebab à votre panier. »). Pour un produit à options, invite à choisir les options via le lien.
 
 LIVRAISON :
 - Codes postaux desservis et conditions :
@@ -344,13 +344,13 @@ export function ruleBasedAnswer(input: string): string {
     return "Pour un événement, la page Traiteur permet d'envoyer une demande de devis avec le nombre d'invités, la date et le message.";
   }
   if (q.includes("allerg") || q.includes("halal") || q.includes("vegetar")) {
-    return "Indiquez vos contraintes dans les notes de commande. Pour les allergènes, appelez la boulangerie avant de valider.";
+    return "Indiquez vos contraintes dans les notes de commande. Pour les allergènes, appelez le restaurant avant de valider.";
   }
   if (
     q.includes("menu") ||
     q.includes("produit") ||
-    q.includes("pain") ||
-    q.includes("croissant") ||
+    q.includes("kebab") ||
+    q.includes("grillade") ||
     q.includes("prix")
   ) {
     return "Le menu contient les produits disponibles avec prix, options et ajout au panier. Rendez-vous sur la page Menu.";

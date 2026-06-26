@@ -73,8 +73,8 @@ export default async function ComptePage({
 
               <aside className="relative min-h-[28rem] border-l border-white/10">
                 <Image
-                  src="/images/boulangerie-viennoiseries.webp"
-                  alt="Viennoiseries et commandes de la boulangerie"
+                  src="/images/hero-plateau-turc-premium.png"
+                  alt="Plateau de grillades turques de notre restaurant"
                   fill
                   sizes="42vw"
                   className="object-cover"

@@ -4,11 +4,7 @@ import { ArrowRight } from "lucide-react";
 import { DishCard } from "@/components/DishCard";
 import { getMenuForBrowser } from "@/lib/dishes";
 
-const specialtySlugs = [
-  "baguette-tradition",
-  "croissant-beurre",
-  "tartelette-fruits",
-];
+const specialtySlugs = ["adana-kebab", "iskender-kebab", "baklava"];
 
 /** Grille des spécialités mises en avant sur l'accueil. */
 export async function FeaturedDishes() {
@@ -75,7 +71,7 @@ export async function FeaturedDishes() {
           <div className="flex flex-col gap-3 xl:flex-row xl:items-start xl:justify-between xl:gap-6">
             <div className="min-w-0 flex-1">
               <h2 className="font-display text-xl font-bold leading-tight text-cream sm:text-3xl sm:text-ink lg:text-4xl 3xl:text-5xl">
-                Nos spécialités boulangères.
+                Nos spécialités turques.
               </h2>
             </div>
             <div className="hidden sm:block xl:shrink-0">
@@ -90,8 +86,8 @@ export async function FeaturedDishes() {
           </div>
           <div className="max-w-4xl">
             <p className="hidden text-sm leading-7 text-ink/70 sm:block sm:text-base 3xl:text-lg 3xl:leading-8">
-              Baguette tradition, croissant pur beurre et tartelette de saison :
-              trois signatures à commander rapidement.
+              Adana kebab, İskender kebab et baklava : trois signatures à
+              commander rapidement.
             </p>
           </div>
         </div>
@@ -113,53 +109,50 @@ export async function FeaturedDishes() {
 }
 
 function imageForCategory(slug: string) {
-  if (slug.includes("pain")) return "/images/boulangerie-pains.webp";
-  if (slug.includes("viennoiser")) {
-    return "/images/boulangerie-viennoiseries.webp";
+  if (
+    slug.includes("grillade") ||
+    slug.includes("kebab") ||
+    slug.includes("kofte")
+  ) {
+    return "/images/hero-slide-grillades-turques.png";
   }
-  if (slug.includes("patis") || slug.includes("gateau")) {
-    return "/images/boulangerie-patisseries.webp";
+  if (slug.includes("pide") || slug.includes("lahmacun")) {
+    return "/images/hero-slide-pide-lahmacun.png";
   }
   if (
-    slug.includes("snack") ||
-    slug.includes("sandwich") ||
-    slug.includes("boisson")
+    slug.includes("dessert") ||
+    slug.includes("baklava") ||
+    slug.includes("sutlac")
   ) {
-    return "/images/boulangerie-snacking-boissons.webp";
+    return "/images/hero-slide-desserts-turcs.png";
   }
-  return "/images/boulangerie-hero.webp";
+  if (
+    slug.includes("boisson") ||
+    slug.includes("ayran") ||
+    slug.includes("the-turc")
+  ) {
+    return "/images/hero-slide-boissons-turques.png";
+  }
+  if (
+    slug.includes("entree") ||
+    slug.includes("mezze") ||
+    slug.includes("houmous") ||
+    slug.includes("borek") ||
+    slug.includes("manti") ||
+    slug.includes("specialite")
+  ) {
+    return "/images/about-3.jpg";
+  }
+  return "/images/hero-plateau-turc-premium.png";
 }
 
 function groupMobileCategories(
   categories: Array<{ id: string; slug: string; name: string }>,
 ) {
-  let combinedAdded = false;
-
-  return categories.flatMap((category) => {
-    const isSnackOrDrink =
-      category.slug.includes("snack") || category.slug.includes("boisson");
-
-    if (!isSnackOrDrink) {
-      return [
-        {
-          ...category,
-          href: `/menu#${category.slug}`,
-          imageSlug: category.slug,
-        },
-      ];
-    }
-
-    if (combinedAdded) return [];
-    combinedAdded = true;
-
-    return [
-      {
-        id: "snacking-boissons",
-        slug: "snacking-boissons",
-        name: "Snack & boissons",
-        href: "/menu#snacking-boissons",
-        imageSlug: "snacking-boissons",
-      },
-    ];
-  });
+  // Restaurant : chaque catégorie pointe vers sa propre ancre de menu.
+  return categories.map((category) => ({
+    ...category,
+    href: `/menu#${category.slug}`,
+    imageSlug: category.slug,
+  }));
 }

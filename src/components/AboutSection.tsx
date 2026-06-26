@@ -4,9 +4,12 @@ import { Reveal } from "@/components/ui/Reveal";
 import { aboutPoints } from "@/data/services";
 
 const gallery = [
-  { src: "/images/boulangerie-pains.webp", alt: "Pains artisanaux" },
-  { src: "/images/boulangerie-viennoiseries.webp", alt: "Viennoiseries" },
-  { src: "/images/boulangerie-patisseries.webp", alt: "Pâtisseries" },
+  {
+    src: "/images/hero-slide-grillades-turques.png",
+    alt: "Plateau de grillades turques",
+  },
+  { src: "/images/about-1.jpg", alt: "Notre salle de restaurant" },
+  { src: "/images/about-3.jpg", alt: "Assortiment de spécialités turques" },
 ];
 
 /** Bloc « À propos de nous » (colonne centrale de la bande). */
@@ -18,12 +21,12 @@ export function AboutSection() {
           À propos de nous
         </p>
         <h3 className="mt-3 font-display text-2xl font-bold leading-tight text-ink sm:text-3xl">
-          Une boulangerie pensée pour le quotidien
+          Un restaurant turc pensé pour le partage
         </h3>
         <p className="mt-3 text-sm leading-relaxed text-ink/70">
-          {`Notre équipe prépare pains, viennoiseries et pâtisseries chaque jour
-          avec une exigence simple : du frais, du bon, et un service direct
-          pour le petit-déjeuner, le déjeuner et le goûter.`}
+          {`Notre équipe prépare chaque jour grillades au charbon, kebabs, pide
+          et mezze, avec une exigence simple : des produits frais, des saveurs
+          généreuses et un accueil chaleureux, midi et soir.`}
         </p>
 
         <ul className="mt-5 grid gap-2.5 sm:grid-cols-2">

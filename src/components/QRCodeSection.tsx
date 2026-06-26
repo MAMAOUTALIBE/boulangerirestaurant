@@ -9,7 +9,7 @@ import {
   PhoneCall,
   Send,
   Truck,
-  Wheat,
+  UtensilsCrossed,
 } from "lucide-react";
 import { Logo } from "@/components/Logo";
 import { Reveal } from "@/components/ui/Reveal";
@@ -18,8 +18,8 @@ import { siteConfig } from "@/lib/config";
 const benefits = [
   {
     title: "Accédez au menu complet",
-    detail: "Tous les produits du jour accessibles en quelques clics.",
-    Icon: Wheat,
+    detail: "Toute la carte du restaurant accessible en quelques clics.",
+    Icon: UtensilsCrossed,
   },
   {
     title: "Commande rapide",
@@ -74,7 +74,7 @@ export async function QRCodeSection() {
                 <div className="mx-auto mb-3 h-5 w-24 rounded-full bg-black/85" />
                 <p className="text-xs text-cream/70">Bonjour</p>
                 <p className="mt-1 text-sm font-semibold">
-                  Prêt à commander votre fournée ?
+                  Prêt à commander votre repas ?
                 </p>
 
                 <div className="mt-4 rounded-xl border border-white/10 bg-white/5 p-3">
@@ -191,7 +191,9 @@ export async function QRCodeSection() {
               <p className="text-2xl font-bold tracking-wide">
                 {siteConfig.contact.phone}
               </p>
-              <p className="text-sm text-cream/70">{siteConfig.hours.summary}</p>
+              <p className="text-sm text-cream/70">
+                {siteConfig.hours.summary}
+              </p>
             </div>
           </div>
 

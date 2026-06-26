@@ -7,8 +7,8 @@ import {
   LayoutDashboard,
   ShoppingBag,
   Users,
+  UsersRound,
   CalendarCheck,
-  CakeSlice,
   ChefHat,
   Inbox,
   UtensilsCrossed,
@@ -46,7 +46,12 @@ type NavGroup = {
 
 // Écrans du quotidien — toujours visibles.
 const topLinks: NavLink[] = [
-  { href: "/admin", label: "Tableau de bord", Icon: LayoutDashboard, exact: true },
+  {
+    href: "/admin",
+    label: "Tableau de bord",
+    Icon: LayoutDashboard,
+    exact: true,
+  },
   { href: "/admin/service", label: "Service", Icon: MonitorPlay },
   { href: "/admin/commandes", label: "Commandes", Icon: ShoppingBag },
   { href: "/admin/reservations", label: "Réservations", Icon: CalendarCheck },
@@ -64,7 +69,7 @@ const groups: NavGroup[] = [
     Icon: Store,
     items: [
       { href: "/admin/traiteur", label: "Traiteur", Icon: ChefHat },
-      { href: "/admin/gateaux", label: "Gâteaux", Icon: CakeSlice },
+      { href: "/admin/sur-mesure", label: "Sur-mesure", Icon: UsersRound },
       { href: "/admin/saison", label: "Saison", Icon: Sparkles },
       { href: "/admin/anti-gaspi", label: "Anti-gaspi", Icon: Recycle },
       { href: "/admin/paniers", label: "Paniers", Icon: ShoppingCart },
@@ -104,8 +109,8 @@ export function AdminSidebar() {
         : pathname.startsWith(link.href);
 
   const activeGroupId =
-    groups.find((g) => g.items.some((it) => pathname.startsWith(it.href)))?.id ??
-    null;
+    groups.find((g) => g.items.some((it) => pathname.startsWith(it.href)))
+      ?.id ?? null;
 
   // État initial déterministe (SSR == client) : seul le groupe actif est ouvert.
   const [open, setOpen] = useState<Record<string, boolean>>(() =>
@@ -118,7 +123,8 @@ export function AdminSidebar() {
       const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
       setOpen((prev) => {
         const next = { ...prev };
-        for (const g of groups) if (typeof saved[g.id] === "boolean") next[g.id] = saved[g.id];
+        for (const g of groups)
+          if (typeof saved[g.id] === "boolean") next[g.id] = saved[g.id];
         if (activeGroupId) next[activeGroupId] = true;
         return next;
       });
@@ -138,7 +144,10 @@ export function AdminSidebar() {
       return next;
     });
 
-  const renderLink = (link: NavLink, opts?: { sub?: boolean; muted?: boolean }) => {
+  const renderLink = (
+    link: NavLink,
+    opts?: { sub?: boolean; muted?: boolean },
+  ) => {
     const active = isActive(link);
     return (
       <Link
@@ -168,11 +177,17 @@ export function AdminSidebar() {
         {topLinks.map((l) => renderLink(l))}
         {groups.map((g) => (
           <Fragment key={g.id}>
-            <span className="mx-1 my-1 w-px shrink-0 self-stretch bg-white/10" aria-hidden />
+            <span
+              className="mx-1 my-1 w-px shrink-0 self-stretch bg-white/10"
+              aria-hidden
+            />
             {g.items.map((l) => renderLink(l))}
           </Fragment>
         ))}
-        <span className="mx-1 my-1 w-px shrink-0 self-stretch bg-white/10" aria-hidden />
+        <span
+          className="mx-1 my-1 w-px shrink-0 self-stretch bg-white/10"
+          aria-hidden
+        />
         {renderLink(settingsLink)}
         {renderLink(backLink, { muted: true })}
       </nav>
@@ -198,9 +213,14 @@ export function AdminSidebar() {
                 )}
               >
                 <g.Icon className="h-4 w-4 shrink-0" />
-                <span className="flex-1 whitespace-nowrap text-left">{g.label}</span>
+                <span className="flex-1 whitespace-nowrap text-left">
+                  {g.label}
+                </span>
                 {hasActive && !isOpen && (
-                  <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-gold" aria-hidden />
+                  <span
+                    className="h-1.5 w-1.5 shrink-0 rounded-full bg-gold"
+                    aria-hidden
+                  />
                 )}
                 <ChevronDown
                   className={cn(

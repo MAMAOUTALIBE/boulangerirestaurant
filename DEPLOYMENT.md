@@ -1,7 +1,7 @@
-# Guide de déploiement — boulangerie
+# Guide de déploiement — restaurant turc
 
-> Pour le déploiement réel (VPS Hostinger partagé, `boulangerie.lodene.cloud`),
-> voir `HOSTINGER.md`. Ce guide-ci décrit l'alternative Vercel + base managée.
+> Pour le déploiement sur un VPS (`votre-domaine.fr`),
+> voir `DEPLOIEMENT-VPS.md`. Ce guide-ci décrit l'alternative Vercel + base managée.
 
 Déploiement recommandé : **Vercel** (app Next.js) + **base PostgreSQL managée**
 (Neon ou Supabase) + **Stripe** + **Resend**.
@@ -22,15 +22,15 @@ et récupérer la chaîne de connexion (`postgresql://…`).
 | Variable                              | Obligatoire | Description                                                    |
 | ------------------------------------- | ----------- | -------------------------------------------------------------- |
 | `DATABASE_URL`                        | ✅          | URL PostgreSQL managée (`?sslmode=require`)                    |
-| `NEXT_PUBLIC_SITE_URL`                | ✅          | URL publique finale (ex. `https://boulangerie.lodene.cloud`)   |
+| `NEXT_PUBLIC_SITE_URL`                | ✅          | URL publique finale (ex. `https://votre-domaine.fr`)           |
 | `SESSION_SECRET`                      | ✅          | Secret aléatoire (`openssl rand -hex 32`)                      |
 | `ADMIN_EMAILS`                        | ✅          | Emails admin séparés par des virgules                          |
-| `DEFAULT_RESTAURANT_SLUG`             | ⬜          | Slug de l'établissement par défaut (défaut `boulangerie`, créé par le seed) |
+| `DEFAULT_RESTAURANT_SLUG`             | ⬜          | Slug de l'établissement par défaut (défaut `anatolia-grill`, créé par le seed) |
 | `STRIPE_SECRET_KEY`                   | ⬜          | Clé secrète Stripe (`sk_live_…`)                               |
 | `STRIPE_WEBHOOK_SECRET`               | ⬜          | Secret du webhook Stripe (`whsec_…`)                           |
 | `STRIPE_CONNECT_COUNTRY`              | ⬜          | Pays des comptes Connect créés depuis l’admin (ex. `FR`)       |
 | `RESEND_API_KEY`                      | ⬜          | Clé API Resend (emails transactionnels)                        |
-| `EMAIL_FROM`                          | ⬜          | Expéditeur vérifié (ex. `Boulangerie <commandes@lodene.cloud>`) |
+| `EMAIL_FROM`                          | ⬜          | Expéditeur vérifié (ex. `Anatolia Grill <commandes@votre-domaine.fr>`) |
 | `NEXT_PUBLIC_WHATSAPP_ORDER_NUMBER`   | ⬜          | Numéro public pour les commandes WhatsApp (`+33...`)           |
 | `NEXT_PUBLIC_TELEGRAM_ORDER_USERNAME` | ⬜          | Username Telegram public du restaurant, sans `@`               |
 | `NEXT_PUBLIC_FACEBOOK_URL`            | ⬜          | URL de la page Facebook affichée dans le footer                |

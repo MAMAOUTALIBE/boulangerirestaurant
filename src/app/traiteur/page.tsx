@@ -8,11 +8,11 @@ import { CateringForm } from "@/components/CateringForm";
 export const metadata: Metadata = {
   title: "Service traiteur",
   description:
-    "Petits-déjeuners, entreprises, brunchs, événements : la boulangerie régale vos invités. Demandez un devis.",
+    "Repas de famille, événements d'entreprise, fêtes et réceptions : notre restaurant turc régale vos invités. Demandez un devis.",
 };
 
 const atouts = [
-  "Plateaux sucrés & salés",
+  "Plateaux de grillades & mezze",
   "Produits frais maison",
   "Devis sous 48 h",
   "10 à 300+ convives",
@@ -59,16 +59,16 @@ export default function TraiteurPage() {
             </h1>
             <p className="mt-2 max-w-2xl text-sm leading-6 text-muted lg:text-base">
               Pour vos mariages, événements d&apos;entreprise ou fêtes de
-              famille, nous préparons pains, viennoiseries, pâtisseries et
-              pièces salées. Décrivez votre projet, nous vous envoyons un devis
-              sur mesure.
+              famille, nous préparons plateaux de grillades, kebabs, mezze, pide
+              et desserts turcs. Décrivez votre projet, nous vous envoyons un
+              devis sur mesure.
             </p>
 
             <div className="mt-5 overflow-hidden rounded-[24px] border border-white/10 bg-[radial-gradient(circle_at_top_left,rgba(216,154,28,0.12),transparent_38%),#111111] shadow-[0_28px_85px_-62px_rgba(0,0,0,0.95)] lg:grid lg:h-[calc(100svh-17rem)] lg:max-h-[31rem] lg:min-h-[28rem] lg:grid-cols-[0.92fr_1.08fr]">
               <div className="relative min-h-[20rem] lg:min-h-0">
                 <Image
-                  src="/images/boulangerie-snacking.webp"
-                  alt="Plateaux traiteur, pains, pâtisseries et pièces salées"
+                  src="/images/hero-slide-grillades-turques.png"
+                  alt="Plateaux traiteur de grillades, mezze et spécialités turques"
                   fill
                   sizes="(max-width: 1024px) 100vw, 44vw"
                   className="object-cover"

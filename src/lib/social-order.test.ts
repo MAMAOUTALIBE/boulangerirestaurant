@@ -7,18 +7,18 @@ import {
 import type { CartItem } from "@/types";
 
 const item: CartItem = {
-  lineId: "sandwich-1",
-  dishId: "sandwich-baguette-poulet",
-  name: "Sandwich baguette poulet",
-  image: "/images/boulangerie-snacking.webp",
+  lineId: "kebab-1",
+  dishId: "kebab-grille",
+  name: "Kebab grillé",
+  image: "/images/hero-slide-grillades-turques.png",
   basePrice: 6.9,
   unitPrice: 7.9,
   quantity: 2,
   options: [
     {
-      groupId: "pain",
-      optionId: "complet",
-      label: "Pain complet",
+      groupId: "accompagnement",
+      optionId: "riz-pilaf",
+      label: "Riz pilaf",
       priceDelta: 1,
     },
   ],
@@ -41,11 +41,11 @@ describe("social order helpers", () => {
       discount: 5,
       tip: 2,
       total: 16.8,
-      promoCode: "BOULANGERIE10",
+      promoCode: "BIENVENUE10",
     });
 
-    expect(message).toContain("2 x Sandwich baguette poulet");
-    expect(message).toContain("Options : Pain complet");
+    expect(message).toContain("2 x Kebab grillé");
+    expect(message).toContain("Options : Riz pilaf");
     expect(message).toContain("Code postal : 91260");
     expect(message).toContain(
       "Adresse : 5 rue Jules Vallès — 91260 Juvisy-sur-Orge — Complément : 2e étage",
@@ -54,7 +54,7 @@ describe("social order helpers", () => {
   });
 
   it("génère des URLs WhatsApp et Telegram encodées", () => {
-    const message = "Bonjour Boulangerie\nCommande test";
+    const message = "Bonjour Anatolia Grill\nCommande test";
 
     expect(buildWhatsAppOrderUrl(message)).toMatch(
       /^https:\/\/wa\.me\/33775787825\?text=/,

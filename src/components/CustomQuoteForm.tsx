@@ -2,7 +2,7 @@
 
 import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
-import { requestCustomCake, type ActionState } from "@/app/actions";
+import { requestCustomQuote, type ActionState } from "@/app/actions";
 
 const field =
   "w-full rounded-xl border border-white/15 bg-white/5 px-4 py-2.5 text-sm text-cream placeholder:text-muted focus:border-gold/60 focus:outline-none focus:ring-1 focus:ring-gold/40";
@@ -10,9 +10,9 @@ const compactField =
   "h-9 w-full rounded-xl border border-white/15 bg-white/5 px-3 text-[0.8rem] text-cream placeholder:text-muted focus:border-gold/60 focus:outline-none focus:ring-1 focus:ring-gold/40 min-[390px]:h-10 min-[390px]:text-[0.82rem]";
 const compactTextarea =
   "min-h-14 w-full rounded-xl border border-white/15 bg-white/5 px-3 py-2 text-[0.8rem] text-cream placeholder:text-muted focus:border-gold/60 focus:outline-none focus:ring-1 focus:ring-gold/40 min-[390px]:min-h-[4.25rem] min-[390px]:text-[0.82rem]";
-const hiddenCakeDefaults = {
+const hiddenQuoteDefaults = {
   occasion: "Sur-mesure",
-  flavor: "À définir avec la boulangerie",
+  preferences: "À définir avec le restaurant",
 };
 
 function SubmitButton({ compact = false }: { compact?: boolean }) {
@@ -28,9 +28,9 @@ function SubmitButton({ compact = false }: { compact?: boolean }) {
   );
 }
 
-export function CustomCakeForm() {
+export function CustomQuoteForm() {
   const [state, formAction] = useActionState<ActionState | null, FormData>(
-    requestCustomCake,
+    requestCustomQuote,
     null,
   );
 
@@ -55,13 +55,17 @@ export function CustomCakeForm() {
         <input
           type="hidden"
           name="occasion"
-          value={hiddenCakeDefaults.occasion}
+          value={hiddenQuoteDefaults.occasion}
         />
-        <input type="hidden" name="flavor" value={hiddenCakeDefaults.flavor} />
+        <input
+          type="hidden"
+          name="preferences"
+          value={hiddenQuoteDefaults.preferences}
+        />
 
         <div className="grid grid-cols-2 gap-2">
           <CompactField
-            id="mobile-cake-name"
+            id="mobile-quote-name"
             name="name"
             label="Votre nom"
             placeholder="Nom"
@@ -69,7 +73,7 @@ export function CustomCakeForm() {
             error={state?.errors?.name}
           />
           <CompactField
-            id="mobile-cake-phone"
+            id="mobile-quote-phone"
             name="phone"
             label="Téléphone"
             type="tel"
@@ -81,7 +85,7 @@ export function CustomCakeForm() {
         </div>
 
         <CompactField
-          id="mobile-cake-email"
+          id="mobile-quote-email"
           name="email"
           label="Email"
           type="email"
@@ -93,18 +97,18 @@ export function CustomCakeForm() {
 
         <div className="grid grid-cols-2 gap-2">
           <CompactField
-            id="mobile-cake-pickup-date"
+            id="mobile-quote-pickup-date"
             name="pickupDate"
             label="Date de retrait"
             type="date"
             error={state?.errors?.pickupDate}
           />
           <CompactField
-            id="mobile-cake-servings"
+            id="mobile-quote-servings"
             name="servings"
-            label="Nombre de parts"
+            label="Nombre de convives"
             type="number"
-            placeholder="Parts"
+            placeholder="Convives"
             autoComplete="off"
             inputMode="numeric"
             error={state?.errors?.servings}
@@ -112,15 +116,15 @@ export function CustomCakeForm() {
         </div>
 
         <div>
-          <label htmlFor="mobile-cake-details" className="sr-only">
+          <label htmlFor="mobile-quote-details" className="sr-only">
             Votre projet
           </label>
           <textarea
-            id="mobile-cake-details"
+            id="mobile-quote-details"
             name="details"
             rows={2}
             required
-            placeholder="Projet : occasion, parfum, décor..."
+            placeholder="Projet : occasion, convives, plats souhaités..."
             maxLength={240}
             className={compactTextarea}
           />
@@ -141,9 +145,13 @@ export function CustomCakeForm() {
         <input
           type="hidden"
           name="occasion"
-          value={hiddenCakeDefaults.occasion}
+          value={hiddenQuoteDefaults.occasion}
         />
-        <input type="hidden" name="flavor" value={hiddenCakeDefaults.flavor} />
+        <input
+          type="hidden"
+          name="preferences"
+          value={hiddenQuoteDefaults.preferences}
+        />
 
         <div className="grid gap-4 sm:grid-cols-2">
           <Field
@@ -181,7 +189,7 @@ export function CustomCakeForm() {
 
         <Field
           id="servings"
-          label="Nombre de parts"
+          label="Nombre de convives"
           type="number"
           autoComplete="off"
           inputMode="numeric"
@@ -193,14 +201,14 @@ export function CustomCakeForm() {
             htmlFor="details"
             className="mb-1.5 block text-sm text-cream/80"
           >
-            Décrivez votre gâteau
+            Décrivez votre demande
           </label>
           <textarea
             id="details"
             name="details"
             rows={2}
             required
-            placeholder="Occasion, parfum, décor, message, allergies si besoin..."
+            placeholder="Occasion, nombre de convives, plats souhaités, allergies si besoin..."
             className={field}
           />
           {state?.errors?.details && (

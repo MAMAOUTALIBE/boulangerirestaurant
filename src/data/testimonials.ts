@@ -7,7 +7,7 @@ export const testimonials: Testimonial[] = [
     avatar: "/images/avatar-marie.jpg",
     rating: 5,
     comment:
-      "Les croissants sont feuilletés comme il faut et le pain reste excellent même le soir.",
+      "Les grillades sont savoureuses et parfaitement cuites au charbon. Un vrai régal !",
     city: "Paris",
   },
   {
@@ -16,7 +16,7 @@ export const testimonials: Testimonial[] = [
     avatar: "/images/avatar-benoit.jpg",
     rating: 5,
     comment:
-      "Commande en ligne très pratique, sandwichs frais et accueil toujours rapide.",
+      "Commande en ligne très pratique, adana kebab généreux et accueil toujours rapide.",
     city: "Lyon",
   },
   {
@@ -25,7 +25,7 @@ export const testimonials: Testimonial[] = [
     avatar: "/images/avatar-aissata.jpg",
     rating: 5,
     comment:
-      "Une vraie adresse de quartier : pains au levain, pâtisseries soignées et équipe chaleureuse.",
+      "Une vraie adresse de quartier : lahmacun maison, baklava délicieux et équipe chaleureuse.",
     city: "Marseille",
   },
 ];

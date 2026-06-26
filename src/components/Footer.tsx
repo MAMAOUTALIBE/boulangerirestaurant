@@ -1,6 +1,5 @@
 import type { ReactNode } from "react";
 import {
-  CakeSlice,
   ChefHat,
   ChevronRight,
   Clock,
@@ -12,6 +11,7 @@ import {
   Phone,
   Recycle,
   ShoppingBag,
+  UsersRound,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import Link from "next/link";
@@ -130,19 +130,20 @@ const contact = [
 const footerHighlights = [
   {
     label: "Commander en ligne",
-    description: "Pain, viennoiseries et pâtisseries à retirer ou livrer.",
+    description: "Grillades, kebabs et mezze à retirer ou en livraison.",
     href: "/commander",
     Icon: ShoppingBag,
   },
   {
-    label: "Gâteau sur-mesure",
-    description: "Une demande simple pour recevoir un devis personnalisé.",
+    label: "Plateaux sur-mesure",
+    description:
+      "Menus de groupe et événements : recevez un devis personnalisé.",
     href: "/sur-mesure",
-    Icon: CakeSlice,
+    Icon: UsersRound,
   },
   {
     label: "Service traiteur",
-    description: "Plateaux et formats événementiels pour vos invités.",
+    description: "Buffets et plateaux turcs pour tous vos événements.",
     href: "/traiteur",
     Icon: ChefHat,
   },
@@ -170,7 +171,7 @@ const footerLinkGroups: FooterLinkGroup[] = [
   {
     title: "Nos offres",
     links: [
-      { label: "Sur-mesure", href: "/sur-mesure", Icon: CakeSlice },
+      { label: "Sur-mesure", href: "/sur-mesure", Icon: UsersRound },
       { label: "Boutique de saison", href: "/boutique-de-saison", Icon: Gift },
       { label: "Anti-gaspi", href: "/anti-gaspi", Icon: Recycle },
       { label: "Traiteur", href: "/traiteur", Icon: ChefHat },
@@ -233,7 +234,7 @@ export function Footer() {
           <div className="pr-4">
             <Logo />
             <p className="mt-4 max-w-xs text-sm leading-relaxed text-muted">
-              Pain frais, viennoiseries pur beurre et pâtisseries maison.
+              Grillades au charbon, kebabs et spécialités turques maison.
             </p>
             <p className="mt-6 text-xs font-semibold uppercase tracking-[0.22em] text-gold">
               Suivez-nous
@@ -315,7 +316,7 @@ export function Footer() {
                 Newsletter
               </h4>
               <p className="mt-3 text-sm leading-5 text-muted">
-                Recevez nos offres, fournées spéciales et nouveautés.
+                Recevez nos offres, nouveautés et spécialités du moment.
               </p>
               <NewsletterForm />
             </section>
@@ -346,45 +347,10 @@ function MobileFooter() {
   return (
     <div className="sm:hidden">
       <div className="mx-auto max-w-[48rem] border-x border-white/[0.08] bg-[radial-gradient(circle_at_top,rgba(245,158,11,0.08),transparent_34%),linear-gradient(180deg,#080808,#050505)] px-4 pb-5 pt-7">
-        <Link
-          href="/"
-          aria-label="Boulangerie Artisanale — Accueil"
-          className="mx-auto grid w-fit justify-items-center text-center"
-        >
-          <span className="grid h-16 w-16 place-items-center rounded-2xl border border-gold bg-black/30 text-gold shadow-[0_0_34px_-18px_rgba(245,158,11,0.95)]">
-            <svg
-              viewBox="0 0 48 48"
-              className="h-10 w-10"
-              fill="none"
-              aria-hidden="true"
-            >
-              <path
-                d="M10 29c0-8 6-15 14-15s14 7 14 15c0 7-5.7 12-14 12S10 36 10 29Z"
-                stroke="currentColor"
-                strokeWidth="2.4"
-                strokeLinejoin="round"
-              />
-              <path
-                d="M17 29c0-4 3-8 7-10M24 19c4 2 7 6 7 10M14 31h20"
-                stroke="currentColor"
-                strokeWidth="2.4"
-                strokeLinecap="round"
-              />
-              <path
-                d="M18 10c1.5-3 3.5-4 6-4s4.5 1 6 4"
-                stroke="currentColor"
-                strokeWidth="2.4"
-                strokeLinecap="round"
-              />
-            </svg>
-          </span>
-          <span className="mt-3 font-display text-3xl font-bold leading-none text-cream">
-            {siteConfig.shortName}
-          </span>
-        </Link>
+        <Logo className="mx-auto w-fit justify-center" />
 
         <p className="mx-auto mt-3 max-w-xs text-center text-sm leading-5 text-cream/70">
-          Pain frais, viennoiseries pur beurre et pâtisseries maison.
+          Grillades au charbon, kebabs et spécialités turques maison.
         </p>
 
         <p className="mt-5 text-center text-xs font-bold uppercase tracking-[0.32em] text-gold">
@@ -449,7 +415,7 @@ function MobileFooter() {
         <section className="mt-5 rounded-2xl border border-white/10 bg-white/[0.035] p-3 shadow-[0_24px_70px_-58px_rgba(255,255,255,0.7)]">
           <FooterMobileHeading>Newsletter</FooterMobileHeading>
           <p className="text-cream/78 mt-2 text-sm leading-5">
-            Recevez nos offres, fournées spéciales et nouveautés
+            Recevez nos offres, nouveautés et spécialités du moment
           </p>
           <div className="[&_button]:h-11 [&_button]:w-11 [&_button]:shrink-0 [&_button]:px-0 [&_input]:h-11 [&_input]:bg-black/35 [&_input]:text-sm">
             <NewsletterForm />

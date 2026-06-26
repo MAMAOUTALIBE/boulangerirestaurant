@@ -5,12 +5,11 @@ import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import {
-  Coffee,
-  Croissant,
+  Flame,
   MapPin,
   MessageCircle,
   ShoppingBag,
-  Wheat,
+  UtensilsCrossed,
   type LucideIcon,
 } from "lucide-react";
 import { siteConfig } from "@/lib/config";
@@ -31,42 +30,42 @@ const serviceHighlights: {
     Icon: MapPin,
   },
   {
-    title: "Café & pause",
-    detail: "Sur place ou à emporter",
-    Icon: Coffee,
+    title: "Sur place",
+    detail: "Salle conviviale",
+    Icon: UtensilsCrossed,
   },
   {
-    title: "Fabrication maison",
-    detail: "Pétrissage quotidien",
-    Icon: Wheat,
+    title: "Grillades au charbon",
+    detail: "Préparé minute",
+    Icon: Flame,
   },
 ];
 
 const heroSlides = [
   {
-    label: "Boulangerie",
-    src: "/images/boulangerie-hero.webp",
-    alt: "Comptoir de boulangerie avec croissants, pains au chocolat, baguettes et pains artisanaux",
+    label: "Anatolia Grill",
+    src: "/images/hero-plateau-turc-premium.png",
+    alt: "Grand plateau de grillades turques : kebabs, brochettes, côtelettes d'agneau, riz et pain",
   },
   {
-    label: "Viennoiseries",
-    src: "/images/boulangerie-viennoiseries.webp",
-    alt: "Croissants et pains au chocolat dorés sur un plateau en bois",
+    label: "Grillades & kebabs",
+    src: "/images/hero-slide-grillades-turques.png",
+    alt: "Assortiment de grillades turques au charbon avec brochettes et viandes marinées",
   },
   {
-    label: "Pains au levain",
-    src: "/images/boulangerie-pains.webp",
-    alt: "Pains au levain et baguettes artisanales dans un panier en osier",
+    label: "Adana kebab",
+    src: "/images/hero-slide-adana-kebab.png",
+    alt: "Adana kebab grillé, brochettes de viande hachée épicée, salade d'oignons et pain",
   },
   {
-    label: "Pâtisseries",
-    src: "/images/boulangerie-patisseries.webp",
-    alt: "Pâtisseries françaises en vitrine avec tartelettes, éclairs, flans et mille-feuilles",
+    label: "Pide & lahmacun",
+    src: "/images/hero-slide-pide-lahmacun.png",
+    alt: "Pide et lahmacun dorés garnis de viande hachée, légumes et herbes fraîches",
   },
   {
-    label: "Snacking",
-    src: "/images/boulangerie-snacking.webp",
-    alt: "Sandwichs baguette, quiches, focaccias, salades et cafés sur un comptoir de boulangerie",
+    label: "Desserts & boissons",
+    src: "/images/hero-slide-desserts-turcs.png",
+    alt: "Baklava aux pistaches, loukoums et thé turc servis dans des verres traditionnels",
   },
 ] as const;
 
@@ -144,12 +143,11 @@ export function Hero() {
 
             <div className="relative z-10">
               <h1 className="font-display text-[2.65rem] font-bold leading-[0.98] text-[#F8F3EA] drop-shadow-[0_3px_8px_rgba(0,0,0,0.96)] min-[390px]:text-5xl sm:text-6xl lg:text-[4.15rem] xl:text-[4.8rem] 3xl:text-[5.8rem] 4xl:text-[6.5rem]">
-                <span className="block text-[#D89A1C]">Boulangerie</span>
-                <span className="block">Artisanale</span>
+                <span className="block text-[#D89A1C]">Anatolia Grill</span>
               </h1>
 
               <p className="text-[#F8F3EA]/88 mt-3 max-w-[18rem] text-sm font-semibold leading-5 drop-shadow-[0_2px_5px_rgba(0,0,0,0.98)] sm:mt-5 sm:max-w-xl sm:text-xl sm:leading-8 3xl:max-w-3xl 3xl:text-2xl 3xl:leading-10">
-                Frais du jour. Commandez maintenant.
+                Grillades au charbon. Commandez maintenant.
               </p>
 
               <div className="mt-5 hidden flex-col gap-3 sm:mt-6 sm:flex sm:flex-row sm:flex-wrap 3xl:gap-4">
@@ -175,7 +173,7 @@ export function Hero() {
                     href="/menu"
                     className="inline-flex min-h-[3rem] flex-1 items-center justify-center gap-2 rounded-full border border-white/25 bg-black/20 px-4 py-2.5 text-sm font-bold text-[#F8F3EA] transition hover:-translate-y-1 hover:border-[#D89A1C]/70 hover:bg-black/35 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50 sm:flex-none sm:gap-2.5 sm:px-6 3xl:min-h-[3.6rem] 3xl:px-8 3xl:text-base"
                   >
-                    <Croissant className="h-4 w-4 3xl:h-5 3xl:w-5" />
+                    <UtensilsCrossed className="h-4 w-4 3xl:h-5 3xl:w-5" />
                     <span className="whitespace-nowrap">Voir le menu</span>
                   </Link>
                 </div>
@@ -207,7 +205,7 @@ export function Hero() {
         {/* Mobile : réassurance en ruban premium défilant */}
         <div
           className="hero-service-marquee relative z-20 -mx-4 overflow-hidden pb-0.5 sm:hidden"
-          aria-label="Services disponibles : click and collect, livraison, café et pause, fabrication maison"
+          aria-label="Services disponibles : click and collect, livraison, sur place et grillades au charbon"
         >
           <div className="hero-service-track" aria-hidden="true">
             {[...serviceHighlights, ...serviceHighlights].map(

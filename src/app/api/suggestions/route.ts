@@ -3,10 +3,10 @@ import { getMenuForBrowser } from "@/lib/dishes";
 
 export const dynamic = "force-dynamic";
 
-// Boissons et pâtisseries proposées en vente additionnelle dans le panier.
-const SUGGEST_CATEGORIES = ["boissons", "patisseries"];
+// Boissons et desserts proposés en vente additionnelle dans le panier.
+const SUGGEST_CATEGORIES = ["boissons", "desserts"];
 
-/** GET /api/suggestions — boissons & pâtisseries ajoutables en 1 clic. */
+/** GET /api/suggestions — boissons & desserts ajoutables en 1 clic. */
 export async function GET() {
   try {
     const { categories, dishes } = await getMenuForBrowser();

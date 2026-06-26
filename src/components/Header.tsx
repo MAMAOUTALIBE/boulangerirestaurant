@@ -3,10 +3,9 @@
 import { useEffect, useState } from "react";
 import {
   BookOpen,
-  CakeSlice,
   ChefHat,
   ChevronDown,
-  Croissant,
+  Flame,
   Gift,
   Images,
   Menu,
@@ -15,6 +14,7 @@ import {
   Search,
   ShoppingBag,
   SlidersHorizontal,
+  UsersRound,
 } from "lucide-react";
 import { Logo } from "@/components/Logo";
 import { MobileNav } from "@/components/MobileNav";
@@ -39,35 +39,35 @@ const offerLinks = [
     labelKey: "nav./sur-mesure",
     label: "Sur-mesure",
     href: "/sur-mesure",
-    description: "Gâteaux personnalisés et pièces d'exception",
-    Icon: CakeSlice,
+    description: "Plateaux et menus de groupe sur-mesure",
+    Icon: UsersRound,
   },
   {
     labelKey: "nav./boutique-de-saison",
     label: "Boutique de saison",
     href: "/boutique-de-saison",
-    description: "Galettes, bûches et séries limitées",
+    description: "Spécialités turques de saison et fêtes",
     Icon: Gift,
   },
   {
     labelKey: "nav./anti-gaspi",
     label: "Anti-gaspi",
     href: "/anti-gaspi",
-    description: "Paniers du soir à prix doux",
+    description: "Plateaux du soir à prix doux",
     Icon: Recycle,
   },
   {
     labelKey: "nav./traiteur",
     label: "Traiteur",
     href: "/traiteur",
-    description: "Plateaux, brunchs et réceptions",
+    description: "Buffets turcs, réceptions et événements",
     Icon: ChefHat,
   },
   {
     labelKey: "nav./galerie",
     label: "Galerie",
     href: "/galerie",
-    description: "Nos créations en photos et vidéos",
+    description: "Nos plats en photos et vidéos",
     Icon: Images,
   },
 ];
@@ -128,7 +128,7 @@ export function Header() {
               className="text-cream/88 relative inline-flex items-center gap-2 text-sm font-semibold transition hover:text-white focus:outline-none 2xl:gap-2.5 2xl:text-base 3xl:text-lg"
               aria-haspopup="true"
             >
-              <Croissant className="h-[1.125rem] w-[1.125rem] text-[#D89A1C] 2xl:h-5 2xl:w-5" />
+              <Flame className="h-[1.125rem] w-[1.125rem] text-[#D89A1C] 2xl:h-5 2xl:w-5" />
               {t("nav.offers", "Nos offres")}
               <ChevronDown className="h-4 w-4 text-[#D89A1C] transition group-focus-within/offers:rotate-180 group-hover/offers:rotate-180" />
               <span className="absolute -bottom-2 left-1/2 h-px w-0 -translate-x-1/2 bg-[#D89A1C] transition-all duration-300 group-focus-within/offers:w-full group-hover/offers:w-full" />
@@ -171,8 +171,8 @@ export function Header() {
           <input
             name="q"
             type="search"
-            aria-label="Rechercher un pain, une pâtisserie ou une boisson"
-            placeholder="Rechercher pain, pâtisserie, boisson..."
+            aria-label="Rechercher un kebab, une grillade ou un dessert"
+            placeholder="Rechercher kebab, pide, dessert..."
             className="placeholder:text-cream/46 min-w-0 flex-1 bg-transparent text-sm font-medium text-cream focus:outline-none 2xl:text-base 3xl:text-lg"
           />
           <button

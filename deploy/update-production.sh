@@ -18,7 +18,7 @@ VPS="${DEPLOY_VPS:-}"
 KEY="${DEPLOY_KEY:-$HOME/.ssh/deploy_key}"
 REMOTE_DIR="${DEPLOY_REMOTE_DIR:-}"
 SITE_URL="${DEPLOY_SITE_URL:-}"
-COMPOSE_PROJECT="${DEPLOY_COMPOSE_PROJECT:-boulangerie}"
+COMPOSE_PROJECT="${DEPLOY_COMPOSE_PROJECT:-restaurant-turc}"
 SSH_OPTS=(-i "$KEY" -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new)
 
 missing=()

@@ -34,7 +34,7 @@ export const dict: Record<Locale, Record<string, string>> = {
     "nav./commander": "Order",
     "nav./reservation": "Booking",
     "nav.offers": "Our offers",
-    "nav./sur-mesure": "Custom cakes",
+    "nav./sur-mesure": "Tailor-made",
     "nav./boutique-de-saison": "Seasonal shop",
     "nav./anti-gaspi": "Anti-waste",
     "nav./traiteur": "Catering",

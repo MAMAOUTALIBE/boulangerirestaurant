@@ -6,7 +6,7 @@ import { GallerySection } from "@/components/GallerySection";
 export const metadata: Metadata = {
   title: "Galerie",
   description:
-    "Galerie photos et vidéos de la boulangerie : pains au levain, viennoiseries, pâtisseries et gâteaux sur-mesure préparés chaque jour.",
+    "Galerie photos et vidéos de notre restaurant turc : grillades au charbon, kebabs, pide, lahmacun et desserts préparés chaque jour.",
 };
 
 export default function GaleriePage() {

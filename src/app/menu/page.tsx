@@ -10,7 +10,7 @@ export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "Le Menu",
   description:
-    "Découvrez toute la carte de la boulangerie : pains artisanaux, viennoiseries, pâtisseries, snacking et boissons.",
+    "Découvrez toute la carte de notre restaurant turc : entrées et mezze, grillades et kebabs, pide, lahmacun, desserts et boissons.",
 };
 
 export default async function MenuPage() {
@@ -32,9 +32,8 @@ export default async function MenuPage() {
                 Le Menu
               </h1>
               <p className="mt-3 hidden max-w-xl text-base leading-relaxed text-cream/60 sm:block">
-                Pains au levain, viennoiseries pur beurre, pâtisseries de
-                saison, snacking et boissons, préparés chaque jour avec des
-                produits frais.
+                Grillades au charbon, kebabs, pide, lahmacun, mezze et desserts
+                turcs, préparés chaque jour avec des produits frais.
               </p>
             </Reveal>
           </div>

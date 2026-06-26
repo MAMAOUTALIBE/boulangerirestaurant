@@ -20,7 +20,7 @@ const orderSteps = [
   {
     step: "01",
     title: "Choisissez",
-    text: "Pains, viennoiseries, pâtisseries, snacking et boissons.",
+    text: "Grillades, kebabs, pide, lahmacun, mezze et desserts.",
   },
   {
     step: "02",

@@ -24,7 +24,7 @@ export function PromoSection() {
             </span>
             <div className="mt-2 flex items-center justify-center rounded-xl border border-dashed border-gold/50 bg-gold/10 px-4 py-3">
               <span className="font-display text-2xl font-bold tracking-[0.22em] text-gold">
-                BOULANGERIE10
+                BIENVENUE10
               </span>
             </div>
           </div>

@@ -27,7 +27,7 @@ interface Message {
 
 const initialMessage: Message = {
   role: "assistant",
-  text: "Bonjour ! Je peux conseiller pains, viennoiseries, pâtisseries ou snacking, les ajouter à votre panier, ou vous aider pour la livraison, une réservation ou le traiteur.",
+  text: "Bonjour ! Je peux conseiller grillades, kebabs, pide, mezze ou desserts turcs, les ajouter à votre panier, ou vous aider pour la livraison, une réservation ou le traiteur.",
 };
 
 const FALLBACK_REPLY =

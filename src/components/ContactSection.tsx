@@ -63,8 +63,8 @@ export function ContactSection() {
 
             <div className="relative hidden min-h-64 overflow-hidden rounded-3xl border border-white/10 lg:block">
               <Image
-                src="/images/boulangerie-hero.webp"
-                alt="Façade et vitrine de la boulangerie"
+                src="/images/about-1.jpg"
+                alt="Salle de notre restaurant turc"
                 fill
                 sizes="36vw"
                 className="object-cover"

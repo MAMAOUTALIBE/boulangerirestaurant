@@ -1,0 +1,172 @@
+# Déploiement sur un VPS — Restaurant turc
+
+> Remplacez les placeholders (`votre-domaine.fr`, `VOTRE_IP_SERVEUR`, etc.) par
+> vos valeurs réelles. Si le serveur héberge **d'autres sites**, tout ici est
+> isolé pour **ne pas y toucher** :
+>
+> - projet Docker Compose dédié : **`restaurant-turc`**
+> - base PostgreSQL dédiée (volume `restaurant-turc_pgdata`)
+> - port hôte **3200**
+> - fichier Nginx **séparé** (`/etc/nginx/sites-available/restaurant-turc`)
+>
+> L'app est **Next.js full-stack** (Server Actions, API, Prisma, PostgreSQL) → elle
+> tourne en **Docker Compose** (app Next.js + PostgreSQL) derrière **Nginx** + **HTTPS
+> Let's Encrypt**. Domaine cible : **`votre-domaine.fr`**.
+
+---
+
+## 1. DNS (domaine → serveur)
+
+Dans la zone DNS du domaine, ajouter l'enregistrement :
+
+- `A` `@` (ou le sous-domaine) → IP du serveur
+
+## 2. Pré-requis sur le serveur
+
+Docker, le plugin Compose et Nginx doivent être installés. Vérifier :
+
+```bash
+docker --version && docker compose version && nginx -v
+```
+
+> Sur un serveur partagé, ne **pas** relancer `apt upgrade` ni réinstaller
+> Docker/Nginx sans précaution : cela pourrait perturber un site déjà en ligne.
+
+## 3. Récupérer le code + configurer
+
+```bash
+cd /root                                  # ou le dossier qui héberge vos sites
+git clone VOTRE_DEPOT restaurant-turc && cd restaurant-turc
+cp .env.production.example .env
+nano .env                                 # remplir les valeurs (voir ci-dessous)
+```
+
+Générer les secrets :
+
+```bash
+openssl rand -hex 32   # → SESSION_SECRET
+openssl rand -hex 16   # → CRON_SECRET
+```
+
+Variables minimales à remplir :
+
+- `POSTGRES_PASSWORD` (mot de passe fort)
+- `NEXT_PUBLIC_SITE_URL=https://votre-domaine.fr`
+- `SESSION_SECRET`
+- `ADMIN_EMAILS` (votre email admin)
+
+Les intégrations (Stripe, Resend, Twilio, Upstash) sont **optionnelles** : sans clés,
+l'app tourne en mode simulation. `POSTGRES_USER`, `POSTGRES_DB` et
+`DEFAULT_RESTAURANT_SLUG` ont déjà la valeur `anatolia-grill` par défaut.
+
+## 4. Lancer l'application (projet isolé `restaurant-turc`)
+
+```bash
+docker compose -p restaurant-turc --env-file .env up -d --build
+```
+
+- Le conteneur **db** (PostgreSQL) démarre avec son **volume dédié** (`restaurant-turc_pgdata`).
+- Le service **migrate** applique **automatiquement les migrations** (`prisma migrate deploy`)
+  puis s'arrête ; l'**app** ne démarre qu'une fois les migrations réussies, exposée
+  sur **`127.0.0.1:3200`** uniquement (Nginx fait le reverse-proxy).
+
+> `-p restaurant-turc` est **important** : il garde les conteneurs, le réseau et le volume
+> séparés des autres sites éventuels. À rappeler sur **chaque** commande `docker compose`.
+
+### Charger les données initiales (menu, catégories, zones, horaires, code promo) — une seule fois
+
+```bash
+docker compose -p restaurant-turc --env-file .env run --rm migrate npm run db:seed
+```
+
+Vérifier (en local sur le serveur) :
+
+```bash
+curl http://127.0.0.1:3200/api/health   # → {"status":"ok","db":"up"}
+```
+
+## 5. Nginx (nouveau site, sans toucher l'existant)
+
+```bash
+cp deploy/nginx.conf /etc/nginx/sites-available/restaurant-turc
+ln -s /etc/nginx/sites-available/restaurant-turc /etc/nginx/sites-enabled/restaurant-turc
+nginx -t && systemctl reload nginx
+```
+
+> Le fichier pointe vers `votre-domaine.fr` et le port **3200** (à adapter).
+> Sur un serveur partagé, **ne pas** supprimer `sites-enabled/default` ni la conf
+> des autres sites.
+
+## 6. HTTPS (Let's Encrypt)
+
+```bash
+certbot --nginx -d votre-domaine.fr
+```
+
+Certbot configure le SSL + la redirection 80→443 automatiquement
+(sinon `apt install -y certbot python3-certbot-nginx`).
+
+## 7. Intégrations (quand vous avez les clés)
+
+- **Stripe** : ajouter `STRIPE_SECRET_KEY` + créer un webhook
+  `https://votre-domaine.fr/api/webhooks/stripe` (événements
+  `checkout.session.completed`, `checkout.session.expired`) → `STRIPE_WEBHOOK_SECRET`.
+- **Resend** : `RESEND_API_KEY` + domaine vérifié (SPF/DKIM), `EMAIL_FROM`.
+- **Twilio** : `TWILIO_*` pour SMS/WhatsApp.
+- Après modif du `.env` : `docker compose -p restaurant-turc --env-file .env up -d` (recharge l'app).
+
+## 8. Relance automatique (cron)
+
+Sur le serveur, `crontab -e` :
+
+```
+0 10 * * 1 curl -s -H "Authorization: Bearer VOTRE_CRON_SECRET" https://votre-domaine.fr/api/cron/reengage
+```
+
+## 9. Sauvegardes de la base (recommandé)
+
+```bash
+# Dump quotidien à 3h
+0 3 * * * docker compose -p restaurant-turc -f /root/restaurant-turc/docker-compose.yml exec -T db pg_dump -U restaurant_turc restaurant_turc > /root/backups/restaurant-turc-$(date +\%F).sql
+```
+
+## 10. Mises à jour de l'app
+
+Depuis votre Mac (recommandé), avec le script automatisé :
+
+```bash
+DEPLOY_VPS="root@VOTRE_IP_SERVEUR" \
+DEPLOY_REMOTE_DIR="/root/restaurant-turc" \
+DEPLOY_SITE_URL="https://votre-domaine.fr" \
+./deploy/update-production.sh
+```
+
+Voir `deploy/MISE-A-JOUR.md`. Ou directement sur le serveur :
+
+```bash
+cd /root/restaurant-turc
+git pull
+docker compose -p restaurant-turc --env-file .env up -d --build    # rebuild + migrations auto
+```
+
+---
+
+## ✅ Checklist de mise en ligne
+
+- [ ] DNS : `A` (domaine ou sous-domaine) → IP du serveur
+- [ ] `.env` rempli (secrets forts), `NEXT_PUBLIC_SITE_URL=https://votre-domaine.fr`
+- [ ] `docker compose -p restaurant-turc --env-file .env up -d --build` OK
+- [ ] `curl http://127.0.0.1:3200/api/health` = `{"status":"ok","db":"up"}`
+- [ ] Données initiales chargées (`db:seed`)
+- [ ] Site Nginx `restaurant-turc` activé (sans toucher aux autres sites)
+- [ ] Certbot (HTTPS) actif sur `votre-domaine.fr`
+- [ ] Webhook Stripe configuré (si paiement réel)
+- [ ] Domaine email vérifié (si emails réels)
+- [ ] Cron de relance + sauvegardes DB
+- [ ] Coordonnées réelles dans `src/lib/config.ts` + textes légaux validés
+
+## 🔐 Sécurité
+
+- Next.js est en **16** (à jour) — garder les patchs à jour lors des fenêtres de maintenance.
+- Le port app n'est exposé qu'en **local** (`127.0.0.1:3200`) ; seul Nginx est public.
+- Vérifier que le pare-feu (`ufw`) autorise `Nginx Full` (80/443).

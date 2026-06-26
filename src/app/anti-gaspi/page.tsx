@@ -18,35 +18,35 @@ export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "Panier anti-gaspi",
   description:
-    "Réservez un panier surprise anti-gaspillage à prix réduit, à retirer en fin de journée. Quantités limitées, contre le gaspillage alimentaire.",
+    "Réservez un plateau surprise anti-gaspillage à prix réduit, à retirer en fin de journée. Quantités limitées, contre le gaspillage alimentaire.",
 };
 
 const atoutsMobile = ["Retrait soir", "Prix réduit", "Zéro gaspi"];
 
 const paniersExemples = [
   {
-    name: "Pains du jour",
-    description: "Baguettes, pains spéciaux et tranches gourmandes.",
-    image: "/images/boulangerie-pains.webp",
-    badge: "Boulangerie",
+    name: "Grillades du soir",
+    description: "Brochettes, kebabs et viandes grillées du jour.",
+    image: "/images/hero-slide-grillades-turques.png",
+    badge: "Maison",
   },
   {
-    name: "Viennoiseries",
-    description: "Croissants, pains au chocolat et brioches du matin.",
-    image: "/images/boulangerie-viennoiseries.webp",
-    badge: "Pur beurre",
+    name: "Pide & lahmacun",
+    description: "Pide et lahmacun préparés dans la journée.",
+    image: "/images/hero-slide-pide-lahmacun.png",
+    badge: "Du four",
   },
   {
-    name: "Douceurs",
-    description: "Parts de tarte, cakes et pâtisseries selon vitrine.",
-    image: "/images/boulangerie-patisseries.webp",
+    name: "Mezze & entrées",
+    description: "Houmous, börek et assortiment de mezze.",
+    image: "/images/about-3.jpg",
+    badge: "À partager",
+  },
+  {
+    name: "Desserts",
+    description: "Baklava et douceurs turques selon la vitrine.",
+    image: "/images/baklava.png",
     badge: "Sucré",
-  },
-  {
-    name: "Snacking",
-    description: "Sandwichs, quiches et salades disponibles le soir.",
-    image: "/images/boulangerie-snacking.webp",
-    badge: "Midi",
   },
 ];
 
@@ -112,7 +112,7 @@ export default async function AntiGaspiPage() {
               Panier anti-gaspi
             </h1>
             <p className="mt-2 max-w-2xl text-sm leading-6 text-muted lg:text-base">
-              Chaque soir, nous proposons un panier surprise composé des
+              Chaque soir, nous proposons un plateau surprise composé des
               invendus du jour, à prix réduit. Une bonne affaire, et un geste
               contre le gaspillage alimentaire.
             </p>
@@ -180,8 +180,8 @@ function DesktopNoOfferCard() {
     <div className="mt-5 overflow-hidden rounded-[24px] border border-white/10 bg-[radial-gradient(circle_at_top_left,rgba(34,197,94,0.12),transparent_36%),#111111] shadow-[0_28px_85px_-62px_rgba(0,0,0,0.95)] lg:grid lg:h-[calc(100svh-17rem)] lg:max-h-[31rem] lg:min-h-[27rem] lg:grid-cols-[0.92fr_1.08fr]">
       <div className="relative min-h-[20rem] lg:min-h-0">
         <Image
-          src="/images/boulangerie-pains.webp"
-          alt="Pains et viennoiseries du jour pour les paniers anti-gaspi"
+          src="/images/hero-slide-grillades-turques.png"
+          alt="Grillades et spécialités du jour pour les plateaux anti-gaspi"
           fill
           sizes="(max-width: 1024px) 100vw, 44vw"
           className="object-cover"

@@ -12,19 +12,54 @@ type GalleryItem =
 // Médias de la galerie.
 //
 // Pour AJOUTER UNE VIDÉO : dépose ton fichier dans `public/videos/`
-// (ex. `public/videos/fournee.mp4`) puis ajoute une entrée :
-//   { type: "video", src: "/videos/fournee.mp4",
-//     poster: "/images/boulangerie-pains.webp", alt: "La fournée du matin",
+// (ex. `public/videos/grillades.mp4`) puis ajoute une entrée :
+//   { type: "video", src: "/videos/grillades.mp4",
+//     poster: "/images/hero-slide-grillades-turques.png", alt: "Le mangal en action",
 //     tag: "Coulisses" },
 // Le poster est l'image affichée avant lecture.
 const items: GalleryItem[] = [
-  { type: "image", src: "/images/boulangerie-hero.webp", alt: "Notre vitrine du matin", tag: "Maison" },
-  { type: "image", src: "/images/boulangerie-pains.webp", alt: "Pains au levain", tag: "Pains" },
-  { type: "image", src: "/images/boulangerie-viennoiseries.webp", alt: "Viennoiseries pur beurre", tag: "Viennoiseries" },
-  { type: "image", src: "/images/boulangerie-patisseries.webp", alt: "Pâtisseries de saison", tag: "Pâtisseries" },
-  { type: "image", src: "/images/gateaux-sur-mesure-pinterest.webp", alt: "Gâteaux sur-mesure", tag: "Sur-mesure" },
-  { type: "image", src: "/images/boulangerie-snacking.webp", alt: "Snacking maison", tag: "Snacking" },
-  { type: "image", src: "/images/boulangerie-snacking-boissons.webp", alt: "Snacking & boissons", tag: "Boissons" },
+  {
+    type: "image",
+    src: "/images/hero-plateau-turc-premium.png",
+    alt: "Plateau de grillades du chef",
+    tag: "Maison",
+  },
+  {
+    type: "image",
+    src: "/images/hero-slide-adana-kebab.png",
+    alt: "Adana kebab grillé",
+    tag: "Grillades",
+  },
+  {
+    type: "image",
+    src: "/images/hero-slide-pide-lahmacun.png",
+    alt: "Pide & lahmacun",
+    tag: "Pide",
+  },
+  {
+    type: "image",
+    src: "/images/hero-premium-kebab.png",
+    alt: "Sauté de viande et riz",
+    tag: "Spécialités",
+  },
+  {
+    type: "image",
+    src: "/images/hero-slide-desserts-turcs.png",
+    alt: "Baklava & douceurs",
+    tag: "Desserts",
+  },
+  {
+    type: "image",
+    src: "/images/hero-slide-boissons-turques.png",
+    alt: "Thé, ayran & limonades",
+    tag: "Boissons",
+  },
+  {
+    type: "image",
+    src: "/images/about-1.jpg",
+    alt: "Notre salle de restaurant",
+    tag: "Maison",
+  },
 ];
 
 type Filter = "all" | "image" | "video";
@@ -104,11 +139,11 @@ export function GallerySection() {
           <Camera className="h-4 w-4" /> Galerie
         </p>
         <h1 className="mt-2 font-display text-[1.9rem] font-bold leading-tight text-cream sm:text-4xl lg:text-5xl">
-          Nos créations en images
+          Nos plats en images
         </h1>
         <p className="mt-3 text-sm leading-relaxed text-cream/65 sm:text-base">
-          Pains au levain, viennoiseries, pâtisseries et gâteaux sur-mesure : un
-          aperçu de ce que l&apos;on prépare chaque jour à l&apos;atelier.
+          Grillades au charbon, kebabs, pide et desserts turcs : un aperçu de ce
+          que l&apos;on prépare chaque jour en cuisine.
         </p>
       </div>
 
@@ -164,7 +199,7 @@ export function GallerySection() {
         <div
           ref={trackRef}
           onScroll={updateArrows}
-          className="mt-6 flex snap-x snap-mandatory items-start gap-4 overflow-x-auto scroll-smooth pb-2 sm:mt-8 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          className="mt-6 flex snap-x snap-mandatory items-start gap-4 overflow-x-auto scroll-smooth pb-2 [-ms-overflow-style:none] [scrollbar-width:none] sm:mt-8 [&::-webkit-scrollbar]:hidden"
         >
           {visible.map((item, i) => (
             <button
@@ -186,7 +221,10 @@ export function GallerySection() {
                 aria-hidden
               />
               {item.type === "video" && (
-                <span className="absolute inset-0 grid place-items-center" aria-hidden>
+                <span
+                  className="absolute inset-0 grid place-items-center"
+                  aria-hidden
+                >
                   <span className="grid h-12 w-12 place-items-center rounded-full bg-black/55 text-cream backdrop-blur transition group-hover:bg-gold group-hover:text-ink">
                     <Play className="h-5 w-5 translate-x-0.5" />
                   </span>

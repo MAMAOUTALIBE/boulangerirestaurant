@@ -1,4 +1,4 @@
-import { Clock, Mail, MapPin, Phone, Wheat } from "lucide-react";
+import { Clock, Mail, MapPin, Phone, UtensilsCrossed } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { siteConfig } from "@/lib/config";
 import { emailHref, mapsHref, phoneHref } from "@/lib/contactLinks";
@@ -23,13 +23,13 @@ const informationRows: InformationRow[] = [
     Icon: Phone,
     label: siteConfig.contact.phone,
     href: phoneHref,
-    ariaLabel: "Appeler la boulangerie",
+    ariaLabel: "Appeler le restaurant",
   },
   {
     Icon: Mail,
     label: `Contact : ${siteConfig.contact.email}`,
     href: emailHref,
-    ariaLabel: "Envoyer un email à la boulangerie",
+    ariaLabel: "Envoyer un email au restaurant",
   },
   {
     Icon: Clock,
@@ -49,7 +49,7 @@ export function MobileInformationPanel({
     >
       <div className="flex items-center gap-3 text-gold/75" aria-hidden="true">
         <span className="h-px flex-1 bg-gradient-to-r from-transparent via-gold/65 to-gold/25" />
-        <Wheat className="h-7 w-7 text-gold" />
+        <UtensilsCrossed className="h-7 w-7 text-gold" />
         <span className="h-px flex-1 bg-gradient-to-l from-transparent via-gold/65 to-gold/25" />
       </div>
 

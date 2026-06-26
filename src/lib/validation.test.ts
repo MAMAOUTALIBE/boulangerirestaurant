@@ -37,9 +37,7 @@ describe("orderSchema", () => {
       name: "Jean Dupont",
       email: "a@b.fr",
       phone: "0612345678",
-      items: [
-        { id: "x", name: "Croissant pur beurre", price: 1.6, quantity: 2 },
-      ],
+      items: [{ id: "x", name: "Adana kebab", price: 14.9, quantity: 2 }],
     });
     expect(r.success).toBe(true);
   });
@@ -51,9 +49,7 @@ describe("orderSchema", () => {
       phone: "0612345678",
       fulfillment: "livraison",
       postalCode: "91260",
-      items: [
-        { id: "x", name: "Croissant pur beurre", price: 1.6, quantity: 2 },
-      ],
+      items: [{ id: "x", name: "Adana kebab", price: 14.9, quantity: 2 }],
     });
 
     expect(r.success).toBe(false);
@@ -67,9 +63,7 @@ describe("orderSchema", () => {
       fulfillment: "livraison",
       postalCode: "91260",
       address: "5 rue Jules Vallès — 91260 Juvisy-sur-Orge",
-      items: [
-        { id: "x", name: "Croissant pur beurre", price: 1.6, quantity: 2 },
-      ],
+      items: [{ id: "x", name: "Adana kebab", price: 14.9, quantity: 2 }],
     });
 
     expect(r.success).toBe(true);

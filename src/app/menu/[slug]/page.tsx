@@ -22,7 +22,7 @@ export async function generateMetadata({
   const dish = await getDishWithOptions(slug);
   if (!dish) return { title: "Plat introuvable" };
 
-  const description = `${dish.description} — ${formatPrice(dish.price)}. Commandez ${dish.name} chez ${siteConfig.name}, boulangerie artisanale à Juvisy-sur-Orge.`;
+  const description = `${dish.description} — ${formatPrice(dish.price)}. Commandez ${dish.name} chez ${siteConfig.name}, restaurant turc à Juvisy-sur-Orge.`;
   return {
     title: dish.name,
     description,

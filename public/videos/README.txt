@@ -10,8 +10,8 @@ dans le tableau `items` de src/components/GallerySection.tsx :
   {
     type: "video",
     src: "/videos/ma-video.mp4",
-    poster: "/images/boulangerie-pains.webp",  // image affichée avant lecture
-    alt: "La fournée du matin",
+    poster: "/images/hero-slide-grillades-turques.png",  // image affichée avant lecture
+    alt: "Grillades turques au charbon",
     tag: "Coulisses",
   },
 

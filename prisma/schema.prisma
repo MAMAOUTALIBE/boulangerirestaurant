@@ -1,4 +1,4 @@
-// Schéma Prisma — base PostgreSQL pour boulangerie.
+// Schéma Prisma — base PostgreSQL pour restaurant turc.
 generator client {
   provider = "prisma-client-js"
 }
@@ -304,8 +304,8 @@ model CateringRequest {
   @@index([email])
 }
 
-/// Demande de gâteau personnalisé (sur-mesure).
-model CustomCakeRequest {
+/// Demande de devis sur-mesure.
+model CustomRequest {
   id             String   @id @default(cuid())
   reference      String   @unique
   createdAt      DateTime @default(now())
@@ -317,8 +317,8 @@ model CustomCakeRequest {
   phone          String
   occasion       String
   servings       Int
-  flavor         String
-  messageOnCake  String?
+  preferences    String   @map("flavor")
+  message        String?  @map("messageOnCake")
   pickupDate     String
   pickupTime     String?
   inspirationUrl String?
@@ -327,6 +327,7 @@ model CustomCakeRequest {
   details        String
 
   @@index([email])
+  @@map("CustomCakeRequest")
 }
 
 /// Produit de saison vendu sur précommande (galette, bûche, pièce de fête…).

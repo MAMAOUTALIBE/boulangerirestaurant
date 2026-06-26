@@ -15,41 +15,42 @@ export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "Boutique de saison",
   description:
-    "Précommandez nos spécialités de saison : galette des rois, bûches de Noël et pièces de fête. Quantités limitées, retrait en boutique.",
+    "Précommandez nos spécialités turques de saison : plateaux de baklava, grillades et pièces de fête. Quantités limitées, retrait au restaurant.",
 };
 
 const atoutsMobile = [
-  "Retrait boutique",
+  "Retrait restaurant",
   "Quantités limitées",
   "Paiement retrait",
 ];
 
 const saisonSuggestions = [
   {
-    name: "Panier du matin",
-    description: "Pains, croissants et douceurs du jour à partager.",
-    image: "/images/boulangerie-hero.webp",
-    badge: "Matin",
-    price: "À partir de 12,90 €",
+    name: "Plateau de baklava",
+    description: "Baklava pistache et noix, assortiment de fête à partager.",
+    image: "/images/hero-slide-desserts-turcs.png",
+    badge: "Fête",
+    price: "À partir de 24,90 €",
   },
   {
-    name: "Couronne briochée",
-    description: "Brioche pur beurre, sucre perlé et notes d'agrumes.",
-    image: "/images/boulangerie-viennoiseries.webp",
-    badge: "Week-end",
-    price: "À partir de 9,50 €",
-  },
-  {
-    name: "Pain apéritif",
-    description: "Pain garni à partager, idéal pour les beaux jours.",
-    image: "/images/boulangerie-pains.webp",
+    name: "Plateau mezze",
+    description: "Houmous, börek et assortiment d'entrées à partager.",
+    image: "/images/about-3.jpg",
     badge: "À partager",
+    price: "À partir de 19,90 €",
+  },
+  {
+    name: "Plateau de grillades",
+    description:
+      "Brochettes, kebabs et accompagnements pour les grandes tablées.",
+    image: "/images/hero-slide-grillades-turques.png",
+    badge: "Famille",
     price: "Sur commande",
   },
   {
-    name: "Plateau gourmand",
-    description: "Mini pâtisseries et viennoiseries pour vos événements.",
-    image: "/images/boulangerie-snacking.webp",
+    name: "Buffet événement",
+    description: "Grillades, mezze et desserts turcs pour vos réceptions.",
+    image: "/images/hero-plateau-turc-premium.png",
     badge: "Traiteur",
     price: "Sur devis",
   },
@@ -81,7 +82,7 @@ export default async function BoutiqueDeSaisonPage() {
                   Boutique de saison
                 </h1>
                 <p className="mt-1.5 text-[0.82rem] leading-5 text-muted min-[390px]:mt-2 min-[390px]:text-sm">
-                  Précommandes limitées, retrait en boutique.
+                  Précommandes limitées, retrait au restaurant.
                 </p>
               </div>
               {products.length > 0 && (
@@ -145,8 +146,8 @@ export default async function BoutiqueDeSaisonPage() {
               Boutique de saison
             </h1>
             <p className="mt-3 max-w-2xl text-muted">
-              Nos spécialités de saison en précommande, en quantités limitées.
-              Réservez la vôtre, payez au retrait en boutique.
+              Nos spécialités turques de saison en précommande, en quantités
+              limitées. Réservez la vôtre, payez au retrait au restaurant.
             </p>
 
             {products.length === 0 ? (
@@ -222,8 +223,8 @@ function DesktopSeasonalEmpty() {
       <div className="grid gap-5 p-5 lg:grid-cols-[0.9fr_1.1fr] lg:p-6">
         <div className="relative min-h-[24rem] overflow-hidden rounded-3xl border border-white/10">
           <Image
-            src="/images/boulangerie-patisseries.webp"
-            alt="Pâtisseries et spécialités de saison"
+            src="/images/hero-slide-desserts-turcs.png"
+            alt="Spécialités turques de saison : baklava et douceurs"
             fill
             sizes="40vw"
             className="object-cover"

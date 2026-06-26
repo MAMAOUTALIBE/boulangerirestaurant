@@ -5,22 +5,21 @@ import type { Dish } from "@/types";
 import { remainingStock, isSoldOut } from "@/lib/stock";
 
 const dishImageOverrides: Record<string, string> = {
-  "baguette-tradition": "/images/menu/baguette-tradition.webp",
-  "brioche-tressee": "/images/menu/brioche-tressee.webp",
-  "cafe-allonge": "/images/menu/cafe-allonge.webp",
-  "chausson-pommes": "/images/menu/chausson-pommes.webp",
-  "chocolat-chaud": "/images/menu/chocolat-chaud.webp",
-  "croissant-beurre": "/images/menu/croissant-beurre.webp",
-  "eclair-chocolat": "/images/menu/eclair-chocolat.webp",
-  "flan-patissier": "/images/menu/flan-patissier.webp",
-  "jus-orange-presse": "/images/menu/jus-orange-presse.webp",
-  "pain-chocolat": "/images/menu/pain-chocolat.webp",
-  "pain-complet-graines": "/images/menu/pain-complet-graines.webp",
-  "pain-levain": "/images/menu/pain-levain.webp",
-  "paris-brest": "/images/menu/paris-brest.webp",
-  "quiche-lorraine": "/images/menu/quiche-lorraine.webp",
-  "sandwich-baguette-poulet": "/images/menu/sandwich-baguette-poulet.webp",
-  "tartelette-fruits": "/images/menu/tartelette-fruits.webp",
+  "adana-kebab": "/images/hero-slide-adana-kebab.png",
+  "iskender-kebab": "/images/hero-premium-kebab.png",
+  "kebab-grille": "/images/hero-slide-grillades-turques.png",
+  kofte: "/images/hero-plateau-turc-premium.png",
+  lahmacun: "/images/hero-slide-pide-lahmacun.png",
+  "pide-sucuk": "/images/hero-slide-pide-lahmacun.png",
+  manti: "/images/about-3.jpg",
+  "mercimek-corbasi": "/images/about-3.jpg",
+  houmous: "/images/about-3.jpg",
+  "borek-fromage": "/images/hero-slide-pide-lahmacun.png",
+  baklava: "/images/baklava.png",
+  sutlac: "/images/hero-slide-desserts-turcs.png",
+  ayran: "/images/ayran.png",
+  "the-turc": "/images/hero-slide-boissons-turques.png",
+  "sodas-frais": "/images/boisson-sodas.png",
 };
 
 // La visibilité publique d'un produit/catégorie est désormais pilotée par le
@@ -153,12 +152,20 @@ export async function getMenuForBrowser() {
     include: { _count: { select: { optionGroups: true } } },
   });
 
+  // N'expose que les catégories ayant au moins un produit disponible
+  // (évite d'afficher d'anciennes catégories vides comme onglets de filtre).
+  const usedCategoryIds = new Set(
+    rows.map((d) => d.categoryId).filter((id): id is string => Boolean(id)),
+  );
+
   return {
-    categories: categories.map((c) => ({
-      id: c.id,
-      slug: c.slug,
-      name: c.name,
-    })),
+    categories: categories
+      .filter((c) => usedCategoryIds.has(c.id))
+      .map((c) => ({
+        id: c.id,
+        slug: c.slug,
+        name: c.name,
+      })),
     dishes: rows
       .filter((d) => d.categoryId)
       .map((d) => ({

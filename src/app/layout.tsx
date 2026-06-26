@@ -23,28 +23,30 @@ const display = Playfair_Display({
   weight: ["500", "600", "700", "800"],
 });
 
-const heroImage = "/images/boulangerie-hero.webp";
+const heroImage = "/images/hero-plateau-turc-premium.png";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
   title: {
-    default: `${siteConfig.name} | Boulangerie artisanale`,
+    default: `${siteConfig.name} | Restaurant turc & grillades`,
     template: `%s | ${siteConfig.name}`,
   },
-  description: `${siteConfig.name} : pains au levain, viennoiseries pur beurre, pâtisseries de saison et snacking frais. Commandez en ligne ou scannez le QR code.`,
+  description: `${siteConfig.name} : grillades au charbon, kebabs, pide, lahmacun, mezze et desserts turcs maison. Commandez en ligne, à emporter ou en livraison.`,
   keywords: [
-    "boulangerie",
-    "boulangerie artisanale",
-    "pain au levain",
-    "croissant",
-    "pain au chocolat",
-    "pâtisserie",
+    "restaurant turc",
+    "grillades turques",
+    "kebab",
+    "adana kebab",
+    "iskender",
+    "lahmacun",
+    "pide",
+    "baklava",
     "livraison",
   ],
   alternates: { canonical: "/" },
   openGraph: {
     title: siteConfig.name,
-    description: "Pain frais, viennoiseries et pâtisseries maison.",
+    description: "Grillades au charbon, kebabs et spécialités turques maison.",
     type: "website",
     locale: siteConfig.locale,
     url: siteConfig.url,
@@ -61,7 +63,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: siteConfig.name,
-    description: "Pain frais, viennoiseries et pâtisseries maison.",
+    description: "Grillades au charbon, kebabs et spécialités turques maison.",
     images: [heroImage],
   },
   robots: {
@@ -77,11 +79,11 @@ export default function RootLayout({
 }>) {
   const jsonLd = {
     "@context": "https://schema.org",
-    "@type": "Bakery",
+    "@type": "Restaurant",
     name: siteConfig.name,
     description: siteConfig.description,
     url: siteConfig.url,
-    servesCuisine: "Boulangerie, pâtisserie, snacking",
+    servesCuisine: "Turque, grillades, kebab",
     priceRange: siteConfig.priceRange,
     telephone: siteConfig.contact.phone,
     email: siteConfig.contact.email,

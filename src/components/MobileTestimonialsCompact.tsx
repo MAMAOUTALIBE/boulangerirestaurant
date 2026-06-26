@@ -90,8 +90,8 @@ export function MobileTestimonialsCompact() {
               <div className="min-w-0">
                 <blockquote className="text-sm font-medium leading-6 text-cream/90">
                   <span className="text-gold">&ldquo;</span>
-                  Les croissants sont feuilletés comme il faut, et le pain reste
-                  excellent même le soir.
+                  Les grillades sont savoureuses et parfaitement cuites au
+                  charbon. Un vrai régal !
                   <span className="text-gold">&rdquo;</span>
                 </blockquote>
                 <p className="mt-2 text-sm font-semibold text-cream/75">
