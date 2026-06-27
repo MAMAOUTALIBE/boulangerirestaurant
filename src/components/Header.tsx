@@ -3,9 +3,9 @@
 import { useEffect, useState } from "react";
 import {
   BookOpen,
+  CalendarCheck,
   ChefHat,
   ChevronDown,
-  Flame,
   Gift,
   Images,
   Menu,
@@ -27,9 +27,15 @@ import { siteConfig } from "@/lib/config";
 const desktopLinks = [
   {
     labelKey: "nav./menu.desktop",
-    label: "Notre carte",
+    label: "La carte",
     href: "/menu",
     Icon: BookOpen,
+  },
+  {
+    labelKey: "nav./reservation",
+    label: "Réserver",
+    href: "/reservation",
+    Icon: CalendarCheck,
   },
   { labelKey: "nav./contact", label: "Contact", href: "/contact", Icon: Phone },
 ];
@@ -37,37 +43,37 @@ const desktopLinks = [
 const offerLinks = [
   {
     labelKey: "nav./sur-mesure",
-    label: "Sur-mesure",
+    label: "Menus de groupe",
     href: "/sur-mesure",
-    description: "Plateaux et menus de groupe sur-mesure",
+    description: "Plateaux et menus à partager",
     Icon: UsersRound,
-  },
-  {
-    labelKey: "nav./boutique-de-saison",
-    label: "Boutique de saison",
-    href: "/boutique-de-saison",
-    description: "Spécialités turques de saison et fêtes",
-    Icon: Gift,
-  },
-  {
-    labelKey: "nav./anti-gaspi",
-    label: "Anti-gaspi",
-    href: "/anti-gaspi",
-    description: "Plateaux du soir à prix doux",
-    Icon: Recycle,
   },
   {
     labelKey: "nav./traiteur",
     label: "Traiteur",
     href: "/traiteur",
-    description: "Buffets turcs, réceptions et événements",
+    description: "Buffets et événements",
     Icon: ChefHat,
+  },
+  {
+    labelKey: "nav./boutique-de-saison",
+    label: "Précommandes",
+    href: "/boutique-de-saison",
+    description: "Spécialités de saison",
+    Icon: Gift,
+  },
+  {
+    labelKey: "nav./anti-gaspi",
+    label: "Paniers du soir",
+    href: "/anti-gaspi",
+    description: "Quantités limitées",
+    Icon: Recycle,
   },
   {
     labelKey: "nav./galerie",
     label: "Galerie",
     href: "/galerie",
-    description: "Nos plats en photos et vidéos",
+    description: "Photos et vidéos",
     Icon: Images,
   },
 ];
@@ -128,23 +134,23 @@ export function Header() {
               className="text-cream/88 relative inline-flex items-center gap-2 text-sm font-semibold transition hover:text-white focus:outline-none 2xl:gap-2.5 2xl:text-base 3xl:text-lg"
               aria-haspopup="true"
             >
-              <Flame className="h-[1.125rem] w-[1.125rem] text-[#D89A1C] 2xl:h-5 2xl:w-5" />
-              {t("nav.offers", "Nos offres")}
+              <ChefHat className="h-[1.125rem] w-[1.125rem] text-[#D89A1C] 2xl:h-5 2xl:w-5" />
+              {t("nav.offers", "Groupes & événements")}
               <ChevronDown className="h-4 w-4 text-[#D89A1C] transition group-focus-within/offers:rotate-180 group-hover/offers:rotate-180" />
               <span className="absolute -bottom-2 left-1/2 h-px w-0 -translate-x-1/2 bg-[#D89A1C] transition-all duration-300 group-focus-within/offers:w-full group-hover/offers:w-full" />
             </button>
 
-            <div className="pointer-events-none invisible absolute left-1/2 top-full z-50 mt-5 w-[34rem] -translate-x-1/2 translate-y-2 rounded-[22px] border border-gold/30 bg-[linear-gradient(135deg,rgba(8,8,8,0.98)_0%,rgba(24,18,12,0.98)_62%,rgba(62,42,12,0.98)_100%)] p-3 opacity-0 shadow-[0_30px_90px_-45px_rgba(0,0,0,0.95)] backdrop-blur-2xl transition duration-200 group-focus-within/offers:pointer-events-auto group-focus-within/offers:visible group-focus-within/offers:translate-y-0 group-focus-within/offers:opacity-100 group-hover/offers:pointer-events-auto group-hover/offers:visible group-hover/offers:translate-y-0 group-hover/offers:opacity-100 3xl:w-[38rem]">
+            <div className="pointer-events-none invisible absolute left-1/2 top-full z-50 mt-5 w-[30rem] -translate-x-1/2 translate-y-2 rounded-[18px] border border-gold/30 bg-[linear-gradient(135deg,rgba(8,8,8,0.98)_0%,rgba(22,18,13,0.98)_68%,rgba(50,34,12,0.98)_100%)] p-2.5 opacity-0 shadow-[0_30px_90px_-45px_rgba(0,0,0,0.95)] backdrop-blur-2xl transition duration-200 group-focus-within/offers:pointer-events-auto group-focus-within/offers:visible group-focus-within/offers:translate-y-0 group-focus-within/offers:opacity-100 group-hover/offers:pointer-events-auto group-hover/offers:visible group-hover/offers:translate-y-0 group-hover/offers:opacity-100 3xl:w-[34rem]">
               <div className="grid grid-cols-2 gap-2">
                 {offerLinks.map(
                   ({ href, labelKey, label, description, Icon }) => (
                     <a
                       key={href}
                       href={href}
-                      className="group/item rounded-[16px] border border-white/10 bg-white/[0.035] p-4 text-left transition hover:-translate-y-0.5 hover:border-gold/55 hover:bg-white/[0.065] focus:outline-none focus:ring-2 focus:ring-gold/60 3xl:p-5"
+                      className="group/item rounded-[14px] border border-white/10 bg-white/[0.03] p-3.5 text-left transition hover:-translate-y-0.5 hover:border-gold/55 hover:bg-white/[0.06] focus:outline-none focus:ring-2 focus:ring-gold/60 3xl:p-4"
                     >
                       <span className="flex items-center gap-3">
-                        <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full border border-gold/35 bg-gold/10 text-gold transition group-hover/item:bg-gold group-hover/item:text-[#050505]">
+                        <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-gold/35 bg-gold/10 text-gold transition group-hover/item:bg-gold group-hover/item:text-[#050505]">
                           <Icon className="h-5 w-5" />
                         </span>
                         <span className="text-sm font-bold text-cream transition group-hover/item:text-white 3xl:text-base">

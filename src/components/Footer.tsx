@@ -100,18 +100,18 @@ const mobileSocials = socials.filter(({ label }) => label !== "Telegram");
 const mobileQuickLinks = [
   [
     { label: "Accueil", href: "/" },
-    { label: "Menu", href: "/menu" },
+    { label: "La carte", href: "/menu" },
     { label: "Commander", href: "/commander" },
-    { label: "Réservation", href: "/reservation" },
+    { label: "Réserver", href: "/reservation" },
     { label: "Contact", href: "/contact" },
   ],
   [
-    { label: "Boutique de saison", href: "/boutique-de-saison" },
-    { label: "Sur-mesure", href: "/sur-mesure" },
+    { label: "Menus de groupe", href: "/sur-mesure" },
     { label: "Traiteur", href: "/traiteur" },
+    { label: "Précommandes", href: "/boutique-de-saison" },
+    { label: "Paniers du soir", href: "/anti-gaspi" },
     { label: "Galerie", href: "/galerie" },
     { label: "Avis", href: "/#avis-clients" },
-    { label: "À propos", href: "/#a-propos" },
   ],
 ] as const;
 
@@ -135,9 +135,9 @@ const footerHighlights = [
     Icon: ShoppingBag,
   },
   {
-    label: "Plateaux sur-mesure",
+    label: "Menus de groupe",
     description:
-      "Menus de groupe et événements : recevez un devis personnalisé.",
+      "Plateaux à partager et devis personnalisé pour vos événements.",
     href: "/sur-mesure",
     Icon: UsersRound,
   },
@@ -162,19 +162,19 @@ const footerLinkGroups: FooterLinkGroup[] = [
   {
     title: "Commander",
     links: [
-      { label: "Notre carte", href: "/menu" },
+      { label: "La carte", href: "/menu" },
       { label: "Commander", href: "/commander" },
-      { label: "Réservation", href: "/reservation" },
+      { label: "Réserver", href: "/reservation" },
       { label: "Espace client", href: "/compte" },
     ],
   },
   {
-    title: "Nos offres",
+    title: "Groupes & événements",
     links: [
-      { label: "Sur-mesure", href: "/sur-mesure", Icon: UsersRound },
-      { label: "Boutique de saison", href: "/boutique-de-saison", Icon: Gift },
-      { label: "Anti-gaspi", href: "/anti-gaspi", Icon: Recycle },
+      { label: "Menus de groupe", href: "/sur-mesure", Icon: UsersRound },
       { label: "Traiteur", href: "/traiteur", Icon: ChefHat },
+      { label: "Précommandes", href: "/boutique-de-saison", Icon: Gift },
+      { label: "Paniers du soir", href: "/anti-gaspi", Icon: Recycle },
       { label: "Galerie", href: "/galerie", Icon: Images },
     ],
   },

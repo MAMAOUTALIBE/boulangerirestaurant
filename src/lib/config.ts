@@ -17,7 +17,7 @@ export const siteConfig = {
   locale: "fr_FR",
   contact: {
     phone: "07 75 78 78 25",
-    email: "contact@anatolia-grill.fr",
+    email: "bahm2062@gmail.com",
     address: "5 Rue Jules Vallès, 91260 Juvisy-sur-Orge",
   },
   /** Horaires d'ouverture — source unique affichée partout (footer, contact, mobile, QR). */

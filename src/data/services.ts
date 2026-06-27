@@ -11,12 +11,12 @@ export const services: Service[] = [
 
 /** Liens de navigation principaux. */
 export const navLinks: NavLink[] = [
-  { label: "Menu", href: "/menu" },
+  { label: "La carte", href: "/menu" },
   { label: "Commander", href: "/commander" },
-  { label: "Réservation", href: "/reservation" },
-  { label: "Sur-mesure", href: "/sur-mesure" },
-  { label: "Boutique de saison", href: "/boutique-de-saison" },
-  { label: "Anti-gaspi", href: "/anti-gaspi" },
+  { label: "Réserver", href: "/reservation" },
+  { label: "Menus de groupe", href: "/sur-mesure" },
+  { label: "Précommandes", href: "/boutique-de-saison" },
+  { label: "Paniers du soir", href: "/anti-gaspi" },
   { label: "Traiteur", href: "/traiteur" },
   { label: "Galerie", href: "/galerie" },
   { label: "Contact", href: "/contact" },

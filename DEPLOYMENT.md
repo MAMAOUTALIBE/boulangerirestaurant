@@ -30,7 +30,7 @@ et récupérer la chaîne de connexion (`postgresql://…`).
 | `STRIPE_WEBHOOK_SECRET`               | ⬜          | Secret du webhook Stripe (`whsec_…`)                           |
 | `STRIPE_CONNECT_COUNTRY`              | ⬜          | Pays des comptes Connect créés depuis l’admin (ex. `FR`)       |
 | `RESEND_API_KEY`                      | ⬜          | Clé API Resend (emails transactionnels)                        |
-| `EMAIL_FROM`                          | ⬜          | Expéditeur vérifié (ex. `Anatolia Grill <commandes@votre-domaine.fr>`) |
+| `EMAIL_FROM`                          | ⬜          | Expéditeur vérifié (ex. `Anatolia Grill <bahm2062@gmail.com>`) |
 | `NEXT_PUBLIC_WHATSAPP_ORDER_NUMBER`   | ⬜          | Numéro public pour les commandes WhatsApp (`+33...`)           |
 | `NEXT_PUBLIC_TELEGRAM_ORDER_USERNAME` | ⬜          | Username Telegram public du restaurant, sans `@`               |
 | `NEXT_PUBLIC_FACEBOOK_URL`            | ⬜          | URL de la page Facebook affichée dans le footer                |

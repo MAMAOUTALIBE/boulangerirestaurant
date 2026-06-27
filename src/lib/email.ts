@@ -14,7 +14,7 @@ interface SendEmailInput {
 export async function sendEmail({ to, subject, html }: SendEmailInput) {
   const apiKey = process.env.RESEND_API_KEY;
   const from =
-    process.env.EMAIL_FROM ?? `${siteConfig.shortName} <onboarding@resend.dev>`;
+    process.env.EMAIL_FROM ?? `${siteConfig.shortName} <${siteConfig.contact.email}>`;
 
   if (!apiKey) {
     console.info(`[email:simulation] → ${to} | ${subject}`);
