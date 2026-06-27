@@ -23,9 +23,9 @@ npm run typecheck && npm run lint && npm run build
 ```
 
 Ce script (paramètres à renseigner, surchargables par variables d'env) :
-vérifs locales (typecheck + lint) → **rsync** du code vers le serveur → **rebuild
-Docker** → **migrations Prisma automatiques** (`prisma migrate deploy` via le
-service `migrate`) → vérification `https://votre-domaine.fr/api/health`.
+vérifs locales (typecheck + lint + build) → **rsync** du code vers le serveur →
+**rebuild Docker** → **migrations Prisma automatiques** (`prisma migrate deploy`
+via le service `migrate`) → vérification `https://votre-domaine.fr/api/health`.
 
 Le déploiement passe par **rsync**, pas par git.
 

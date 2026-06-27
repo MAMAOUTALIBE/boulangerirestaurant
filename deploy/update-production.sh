@@ -7,9 +7,12 @@
 #   DEPLOY_SITE_URL="https://nouveau-domaine.fr" \
 #   ./deploy/update-production.sh
 #
-# Étapes : vérifs locales (typecheck + lint) -> rsync du code -> rebuild Docker
-#          (migrations Prisma auto) -> vérification /api/health.
+# Étapes : vérifs locales (typecheck + lint + build) -> rsync du code
+#          -> rebuild Docker (migrations Prisma auto) -> vérification /api/health.
 # Voir deploy/MISE-A-JOUR.md pour le détail.
+#
+# Les commandes distantes utilisent des valeurs déjà échappées avec printf %q.
+# shellcheck disable=SC2029
 
 set -euo pipefail
 
@@ -32,14 +35,38 @@ if (( ${#missing[@]} > 0 )); then
   exit 1
 fi
 
+SITE_URL="${SITE_URL%/}"
+
+if [[ "$VPS" == *"VOTRE_IP_SERVEUR"* || "$VPS" == *"IP_VPS_HOSTINGER"* || "$SITE_URL" == *"votre-domaine.fr"* ]]; then
+  echo "Les placeholders de déploiement n'ont pas été remplacés."
+  echo "Renseigne DEPLOY_VPS et DEPLOY_SITE_URL avec l'IP Hostinger et le vrai domaine."
+  exit 1
+fi
+
+if [[ "$SITE_URL" != https://* ]]; then
+  echo "DEPLOY_SITE_URL doit être l'URL HTTPS publique finale."
+  exit 1
+fi
+
+if [[ ! -r "$KEY" ]]; then
+  echo "Clé SSH introuvable ou illisible : $KEY"
+  echo "Renseigne DEPLOY_KEY ou installe la clé Hostinger attendue."
+  exit 1
+fi
+
 # Aller à la racine du repo (le script est dans deploy/)
 cd "$(dirname "${BASH_SOURCE[0]}")/.."
 
-echo "==> 1/4  Vérifications locales (typecheck + lint)"
+printf -v remote_dir_q "%q" "$REMOTE_DIR"
+printf -v compose_project_q "%q" "$COMPOSE_PROJECT"
+
+echo "==> 1/5  Vérifications locales (typecheck + lint + build)"
 npm run typecheck
 npm run lint
+npm run build
 
-echo "==> 2/4  Synchronisation du code vers le VPS (rsync)"
+echo "==> 2/5  Synchronisation du code vers le VPS (rsync)"
+ssh "${SSH_OPTS[@]}" "$VPS" "mkdir -p $remote_dir_q"
 rsync -az --delete \
   -e "ssh ${SSH_OPTS[*]}" \
   --exclude '.git' --exclude 'node_modules' --exclude '.next' \
@@ -49,14 +76,22 @@ rsync -az --delete \
   --exclude '.data' --exclude '.vercel' \
   ./ "$VPS:$REMOTE_DIR/"
 
-echo "==> 3/4  Rebuild + redéploiement sur le VPS (migrations auto)"
-ssh "${SSH_OPTS[@]}" "$VPS" \
-  "cd $REMOTE_DIR && docker compose --env-file .env -p $COMPOSE_PROJECT up -d --build"
+echo "==> 3/5  Vérification du .env distant"
+if ! ssh "${SSH_OPTS[@]}" "$VPS" "test -f $remote_dir_q/.env"; then
+  echo "Fichier distant manquant : $REMOTE_DIR/.env"
+  echo "Crée-le sur le VPS Hostinger depuis le modèle synchronisé, remplis les secrets, puis relance :"
+  echo "  ssh -i $KEY $VPS 'cd $REMOTE_DIR && cp .env.production.example .env && nano .env'"
+  exit 1
+fi
 
-echo "==> 4/4  Vérification"
-ssh "${SSH_OPTS[@]}" "$VPS" "docker compose -p $COMPOSE_PROJECT ps"
+echo "==> 4/5  Rebuild + redéploiement sur le VPS (migrations auto)"
+ssh "${SSH_OPTS[@]}" "$VPS" \
+  "cd $remote_dir_q && docker compose --env-file .env -p $compose_project_q up -d --build"
+
+echo "==> 5/5  Vérification"
+ssh "${SSH_OPTS[@]}" "$VPS" "cd $remote_dir_q && docker compose -p $compose_project_q ps"
 printf 'health : '
-for i in 1 2 3 4 5 6 7 8 9 10; do
+for _attempt in 1 2 3 4 5 6 7 8 9 10; do
   if curl -fs --max-time 10 "$SITE_URL/api/health" 2>/dev/null | grep -q '"db":"up"'; then
     curl -s --max-time 10 "$SITE_URL/api/health"; echo
     echo "✅ Mise à jour terminée — $SITE_URL"
@@ -66,5 +101,5 @@ for i in 1 2 3 4 5 6 7 8 9 10; do
 done
 
 echo "⚠️  L'app n'a pas répondu 'ok' à temps. Vérifie les logs :"
-echo "    ssh ${SSH_OPTS[*]} $VPS 'docker logs --tail 80 ${COMPOSE_PROJECT}-app-1'"
+echo "    ssh -i $KEY $VPS 'cd $REMOTE_DIR && docker compose -p $COMPOSE_PROJECT logs --tail 80 app'"
 exit 1

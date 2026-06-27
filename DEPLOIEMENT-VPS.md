@@ -1,7 +1,7 @@
 # Déploiement sur un VPS — Restaurant turc
 
-> Remplacez les placeholders (`votre-domaine.fr`, `VOTRE_IP_SERVEUR`, etc.) par
-> vos valeurs réelles. Si le serveur héberge **d'autres sites**, tout ici est
+> Remplacez les placeholders (`votre-domaine.fr`, `IP_VPS_HOSTINGER`, etc.) par
+> vos valeurs réelles Hostinger. Si le serveur héberge **d'autres sites**, tout ici est
 > isolé pour **ne pas y toucher** :
 >
 > - projet Docker Compose dédié : **`restaurant-turc`**
@@ -17,7 +17,8 @@
 
 ## 1. DNS (domaine → serveur)
 
-Dans la zone DNS du domaine, ajouter l'enregistrement :
+Dans hPanel Hostinger, récupérez l'IPv4 du VPS. Dans la zone DNS du domaine,
+ajouter l'enregistrement :
 
 - `A` `@` (ou le sous-domaine) → IP du serveur
 
@@ -32,19 +33,35 @@ docker --version && docker compose version && nginx -v
 > Sur un serveur partagé, ne **pas** relancer `apt upgrade` ni réinstaller
 > Docker/Nginx sans précaution : cela pourrait perturber un site déjà en ligne.
 
-## 3. Récupérer le code + configurer
+## 3. Synchroniser le code + configurer
+
+Le déploiement de ce dépôt passe par **rsync depuis le Mac**, pas par `git clone`
+sur le serveur.
+
+Depuis ce Mac, lancez une première synchronisation :
 
 ```bash
-cd /root                                  # ou le dossier qui héberge vos sites
-git clone VOTRE_DEPOT restaurant-turc && cd restaurant-turc
-cp .env.production.example .env
-nano .env                                 # remplir les valeurs (voir ci-dessous)
+DEPLOY_VPS="root@IP_VPS_HOSTINGER" \
+DEPLOY_REMOTE_DIR="/root/restaurant-turc" \
+DEPLOY_SITE_URL="https://votre-domaine.fr" \
+DEPLOY_KEY="$HOME/.ssh/deploy_key" \
+DEPLOY_COMPOSE_PROJECT="restaurant-turc" \
+./deploy/update-production.sh
+```
+
+Au premier passage, le script crée/synchronise `/root/restaurant-turc`, puis
+s'arrête si le `.env` distant n'existe pas encore. Créez-le alors sur le VPS :
+
+```bash
+ssh -i "$HOME/.ssh/deploy_key" root@IP_VPS_HOSTINGER \
+  "cd /root/restaurant-turc && cp .env.production.example .env && nano .env"
 ```
 
 Générer les secrets :
 
 ```bash
 openssl rand -hex 32   # → SESSION_SECRET
+openssl rand -hex 32   # → ADMIN_PASSWORD
 openssl rand -hex 16   # → CRON_SECRET
 ```
 
@@ -54,6 +71,7 @@ Variables minimales à remplir :
 - `NEXT_PUBLIC_SITE_URL=https://votre-domaine.fr`
 - `SESSION_SECRET`
 - `ADMIN_EMAILS` (votre email admin)
+- `ADMIN_PASSWORD` (mot de passe fort du back-office)
 
 Les intégrations (Stripe, Resend, Twilio, Upstash) sont **optionnelles** : sans clés,
 l'app tourne en mode simulation. `POSTGRES_USER`, `POSTGRES_DB` et
@@ -61,8 +79,15 @@ l'app tourne en mode simulation. `POSTGRES_USER`, `POSTGRES_DB` et
 
 ## 4. Lancer l'application (projet isolé `restaurant-turc`)
 
+Relancez le script depuis le Mac après avoir rempli le `.env` distant :
+
 ```bash
-docker compose -p restaurant-turc --env-file .env up -d --build
+DEPLOY_VPS="root@IP_VPS_HOSTINGER" \
+DEPLOY_REMOTE_DIR="/root/restaurant-turc" \
+DEPLOY_SITE_URL="https://votre-domaine.fr" \
+DEPLOY_KEY="$HOME/.ssh/deploy_key" \
+DEPLOY_COMPOSE_PROJECT="restaurant-turc" \
+./deploy/update-production.sh
 ```
 
 - Le conteneur **db** (PostgreSQL) démarre avec son **volume dédié** (`restaurant-turc_pgdata`).
@@ -73,11 +98,12 @@ docker compose -p restaurant-turc --env-file .env up -d --build
 > `-p restaurant-turc` est **important** : il garde les conteneurs, le réseau et le volume
 > séparés des autres sites éventuels. À rappeler sur **chaque** commande `docker compose`.
 
-### Charger les données initiales (menu, catégories, zones, horaires, code promo) — une seule fois
+### Données initiales
 
-```bash
-docker compose -p restaurant-turc --env-file .env run --rm migrate npm run db:seed
-```
+Ne lancez pas `npm run db:seed` en production : ce seed injecte des données de
+démo. Après la première mise en ligne, connectez-vous au back-office et créez ou
+importez les données réelles validées : établissement par défaut, carte, zones
+de livraison, horaires et paramètres de commande.
 
 Vérifier (en local sur le serveur) :
 
@@ -135,19 +161,14 @@ Sur le serveur, `crontab -e` :
 Depuis votre Mac (recommandé), avec le script automatisé :
 
 ```bash
-DEPLOY_VPS="root@VOTRE_IP_SERVEUR" \
+DEPLOY_VPS="root@IP_VPS_HOSTINGER" \
 DEPLOY_REMOTE_DIR="/root/restaurant-turc" \
 DEPLOY_SITE_URL="https://votre-domaine.fr" \
 ./deploy/update-production.sh
 ```
 
-Voir `deploy/MISE-A-JOUR.md`. Ou directement sur le serveur :
-
-```bash
-cd /root/restaurant-turc
-git pull
-docker compose -p restaurant-turc --env-file .env up -d --build    # rebuild + migrations auto
-```
+Voir `deploy/MISE-A-JOUR.md`. Ne mettez pas à jour par `git pull` sur le
+serveur : le flux de production de ce dépôt est rsync depuis le Mac.
 
 ---
 
@@ -157,7 +178,7 @@ docker compose -p restaurant-turc --env-file .env up -d --build    # rebuild + m
 - [ ] `.env` rempli (secrets forts), `NEXT_PUBLIC_SITE_URL=https://votre-domaine.fr`
 - [ ] `docker compose -p restaurant-turc --env-file .env up -d --build` OK
 - [ ] `curl http://127.0.0.1:3200/api/health` = `{"status":"ok","db":"up"}`
-- [ ] Données initiales chargées (`db:seed`)
+- [ ] Données réelles créées/importées depuis le back-office, sans seed de démo
 - [ ] Site Nginx `restaurant-turc` activé (sans toucher aux autres sites)
 - [ ] Certbot (HTTPS) actif sur `votre-domaine.fr`
 - [ ] Webhook Stripe configuré (si paiement réel)

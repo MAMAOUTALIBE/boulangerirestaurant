@@ -4,7 +4,7 @@ services:
     restart: unless-stopped
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-restaurant_turc}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-change-me}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD obligatoire dans .env}
       POSTGRES_DB: ${POSTGRES_DB:-restaurant_turc}
     volumes:
       - pgdata:/var/lib/postgresql/data
@@ -28,13 +28,13 @@ services:
       db:
         condition: service_healthy
     environment:
-      DATABASE_URL: postgresql://${POSTGRES_USER:-restaurant_turc}:${POSTGRES_PASSWORD:-change-me}@db:5432/${POSTGRES_DB:-restaurant_turc}?schema=public
+      DATABASE_URL: postgresql://${POSTGRES_USER:-restaurant_turc}:${POSTGRES_PASSWORD:?POSTGRES_PASSWORD obligatoire dans .env}@db:5432/${POSTGRES_DB:-restaurant_turc}?schema=public
 
   app:
     build:
       context: .
       args:
-        NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL}
+        NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:?NEXT_PUBLIC_SITE_URL obligatoire dans .env}
         NEXT_PUBLIC_WHATSAPP_ORDER_NUMBER: ${NEXT_PUBLIC_WHATSAPP_ORDER_NUMBER:-}
         NEXT_PUBLIC_TELEGRAM_ORDER_USERNAME: ${NEXT_PUBLIC_TELEGRAM_ORDER_USERNAME:-}
         NEXT_PUBLIC_FACEBOOK_URL: ${NEXT_PUBLIC_FACEBOOK_URL:-}
@@ -49,17 +49,17 @@ services:
         condition: service_completed_successfully
     environment:
       # La base est jointe par le nom de service « db ».
-      DATABASE_URL: postgresql://${POSTGRES_USER:-restaurant_turc}:${POSTGRES_PASSWORD:-change-me}@db:5432/${POSTGRES_DB:-restaurant_turc}?schema=public
-      NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL}
+      DATABASE_URL: postgresql://${POSTGRES_USER:-restaurant_turc}:${POSTGRES_PASSWORD:?POSTGRES_PASSWORD obligatoire dans .env}@db:5432/${POSTGRES_DB:-restaurant_turc}?schema=public
+      NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:?NEXT_PUBLIC_SITE_URL obligatoire dans .env}
       NEXT_PUBLIC_WHATSAPP_ORDER_NUMBER: ${NEXT_PUBLIC_WHATSAPP_ORDER_NUMBER:-}
       NEXT_PUBLIC_TELEGRAM_ORDER_USERNAME: ${NEXT_PUBLIC_TELEGRAM_ORDER_USERNAME:-}
       NEXT_PUBLIC_FACEBOOK_URL: ${NEXT_PUBLIC_FACEBOOK_URL:-}
       NEXT_PUBLIC_INSTAGRAM_URL: ${NEXT_PUBLIC_INSTAGRAM_URL:-}
       NEXT_PUBLIC_TIKTOK_URL: ${NEXT_PUBLIC_TIKTOK_URL:-}
       NEXT_PUBLIC_TELEGRAM_URL: ${NEXT_PUBLIC_TELEGRAM_URL:-}
-      SESSION_SECRET: ${SESSION_SECRET}
-      ADMIN_EMAILS: ${ADMIN_EMAILS}
-      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-}
+      SESSION_SECRET: ${SESSION_SECRET:?SESSION_SECRET obligatoire dans .env}
+      ADMIN_EMAILS: ${ADMIN_EMAILS:?ADMIN_EMAILS obligatoire dans .env}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:?ADMIN_PASSWORD obligatoire dans .env}
       DEFAULT_RESTAURANT_SLUG: ${DEFAULT_RESTAURANT_SLUG:-anatolia-grill}
       STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY:-}
       STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET:-}
@@ -78,8 +78,8 @@ services:
       UPSTASH_REDIS_REST_TOKEN: ${UPSTASH_REDIS_REST_TOKEN:-}
     ports:
       # Exposé uniquement en local (Nginx fait le reverse-proxy).
-      # Port hôte 3200 (à adapter si déjà pris par un autre site sur le serveur).
-      - "127.0.0.1:3200:3000"
+      # Port hôte 3200 par défaut, surchargeable si un autre site l'utilise déjà.
+      - "127.0.0.1:${APP_HOST_PORT:-3200}:3000"
 
 volumes:
   pgdata:
