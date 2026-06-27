@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
@@ -41,55 +41,147 @@ const serviceHighlights: {
   },
 ];
 
+const HERO_SLIDE_INTERVAL_MS = 5600;
+const HERO_VIDEO_START_AT = 1.2;
+const HERO_VIDEO_SLIDE_INTERVAL_MS = 10800;
+
+type HeroSlideBase = {
+  label: string;
+  alt: string;
+  durationMs?: number;
+};
+
+type HeroImageSlide = HeroSlideBase & {
+  type: "image";
+  src: string;
+};
+
+type HeroVideoSlide = HeroSlideBase & {
+  type: "video";
+  src: string;
+  poster: string;
+  mediaClassName: string;
+  startAt: number;
+};
+
+type HeroSlide = HeroImageSlide | HeroVideoSlide;
+
 const heroSlides = [
   {
+    type: "video",
+    label: "Grillades animées",
+    src: "/videos/hero-grillades-animees.mp4",
+    poster: "/images/hero-slide-grillades-turques.png",
+    alt: "Animation de viandes grillées, flammes et légumes sur un barbecue",
+    durationMs: HERO_VIDEO_SLIDE_INTERVAL_MS,
+    mediaClassName: "object-[50%_48%] sm:object-[50%_50%] lg:object-[50%_54%]",
+    startAt: HERO_VIDEO_START_AT,
+  },
+  {
+    type: "image",
     label: "Anatolia Grill",
     src: "/images/hero-plateau-turc-premium.png",
     alt: "Grand plateau de grillades turques : kebabs, brochettes, côtelettes d'agneau, riz et pain",
   },
   {
+    type: "image",
     label: "Grillades & kebabs",
     src: "/images/hero-slide-grillades-turques.png",
     alt: "Assortiment de grillades turques au charbon avec brochettes et viandes marinées",
   },
   {
+    type: "image",
     label: "Adana kebab",
     src: "/images/hero-slide-adana-kebab.png",
     alt: "Adana kebab grillé, brochettes de viande hachée épicée, salade d'oignons et pain",
   },
   {
+    type: "image",
     label: "Pide & lahmacun",
     src: "/images/hero-slide-pide-lahmacun.png",
     alt: "Pide et lahmacun dorés garnis de viande hachée, légumes et herbes fraîches",
   },
   {
+    type: "image",
     label: "Desserts & boissons",
     src: "/images/hero-slide-desserts-turcs.png",
     alt: "Baklava aux pistaches, loukoums et thé turc servis dans des verres traditionnels",
   },
-] as const;
-
-const HERO_SLIDE_INTERVAL_MS = 5600;
+] satisfies readonly HeroSlide[];
 
 /** Hero premium : promesse forte, image immersive et réassurance immédiate. */
 export function Hero() {
   const [activeSlide, setActiveSlide] = useState(0);
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+  const [readyVideoSrcs, setReadyVideoSrcs] = useState<Record<string, boolean>>(
+    {},
+  );
+  const videoRefs = useRef<Record<string, HTMLVideoElement | null>>({});
 
   useEffect(() => {
     const prefersReducedMotion = window.matchMedia(
       "(prefers-reduced-motion: reduce)",
     );
+    const updateMotionPreference = () => {
+      setPrefersReducedMotion(prefersReducedMotion.matches);
+    };
 
-    if (prefersReducedMotion.matches) {
+    updateMotionPreference();
+
+    prefersReducedMotion.addEventListener("change", updateMotionPreference);
+
+    return () => {
+      prefersReducedMotion.removeEventListener(
+        "change",
+        updateMotionPreference,
+      );
+    };
+  }, []);
+
+  useEffect(() => {
+    if (prefersReducedMotion) {
       return;
     }
 
-    const interval = window.setInterval(() => {
-      setActiveSlide((current) => (current + 1) % heroSlides.length);
-    }, HERO_SLIDE_INTERVAL_MS);
+    const active = heroSlides[activeSlide];
 
-    return () => window.clearInterval(interval);
-  }, []);
+    if (active.type === "video" && !readyVideoSrcs[active.src]) {
+      return;
+    }
+
+    const timeout = window.setTimeout(() => {
+      setActiveSlide((current) => (current + 1) % heroSlides.length);
+    }, active.durationMs ?? HERO_SLIDE_INTERVAL_MS);
+
+    return () => window.clearTimeout(timeout);
+  }, [activeSlide, prefersReducedMotion, readyVideoSrcs]);
+
+  useEffect(() => {
+    const active = heroSlides[activeSlide];
+
+    Object.entries(videoRefs.current).forEach(([src, video]) => {
+      if (!video) {
+        return;
+      }
+
+      if (
+        active.type !== "video" ||
+        active.src !== src ||
+        prefersReducedMotion
+      ) {
+        video.pause();
+        return;
+      }
+
+      try {
+        video.currentTime = active.startAt;
+      } catch {
+        // Certains navigateurs refusent le seek avant le chargement des métadonnées.
+      }
+
+      void video.play().catch(() => undefined);
+    });
+  }, [activeSlide, prefersReducedMotion]);
 
   return (
     <section
@@ -105,21 +197,76 @@ export function Hero() {
             initial={false}
             animate={{
               opacity: index === activeSlide ? 1 : 0,
-              scale: index === activeSlide ? 1.055 : 1.015,
+              scale:
+                index === activeSlide
+                  ? slide.type === "video"
+                    ? 1.02
+                    : 1.055
+                  : slide.type === "video"
+                    ? 1
+                    : 1.015,
             }}
             transition={{
               opacity: { duration: 1.05, ease: "easeInOut" },
               scale: { duration: 6.2, ease: "easeOut" },
             }}
           >
-            <Image
-              src={slide.src}
-              alt={index === activeSlide ? slide.alt : ""}
-              fill
-              priority={index === 0}
-              sizes="100vw"
-              className="origin-right object-cover object-[58%_60%] brightness-[1.08] contrast-[1.08] saturate-[1.08] sm:object-[58%_60%] lg:object-[58%_62%] 3xl:object-[60%_62%]"
-            />
+            {slide.type === "video" ? (
+              <video
+                ref={(node) => {
+                  videoRefs.current[slide.src] = node;
+                }}
+                aria-label={index === activeSlide ? slide.alt : undefined}
+                autoPlay={index === activeSlide && !prefersReducedMotion}
+                className={`h-full w-full origin-center object-cover brightness-[1.05] contrast-[1.08] saturate-[1.12] ${slide.mediaClassName}`}
+                loop
+                muted
+                playsInline
+                poster={slide.poster}
+                preload="auto"
+                onCanPlay={(event) => {
+                  setReadyVideoSrcs((current) =>
+                    current[slide.src]
+                      ? current
+                      : { ...current, [slide.src]: true },
+                  );
+
+                  if (index === activeSlide && !prefersReducedMotion) {
+                    const video = event.currentTarget;
+
+                    if (video.currentTime < slide.startAt) {
+                      video.currentTime = slide.startAt;
+                    }
+
+                    void video.play().catch(() => undefined);
+                  }
+                }}
+                onError={() => {
+                  setReadyVideoSrcs((current) =>
+                    current[slide.src]
+                      ? current
+                      : { ...current, [slide.src]: true },
+                  );
+                }}
+              >
+                <source src={slide.src} type="video/mp4" />
+              </video>
+            ) : null}
+            {slide.type === "video" ? (
+              <div
+                className="absolute inset-0 bg-[linear-gradient(180deg,rgba(5,5,5,0.52)_0%,rgba(5,5,5,0.36)_34%,rgba(5,5,5,0.7)_72%,rgba(5,5,5,0.46)_100%)] sm:bg-[linear-gradient(90deg,rgba(5,5,5,0.84)_0%,rgba(5,5,5,0.62)_46%,rgba(5,5,5,0.24)_76%,rgba(5,5,5,0.08)_100%)] lg:bg-[linear-gradient(90deg,rgba(5,5,5,0.76)_0%,rgba(5,5,5,0.5)_40%,rgba(5,5,5,0.16)_70%,rgba(5,5,5,0.04)_100%)]"
+                aria-hidden
+              />
+            ) : (
+              <Image
+                src={slide.src}
+                alt={index === activeSlide ? slide.alt : ""}
+                fill
+                priority={index === 1}
+                sizes="100vw"
+                className="origin-right object-cover object-[58%_60%] brightness-[1.08] contrast-[1.08] saturate-[1.08] sm:object-[58%_60%] lg:object-[58%_62%] 3xl:object-[60%_62%]"
+              />
+            )}
           </motion.div>
         ))}
         <div
@@ -129,7 +276,7 @@ export function Hero() {
       </div>
 
       <div className="relative z-20 mx-auto flex w-full max-w-[1680px] flex-col gap-5 sm:gap-6 lg:gap-7 3xl:max-w-[2100px] 4xl:max-w-[2360px]">
-        <div className="flex min-h-[300px] items-center pb-1 min-[390px]:min-h-[330px] sm:min-h-[490px] sm:pb-2 lg:min-h-[560px] 2xl:min-h-[630px] 3xl:min-h-[720px] 4xl:min-h-[820px]">
+        <div className="flex min-h-[420px] items-center pb-1 min-[390px]:min-h-[460px] sm:min-h-[560px] sm:pb-2 md:min-h-[600px] lg:min-h-[560px] 2xl:min-h-[630px] 3xl:min-h-[720px] 4xl:min-h-[820px]">
           <motion.div
             className="relative z-20 -mt-8 max-w-[620px] py-3 sm:-mt-[5.25rem] sm:max-w-[650px] sm:py-4 lg:-mt-[6rem] lg:pl-2 xl:-mt-[6.75rem] xl:pl-4 3xl:-mt-32 3xl:max-w-[780px]"
             initial={{ opacity: 0, y: 18 }}
@@ -181,7 +328,7 @@ export function Hero() {
 
               <div
                 className="mt-4 flex items-center gap-2 sm:mt-5 3xl:mt-7 3xl:gap-3"
-                aria-label="Images du hero"
+                aria-label="Visuels du hero"
               >
                 {heroSlides.map((slide, index) => (
                   <button
