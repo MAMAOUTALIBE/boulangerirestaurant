@@ -20,6 +20,48 @@ type GalleryItem =
 const items: GalleryItem[] = [
   {
     type: "image",
+    src: "/images/galerie/plateau-bbq-signature.webp",
+    alt: "Plateau barbecue signature avec steaks grillés, pommes de terre, maïs et sauces",
+    tag: "Plateaux",
+  },
+  {
+    type: "image",
+    src: "/images/galerie/grande-planche-grillades.webp",
+    alt: "Grande planche de grillades avec steaks, brochettes et accompagnements",
+    tag: "Grillades",
+  },
+  {
+    type: "image",
+    src: "/images/galerie/plateau-terre-mer-grillades.webp",
+    alt: "Plateau terre et mer avec steak, gambas, riz, frites et sauces maison",
+    tag: "Signature",
+  },
+  {
+    type: "image",
+    src: "/images/galerie/poulet-grille-fume.webp",
+    alt: "Morceaux de poulet grillé fumant aux herbes et citron vert",
+    tag: "Poulet",
+  },
+  {
+    type: "image",
+    src: "/images/galerie/poulet-roti-citron-romarin.webp",
+    alt: "Poulet rôti entier au citron et romarin",
+    tag: "Poulet",
+  },
+  {
+    type: "image",
+    src: "/images/galerie/brochettes-boeuf-legumes.webp",
+    alt: "Brochettes de boeuf grillé aux poivrons et oignons",
+    tag: "Brochettes",
+  },
+  {
+    type: "image",
+    src: "/images/galerie/plateau-ribs-frites-saucisses.webp",
+    alt: "Plateau de ribs, saucisses grillées, frites et sauce maison",
+    tag: "À partager",
+  },
+  {
+    type: "image",
     src: "/images/hero-plateau-turc-premium.png",
     alt: "Plateau de grillades du chef",
     tag: "Maison",

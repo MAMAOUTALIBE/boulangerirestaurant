@@ -18,7 +18,7 @@ function SubmitButton({ compact = false }: { compact?: boolean }) {
 }
 
 const fieldClass =
-  "w-full rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-sm text-cream placeholder:text-muted focus:border-gold/60 focus:outline-none focus:ring-1 focus:ring-gold/40";
+  "w-full rounded-xl border border-white/15 bg-white/5 px-4 py-2.5 text-sm text-cream placeholder:text-muted focus:border-gold/60 focus:outline-none focus:ring-1 focus:ring-gold/40";
 const compactFieldClass =
   "h-10 w-full rounded-xl border border-white/15 bg-white/5 px-3 text-[0.82rem] text-cream placeholder:text-muted focus:border-gold/60 focus:outline-none focus:ring-1 focus:ring-gold/40";
 const compactTextareaClass =
@@ -87,7 +87,7 @@ export function ContactForm() {
         <SubmitButton compact />
       </form>
 
-      <form action={formAction} className="hidden space-y-4 sm:block">
+      <form action={formAction} className="hidden w-full space-y-3 sm:block">
         <AntiSpamInput />
         <div>
           <label
@@ -132,7 +132,7 @@ export function ContactForm() {
             id="contact-message"
             name="message"
             required
-            rows={4}
+            rows={3}
             className={fieldClass}
           />
           <FieldError error={state?.errors?.message} />

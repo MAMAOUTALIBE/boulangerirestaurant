@@ -68,6 +68,12 @@ type HeroSlide = HeroImageSlide | HeroVideoSlide;
 
 const heroSlides = [
   {
+    type: "image",
+    label: "Plateau BBQ",
+    src: "/images/hero-slide-plateau-grillades-bbq.png",
+    alt: "Grand plateau barbecue avec steaks grillés, pommes de terre, maïs, sauces et garnitures",
+  },
+  {
     type: "video",
     label: "Grillades animées",
     src: "/videos/hero-grillades-animees.mp4",
@@ -186,7 +192,7 @@ export function Hero() {
   return (
     <section
       id="accueil"
-      className="relative overflow-hidden bg-[#050505] px-4 pb-3 pt-[5.15rem] text-cream sm:px-6 sm:pb-9 sm:pt-[6.75rem] lg:min-h-[min(840px,calc(100svh-0.5rem))] lg:pt-[7rem] 2xl:min-h-[min(920px,calc(100svh-0.5rem))] 2xl:pt-[7.35rem] 3xl:min-h-[min(1040px,calc(100svh-0.5rem))] 4xl:min-h-[min(1180px,calc(100svh-0.5rem))]"
+      className="relative isolate overflow-hidden bg-[#050505] px-4 pb-3 pt-[5.15rem] text-cream sm:px-6 sm:pb-9 sm:pt-[6.75rem] lg:min-h-[min(840px,calc(100svh-0.5rem))] lg:pt-[7rem] 2xl:min-h-[min(920px,calc(100svh-0.5rem))] 2xl:pt-[7.35rem] 3xl:min-h-[min(1040px,calc(100svh-0.5rem))] 4xl:min-h-[min(1180px,calc(100svh-0.5rem))]"
     >
       <div className="pointer-events-none absolute inset-0 z-0 h-full w-full">
         {heroSlides.map((slide, index) => (
@@ -262,7 +268,7 @@ export function Hero() {
                 src={slide.src}
                 alt={index === activeSlide ? slide.alt : ""}
                 fill
-                priority={index === 1}
+                priority={index === 0}
                 sizes="100vw"
                 className="origin-right object-cover object-[58%_60%] brightness-[1.08] contrast-[1.08] saturate-[1.08] sm:object-[58%_60%] lg:object-[58%_62%] 3xl:object-[60%_62%]"
               />
@@ -275,20 +281,20 @@ export function Hero() {
         />
       </div>
 
-      <div className="relative z-20 mx-auto flex w-full max-w-[1680px] flex-col gap-5 sm:gap-6 lg:gap-7 3xl:max-w-[2100px] 4xl:max-w-[2360px]">
+      <div className="relative z-30 mx-auto flex w-full max-w-[1680px] flex-col gap-5 sm:gap-6 lg:gap-7 3xl:max-w-[2100px] 4xl:max-w-[2360px]">
         <div className="flex min-h-[420px] items-center pb-1 min-[390px]:min-h-[460px] sm:min-h-[560px] sm:pb-2 md:min-h-[600px] lg:min-h-[560px] 2xl:min-h-[630px] 3xl:min-h-[720px] 4xl:min-h-[820px]">
           <motion.div
-            className="relative z-20 -mt-8 max-w-[620px] py-3 sm:-mt-[5.25rem] sm:max-w-[650px] sm:py-4 lg:-mt-[6rem] lg:pl-2 xl:-mt-[6.75rem] xl:pl-4 3xl:-mt-32 3xl:max-w-[780px]"
-            initial={{ opacity: 0, y: 18 }}
+            className="relative isolate z-20 -mt-8 max-w-[620px] py-3 sm:-mt-[5.25rem] sm:max-w-[650px] sm:py-4 lg:-mt-[6rem] lg:pl-2 xl:-mt-[6.75rem] xl:pl-4 3xl:-mt-32 3xl:max-w-[780px]"
+            initial={false}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.65 }}
           >
             <div
-              className="pointer-events-none absolute -bottom-5 -left-5 -right-8 -top-5 bg-[linear-gradient(90deg,rgba(5,5,5,0.76)_0%,rgba(5,5,5,0.58)_56%,rgba(5,5,5,0.18)_82%,transparent_100%)] sm:-left-7 lg:-bottom-8 lg:-left-10 lg:-right-24 lg:-top-8"
+              className="pointer-events-none absolute -bottom-5 -left-5 -right-8 -top-5 z-0 bg-[linear-gradient(90deg,rgba(5,5,5,0.76)_0%,rgba(5,5,5,0.58)_56%,rgba(5,5,5,0.18)_82%,transparent_100%)] sm:-left-7 lg:-bottom-8 lg:-left-10 lg:-right-24 lg:-top-8"
               aria-hidden
             />
 
-            <div className="relative z-10">
+            <div className="relative z-20">
               <h1 className="font-display text-[2.65rem] font-bold leading-[0.98] text-[#F8F3EA] drop-shadow-[0_3px_8px_rgba(0,0,0,0.96)] min-[390px]:text-5xl sm:text-6xl lg:text-[4.15rem] xl:text-[4.8rem] 3xl:text-[5.8rem] 4xl:text-[6.5rem]">
                 <span className="block text-[#D89A1C]">Anatolia Grill</span>
               </h1>
@@ -369,7 +375,7 @@ export function Hero() {
         <motion.div
           aria-label="Services disponibles"
           className="bg-black/48 relative z-20 hidden overflow-hidden rounded-[24px] border border-white/10 shadow-[0_22px_60px_-34px_rgba(216,154,28,0.95)] backdrop-blur-[2px] sm:block sm:rounded-[28px] 3xl:rounded-[34px]"
-          initial={{ opacity: 0, y: 18 }}
+          initial={false}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.65, delay: 0.2 }}
         >
