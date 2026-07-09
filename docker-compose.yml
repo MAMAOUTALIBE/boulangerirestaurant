@@ -78,8 +78,8 @@ services:
       UPSTASH_REDIS_REST_TOKEN: ${UPSTASH_REDIS_REST_TOKEN:-}
     ports:
       # Exposé uniquement en local (Nginx fait le reverse-proxy).
-      # Port hôte 3200 par défaut, surchargeable si un autre site l'utilise déjà.
-      - "127.0.0.1:${APP_HOST_PORT:-3200}:3000"
+      # Port hôte 3201 en production lodene.cloud.
+      - "127.0.0.1:${APP_HOST_PORT:-3201}:3000"
 
 volumes:
   pgdata:

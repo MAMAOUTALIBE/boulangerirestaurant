@@ -1,7 +1,7 @@
 # Mettre à jour le site en ligne
 
 Runbook de mise à jour du restaurant turc sur le serveur de production
-(`votre-domaine.fr`, projet Docker Compose `restaurant-turc`, port 3200).
+(`lodene.cloud`, projet Docker Compose `restaurant-turc`, port local 3201).
 La première mise en ligne est décrite dans `DEPLOIEMENT-VPS.md`.
 
 ## Le plus simple (recommandé)
@@ -19,9 +19,9 @@ Une seule commande, tous les paramètres pré-remplis :
 Depuis la racine du projet (sur ce Mac) :
 
 ```bash
-DEPLOY_VPS="root@IP_VPS_HOSTINGER" \
+DEPLOY_VPS="root@213.130.144.215" \
 DEPLOY_REMOTE_DIR="/root/restaurant-turc" \
-DEPLOY_SITE_URL="https://votre-domaine.fr" \
+DEPLOY_SITE_URL="https://lodene.cloud" \
 DEPLOY_KEY="$HOME/.ssh/deploy_key" \
 DEPLOY_COMPOSE_PROJECT="restaurant-turc" \
 ./deploy/update-production.sh
@@ -37,7 +37,7 @@ le VPS depuis le modèle synchronisé, remplissez les secrets, puis relancez la
 commande :
 
 ```bash
-ssh -i "$HOME/.ssh/deploy_key" root@IP_VPS_HOSTINGER \
+ssh -i "$HOME/.ssh/deploy_key" root@213.130.144.215 \
   "cd /root/restaurant-turc && cp .env.production.example .env && nano .env"
 ```
 
@@ -45,7 +45,7 @@ ssh -i "$HOME/.ssh/deploy_key" root@IP_VPS_HOSTINGER \
 
 | Variable | Rôle |
 | --- | --- |
-| `DEPLOY_VPS` | Accès SSH au VPS Hostinger, par exemple `root@IP_VPS_HOSTINGER` |
+| `DEPLOY_VPS` | Accès SSH au VPS Hostinger, actuellement `root@213.130.144.215` |
 | `DEPLOY_REMOTE_DIR` | Dossier du projet sur le serveur |
 | `DEPLOY_SITE_URL` | URL publique du nouveau site |
 | `DEPLOY_KEY` | Clé SSH à utiliser, optionnelle |
@@ -62,7 +62,8 @@ npm run build
 
 ## Notes
 
-- Aucun remote GitHub n'est configuré (nouveau dépôt propre à créer). Ne pas `git push`.
+- GitHub contient l'historique source, mais le VPS ne fait pas de `git pull` :
+  le déploiement se fait par `rsync` + rebuild Docker.
 - Les secrets restent exclus de `rsync` : `.env`, `.env.local`, `.env*.local`.
-- Ne lancer le script de déploiement qu'après avoir confirmé le nouveau serveur
-  et le nouveau domaine.
+- Ne pas utiliser les paramètres de la boulangerie (`/root/boulangerie`,
+  `lodene.org`, projet Compose `boulangerie`) pour ce site.

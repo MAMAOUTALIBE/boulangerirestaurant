@@ -25,17 +25,20 @@ npm run typecheck && npm run lint && npm run build
 Ce script (paramètres à renseigner, surchargables par variables d'env) :
 vérifs locales (typecheck + lint + build) → **rsync** du code vers le serveur →
 **rebuild Docker** → **migrations Prisma automatiques** (`prisma migrate deploy`
-via le service `migrate`) → vérification `https://votre-domaine.fr/api/health`.
+via le service `migrate`) → vérification `https://lodene.cloud/api/health`.
 
 Le déploiement passe par **rsync**, pas par git.
 
 ## ⚠️ Contraintes CRITIQUES — serveur de production
 
-- Accès : `root@VOTRE_IP_SERVEUR`, clé SSH `~/.ssh/deploy_key` (à renseigner).
+- Accès : `root@213.130.144.215`, clé SSH `~/.ssh/deploy_key`.
 - Le restaurant est **isolé** : projet Docker Compose **`restaurant-turc`** (toujours
   `docker compose -p restaurant-turc …`), volume dédié, app exposée sur
-  **`127.0.0.1:3200`** uniquement, fichier Nginx `restaurant-turc`, domaine
-  **`votre-domaine.fr`**, code dans `/root/restaurant-turc`.
+  **`127.0.0.1:3201`** uniquement, vhost Nginx `lodene.cloud`, domaine
+  **`lodene.cloud`**, code dans `/root/restaurant-turc`.
+- Les autres apps du VPS sont séparées : `lodene.org`/boulangerie utilise
+  `127.0.0.1:3101`, l'ancien restaurant utilise `127.0.0.1:3100`, et es-viry
+  utilise `127.0.0.1:8090`.
 - Si le serveur héberge **d'autres sites**, ne jamais y toucher : ne pas recréer/arrêter
   leurs conteneurs, ne pas réutiliser leurs ports, ne pas modifier leurs fichiers Nginx.
 - **Interdits en prod** : `prisma migrate reset`, `npm run db:seed` (cela injecterait de
@@ -45,5 +48,6 @@ Le déploiement passe par **rsync**, pas par git.
 
 ## Git
 
-Aucun remote n'est configuré (nouveau dépôt propre à créer) → **ne pas `git push`**.
-Travailler en local.
+Le dépôt GitHub est configuré (`origin`). Les mises à jour applicatives peuvent
+être poussées sur GitHub après validation, mais la production ne fait pas de
+`git pull` : le déploiement VPS reste `rsync` + Docker via `./deploy/redeploy.sh`.

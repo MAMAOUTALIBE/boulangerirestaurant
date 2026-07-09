@@ -1,6 +1,6 @@
 # Guide de déploiement — restaurant turc
 
-> Pour le déploiement sur un VPS (`votre-domaine.fr`),
+> Pour le déploiement sur le VPS de production (`lodene.cloud`),
 > voir `DEPLOIEMENT-VPS.md`. Ce guide-ci décrit l'alternative Vercel + base managée.
 
 Déploiement recommandé : **Vercel** (app Next.js) + **base PostgreSQL managée**
@@ -22,7 +22,7 @@ et récupérer la chaîne de connexion (`postgresql://…`).
 | Variable                              | Obligatoire | Description                                                    |
 | ------------------------------------- | ----------- | -------------------------------------------------------------- |
 | `DATABASE_URL`                        | ✅          | URL PostgreSQL managée (`?sslmode=require`)                    |
-| `NEXT_PUBLIC_SITE_URL`                | ✅          | URL publique finale (ex. `https://votre-domaine.fr`)           |
+| `NEXT_PUBLIC_SITE_URL`                | ✅          | URL publique finale (ex. `https://lodene.cloud`)               |
 | `SESSION_SECRET`                      | ✅          | Secret aléatoire (`openssl rand -hex 32`)                      |
 | `ADMIN_EMAILS`                        | ✅          | Emails admin séparés par des virgules                          |
 | `DEFAULT_RESTAURANT_SLUG`             | ⬜          | Slug de l'établissement par défaut (défaut `anatolia-grill`, créé par le seed) |
@@ -64,7 +64,7 @@ appliquées à chaque déploiement.
 
 1. Dashboard Stripe → **Developers → API keys** → copier `sk_live_…` dans `STRIPE_SECRET_KEY`.
 2. **Developers → Webhooks → Add endpoint** :
-   - URL : `https://VOTRE-DOMAINE/api/webhooks/stripe`
+   - URL : `https://lodene.cloud/api/webhooks/stripe`
    - Événements : `checkout.session.completed`, `checkout.session.expired`
    - Copier le `whsec_…` dans `STRIPE_WEBHOOK_SECRET`.
 3. Test local du webhook :

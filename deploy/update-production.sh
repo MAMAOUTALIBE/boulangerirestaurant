@@ -2,9 +2,10 @@
 #
 # Met à jour le site de production depuis ce Mac.
 # Usage :
-#   DEPLOY_VPS="user@host" \
-#   DEPLOY_REMOTE_DIR="/chemin/projet" \
-#   DEPLOY_SITE_URL="https://nouveau-domaine.fr" \
+#   DEPLOY_VPS="root@213.130.144.215" \
+#   DEPLOY_REMOTE_DIR="/root/restaurant-turc" \
+#   DEPLOY_SITE_URL="https://lodene.cloud" \
+#   DEPLOY_COMPOSE_PROJECT="restaurant-turc" \
 #   ./deploy/update-production.sh
 #
 # Étapes : vérifs locales (typecheck + lint + build) -> rsync du code
