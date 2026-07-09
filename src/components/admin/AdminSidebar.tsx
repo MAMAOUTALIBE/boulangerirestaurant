@@ -80,6 +80,7 @@ const groups: NavGroup[] = [
     label: "Marketing & rapports",
     Icon: Megaphone,
     items: [
+      { href: "/admin/leads", label: "Leads tests", Icon: Users },
       { href: "/admin/avis", label: "Avis", Icon: Star },
       { href: "/admin/marketing", label: "Marketing", Icon: Mail },
       { href: "/admin/rapports", label: "Rapports", Icon: BarChart3 },

@@ -33,6 +33,7 @@ import type { OrderStatus } from "@/types";
 import { sendEmail } from "@/lib/email";
 import { siteConfig } from "@/lib/config";
 import { clientIp, rateLimit } from "@/lib/rate-limit";
+import { recordDemoLead } from "@/lib/demo-leads";
 import {
   createRestaurantOnboardingLink,
   isStripeConnectConfigured,
@@ -88,6 +89,8 @@ export async function subscribeNewsletter(
   }
 
   const email = parsed.data.email.toLowerCase();
+  await recordDemoLead({ source: "newsletter", email });
+
   const existing = await prisma.newsletterSubscriber.findUnique({
     where: { email },
   });
@@ -120,6 +123,7 @@ export async function sendContactMessage(
   const parsed = contactSchema.safeParse({
     name: formData.get("name"),
     email: formData.get("email"),
+    phone: formData.get("phone"),
     message: formData.get("message"),
   });
   if (!parsed.success) {
@@ -131,11 +135,19 @@ export async function sendContactMessage(
   }
 
   const msg = await prisma.contactMessage.create({ data: parsed.data });
+  await recordDemoLead({
+    source: "contact",
+    sourceId: msg.id,
+    name: msg.name,
+    email: msg.email,
+    phone: msg.phone,
+    message: msg.message,
+  });
 
   await sendEmail({
     to: siteConfig.contact.email,
     subject: `Nouveau message de ${msg.name}`,
-    html: `<p><strong>${msg.name}</strong> (${msg.email}) a écrit :</p><p>${msg.message}</p>`,
+    html: `<p><strong>${msg.name}</strong> (${msg.email}, ${msg.phone}) a écrit :</p><p>${msg.message}</p>`,
   });
 
   return { ok: true, message: "Message envoyé ! Nous vous répondrons vite." };
@@ -218,8 +230,16 @@ export async function createReservation(
   }
 
   const ref = `RV-${Date.now().toString(36).toUpperCase()}`;
-  await prisma.reservation.create({
+  const reservation = await prisma.reservation.create({
     data: { reference: ref, ...parsed.data },
+  });
+  await recordDemoLead({
+    source: "réservation",
+    sourceId: reservation.reference,
+    name: parsed.data.name,
+    email: parsed.data.email,
+    phone: parsed.data.phone,
+    message: `${parsed.data.guests} personne(s) le ${parsed.data.date} à ${parsed.data.time}`,
   });
   await upsertCustomer(parsed.data.email, {
     name: parsed.data.name,
@@ -266,7 +286,15 @@ export async function requestCatering(
     };
   }
 
-  await prisma.cateringRequest.create({ data: parsed.data });
+  const request = await prisma.cateringRequest.create({ data: parsed.data });
+  await recordDemoLead({
+    source: "traiteur",
+    sourceId: request.id,
+    name: parsed.data.name,
+    email: parsed.data.email,
+    phone: parsed.data.phone,
+    message: `${parsed.data.guests} convives${parsed.data.eventDate ? ` le ${parsed.data.eventDate}` : ""}`,
+  });
   await upsertCustomer(parsed.data.email, {
     name: parsed.data.name,
     phone: parsed.data.phone,
@@ -319,8 +347,16 @@ export async function requestCustomQuote(
   }
 
   const ref = `SM-${Date.now().toString(36).toUpperCase()}`;
-  await prisma.customRequest.create({
+  const request = await prisma.customRequest.create({
     data: { reference: ref, ...parsed.data },
+  });
+  await recordDemoLead({
+    source: "sur-mesure",
+    sourceId: request.reference,
+    name: parsed.data.name,
+    email: parsed.data.email,
+    phone: parsed.data.phone,
+    message: `${parsed.data.occasion} · ${parsed.data.servings} convives`,
   });
   await upsertCustomer(parsed.data.email, {
     name: parsed.data.name,
@@ -398,6 +434,14 @@ export async function reserveSeasonal(
       pickupDate: parsed.data.pickupDate,
       notes: parsed.data.notes,
     });
+    await recordDemoLead({
+      source: "saison",
+      sourceId: preorder.reference,
+      name: parsed.data.name,
+      email: parsed.data.email,
+      phone: parsed.data.phone,
+      message: `${preorder.quantity} × ${product.name} · retrait ${parsed.data.pickupDate}`,
+    });
     await upsertCustomer(parsed.data.email, {
       name: parsed.data.name,
       phone: parsed.data.phone,
@@ -466,6 +510,14 @@ export async function reserveAntiWaste(
         email: parsed.data.email,
         phone: parsed.data.phone,
       },
+    });
+    await recordDemoLead({
+      source: "anti-gaspi",
+      sourceId: reservation.reference,
+      name: parsed.data.name,
+      email: parsed.data.email,
+      phone: parsed.data.phone,
+      message: `${reservation.quantity} panier(s) · ${offer.title}`,
     });
     await upsertCustomer(parsed.data.email, {
       name: parsed.data.name,

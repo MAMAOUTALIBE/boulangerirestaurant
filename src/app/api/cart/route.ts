@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getDefaultRestaurant } from "@/lib/restaurants";
 import { cartTrackingSchema } from "@/lib/validation";
+import { recordDemoLead } from "@/lib/demo-leads";
 
 export const dynamic = "force-dynamic";
 
@@ -135,6 +136,14 @@ export async function POST(request: Request) {
         },
       });
     }
+    await recordDemoLead({
+      source: "panier",
+      sourceId: cartId,
+      name,
+      email,
+      phone,
+      message: `${itemCount} article(s) · ${total.toFixed(2)} €`,
+    });
   } catch (error) {
     // Tracking panier non bloquant: on n'empêche pas l'utilisateur de naviguer/commander.
     console.error("Cart tracking write failed:", error);

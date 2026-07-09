@@ -18,6 +18,7 @@ import { sendSms } from "@/lib/sms";
 import { getDefaultRestaurant } from "@/lib/restaurants";
 import { siteConfig } from "@/lib/config";
 import { remainingStock, stockToday } from "@/lib/stock";
+import { recordDemoLead } from "@/lib/demo-leads";
 
 interface CreateOrderInput {
   customer: Order["customer"];
@@ -317,6 +318,15 @@ export async function createOrder({
   await upsertCustomer(customer.email, {
     name: customer.name,
     phone: customer.phone,
+  });
+  await recordDemoLead({
+    source: "commande",
+    sourceId: ref,
+    name: customer.name,
+    email: customer.email,
+    phone: customer.phone,
+    message: `${fulfillment} · ${normalizedItems.length} ligne(s) · ${formatPrice(total)}`,
+    converted: true,
   });
 
   await sendEmail({

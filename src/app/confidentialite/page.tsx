@@ -9,7 +9,10 @@ export const metadata: Metadata = {
 
 export default function ConfidentialitePage() {
   return (
-    <LegalLayout title="Politique de confidentialité" updatedAt="31 mai 2026">
+    <LegalLayout
+      title="Politique de confidentialité"
+      updatedAt="9 juillet 2026"
+    >
       <p className="rounded-xl border border-gold/30 bg-gold/5 p-4 text-sm text-gold">
         ⚠️ Modèle conforme RGPD à faire valider juridiquement avant production.
       </p>
@@ -39,7 +42,12 @@ export default function ConfidentialitePage() {
           <strong>Newsletter</strong> : email.
         </li>
         <li>
-          <strong>Contact</strong> : nom, email, message.
+          <strong>Contact</strong> : nom, email, téléphone, message.
+        </li>
+        <li>
+          <strong>Tests et démonstrations</strong> : nom, email, téléphone,
+          source du formulaire et message saisi lorsque ces informations sont
+          renseignées volontairement.
         </li>
       </ul>
 
@@ -48,6 +56,11 @@ export default function ConfidentialitePage() {
         Traitement et suivi des commandes, gestion du compte client, envoi
         d&apos;informations commerciales (avec consentement), réponse aux
         demandes.
+      </p>
+      <p>
+        Les coordonnées saisies pendant un test du site peuvent aussi servir à
+        recontacter la personne au sujet de sa demande, de son panier ou de son
+        essai de commande.
       </p>
 
       <h2>Durée de conservation</h2>

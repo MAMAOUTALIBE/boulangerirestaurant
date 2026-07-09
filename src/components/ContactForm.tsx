@@ -64,6 +64,16 @@ export function ContactForm() {
           inputMode="email"
           error={state?.errors?.email}
         />
+        <CompactField
+          id="mobile-contact-phone"
+          name="phone"
+          label="Téléphone"
+          type="tel"
+          placeholder="Téléphone"
+          autoComplete="tel"
+          inputMode="tel"
+          error={state?.errors?.phone}
+        />
         <div>
           <label htmlFor="mobile-contact-message" className="sr-only">
             Message
@@ -120,6 +130,23 @@ export function ContactForm() {
             className={fieldClass}
           />
           <FieldError error={state?.errors?.email} />
+        </div>
+        <div>
+          <label
+            htmlFor="contact-phone"
+            className="mb-1.5 block text-sm text-cream/80"
+          >
+            Téléphone
+          </label>
+          <input
+            id="contact-phone"
+            name="phone"
+            type="tel"
+            required
+            autoComplete="tel"
+            className={fieldClass}
+          />
+          <FieldError error={state?.errors?.phone} />
         </div>
         <div>
           <label

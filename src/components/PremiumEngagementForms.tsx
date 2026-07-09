@@ -148,6 +148,7 @@ export function PremiumContactForm({
   );
   const nameId = `${idPrefix}-name`;
   const emailId = `${idPrefix}-email`;
+  const phoneId = `${idPrefix}-phone`;
   const messageId = `${idPrefix}-message`;
 
   return (
@@ -191,6 +192,23 @@ export function PremiumContactForm({
         />
         {state?.errors?.email && (
           <p className="mt-1 text-xs text-red-300">{state.errors.email}</p>
+        )}
+      </div>
+
+      <div>
+        <label htmlFor={phoneId} className="mb-1 block text-sm text-cream/85">
+          Téléphone
+        </label>
+        <input
+          id={phoneId}
+          name="phone"
+          type="tel"
+          required
+          placeholder="Votre téléphone"
+          className={fieldClass}
+        />
+        {state?.errors?.phone && (
+          <p className="mt-1 text-xs text-red-300">{state.errors.phone}</p>
         )}
       </div>
 

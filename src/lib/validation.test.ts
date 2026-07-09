@@ -15,6 +15,7 @@ describe("contactSchema", () => {
     const r = contactSchema.safeParse({
       name: "Jo",
       email: "a@b.fr",
+      phone: "0612345678",
       message: "court",
     });
     expect(r.success).toBe(false);

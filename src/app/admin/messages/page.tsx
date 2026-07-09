@@ -40,6 +40,14 @@ export default async function AdminMessagesPage() {
                 >
                   {m.email}
                 </a>
+                {m.phone && (
+                  <a
+                    href={`tel:${m.phone.replace(/\s/g, "")}`}
+                    className="text-sm text-gold hover:underline"
+                  >
+                    {m.phone}
+                  </a>
+                )}
                 <span className="text-xs text-muted">
                   {new Date(m.createdAt).toLocaleString("fr-FR")}
                 </span>

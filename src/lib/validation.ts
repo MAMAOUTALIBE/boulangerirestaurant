@@ -9,6 +9,7 @@ export const newsletterSchema = z.object({
 export const contactSchema = z.object({
   name: z.string().min(2, "Nom trop court."),
   email: z.string().email("Adresse email invalide."),
+  phone: z.string().min(6, "Numéro de téléphone invalide."),
   message: z.string().min(10, "Message trop court (10 caractères minimum)."),
 });
 

@@ -124,9 +124,31 @@ model ContactMessage {
   id        String   @id @default(cuid())
   name      String
   email     String
+  phone     String?
   message   String
   handled   Boolean  @default(false)
   createdAt DateTime @default(now())
+}
+
+/// Coordonnées captées lors des tests/démos du site.
+model DemoLead {
+  id         String   @id @default(cuid())
+  source     String
+  sourceId   String?
+  name       String?
+  email      String?
+  phone      String?
+  message    String?
+  visits     Int      @default(1)
+  converted  Boolean  @default(false)
+  lastSeenAt DateTime @default(now())
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([email])
+  @@index([phone])
+  @@index([source])
+  @@index([lastSeenAt])
 }
 
 /// Catégorie de menu (Entrées, Plats, Desserts, Boissons…).

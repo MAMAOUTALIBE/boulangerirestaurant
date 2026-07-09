@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import {
@@ -83,6 +83,11 @@ export default function CommanderPage() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
   const [globalError, setGlobalError] = useState<string | null>(null);
+  const leadDraftRef = useRef({
+    name: "",
+    phone: "",
+    email: "",
+  });
 
   const [promo, setPromo] = useState("");
   const [discount, setDiscount] = useState(0);
@@ -124,6 +129,28 @@ export default function CommanderPage() {
   const telegramOrderUrl = socialOrderMessage
     ? buildTelegramOrderUrl(socialOrderMessage)
     : "#";
+
+  function trackCheckoutLead(field: "name" | "phone" | "email", value: string) {
+    const next = { ...leadDraftRef.current, [field]: value.trim() };
+    leadDraftRef.current = next;
+    if (!cartId || (!next.email && !next.phone)) return;
+
+    fetch("/api/cart", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        cartId,
+        name: next.name || undefined,
+        phone: next.phone || undefined,
+        email: next.email || undefined,
+        items: items.map((i) => ({
+          name: i.name,
+          quantity: i.quantity,
+          unitPrice: i.unitPrice,
+        })),
+      }),
+    }).catch(() => {});
+  }
 
   async function applyPromo() {
     if (!promo.trim()) return;
@@ -379,35 +406,25 @@ export default function CommanderPage() {
                   Vos coordonnées
                 </h2>
                 <form action={action} className="mt-4 space-y-4">
-                  <Field id="name" label="Nom" error={errors.name} />
+                  <Field
+                    id="name"
+                    label="Nom"
+                    error={errors.name}
+                    onBlur={(v) => trackCheckoutLead("name", v)}
+                  />
                   <Field
                     id="phone"
                     label="Téléphone"
                     type="tel"
                     error={errors.phone}
+                    onBlur={(v) => trackCheckoutLead("phone", v)}
                   />
                   <Field
                     id="email"
                     label="Email de confirmation"
                     type="email"
                     error={errors.email}
-                    onBlur={(v) => {
-                      if (v && cartId) {
-                        fetch("/api/cart", {
-                          method: "POST",
-                          headers: { "Content-Type": "application/json" },
-                          body: JSON.stringify({
-                            cartId,
-                            email: v,
-                            items: items.map((i) => ({
-                              name: i.name,
-                              quantity: i.quantity,
-                              unitPrice: i.unitPrice,
-                            })),
-                          }),
-                        }).catch(() => {});
-                      }
-                    }}
+                    onBlur={(v) => trackCheckoutLead("email", v)}
                   />
                   {choice.fulfillment === "livraison" &&
                     !choice.deliveryAddress && (
