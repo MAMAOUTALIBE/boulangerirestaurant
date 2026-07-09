@@ -5,7 +5,7 @@ import {
   getAssistantMenu,
   lookupOrderContext,
   resolveActions,
-  ruleBasedAnswer,
+  ruleBasedResponse,
   type ResolvedAction,
 } from "@/lib/assistant";
 import { clientIp, rateLimit } from "@/lib/rate-limit";
@@ -34,6 +34,22 @@ function reply(text: string, mode: string, actions: ResolvedAction[] = []) {
   return NextResponse.json({ reply: text, actions, mode });
 }
 
+async function fallbackReply(
+  input: string,
+  menu?: Awaited<ReturnType<typeof getAssistantMenu>>,
+  orderContext?: Awaited<ReturnType<typeof lookupOrderContext>>,
+) {
+  const fallbackMenu = menu ?? (await getAssistantMenu());
+  const fallbackOrderContext =
+    orderContext ?? (await lookupOrderContext(input));
+  const result = await ruleBasedResponse(
+    input,
+    fallbackMenu,
+    fallbackOrderContext,
+  );
+  return reply(result.reply, "rules", result.actions);
+}
+
 export async function POST(request: Request) {
   // Anti-abus : protège le quota gratuit du modèle.
   const ip = await clientIp();
@@ -56,7 +72,7 @@ export async function POST(request: Request) {
 
   // Pas de clé configurée → secours par règles (l'assistant reste fonctionnel).
   if (!apiKey) {
-    return reply(ruleBasedAnswer(lastUser?.content ?? ""), "rules");
+    return fallbackReply(lastUser?.content ?? "");
   }
 
   try {
@@ -86,7 +102,7 @@ export async function POST(request: Request) {
 
     if (!res.ok) {
       console.error("Assistant LLM error:", res.status, await res.text());
-      return reply(ruleBasedAnswer(lastUser?.content ?? ""), "rules");
+      return fallbackReply(lastUser?.content ?? "", menu, orderContext);
     }
 
     const data = await res.json();
@@ -118,13 +134,18 @@ export async function POST(request: Request) {
       ];
     }
 
-    return reply(
-      replyText || ruleBasedAnswer(lastUser?.content ?? ""),
-      replyText ? "llm" : "rules",
-      actions,
+    if (replyText) {
+      return reply(replyText, "llm", actions);
+    }
+
+    const fallback = await ruleBasedResponse(
+      lastUser?.content ?? "",
+      menu,
+      orderContext,
     );
+    return reply(fallback.reply, "rules", fallback.actions);
   } catch (error) {
     console.error("Assistant request failed:", error);
-    return reply(ruleBasedAnswer(lastUser?.content ?? ""), "rules");
+    return fallbackReply(lastUser?.content ?? "");
   }
 }

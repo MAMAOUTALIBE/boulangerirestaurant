@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useMemo, useRef, useState } from "react";
+import { FormEvent, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { motion } from "framer-motion";
@@ -27,7 +27,7 @@ interface Message {
 
 const initialMessage: Message = {
   role: "assistant",
-  text: "Bonjour ! Je peux conseiller grillades, kebabs, pide, mezze ou desserts turcs, les ajouter à votre panier, ou vous aider pour la livraison, une réservation ou le traiteur.",
+  text: "Bonjour ! Posez-moi vos questions sur le menu, les prix, les horaires, la livraison, une réservation, le traiteur ou votre commande.",
 };
 
 const FALLBACK_REPLY =
@@ -43,21 +43,7 @@ export function AiAssistant() {
   const [hasOpened, setHasOpened] = useState(false);
   const [added, setAdded] = useState<Record<string, boolean>>({});
   const scrollRef = useRef<HTMLDivElement>(null);
-  const hidden = useMemo(
-    () => pathname?.startsWith("/admin") || pathname?.startsWith("/commander"),
-    [pathname],
-  );
-  const desktopHidden = useMemo(
-    () =>
-      pathname === "/contact" ||
-      pathname === "/reservation" ||
-      pathname === "/sur-mesure" ||
-      pathname === "/boutique-de-saison" ||
-      pathname === "/anti-gaspi" ||
-      pathname === "/traiteur" ||
-      pathname === "/compte",
-    [pathname],
-  );
+  const hidden = pathname?.startsWith("/admin");
 
   if (hidden) return null;
 
@@ -123,9 +109,7 @@ export function AiAssistant() {
   }
 
   return (
-    <div
-      className={`fixed bottom-4 right-4 z-40 flex flex-col items-end sm:bottom-7 sm:right-7 print:hidden ${desktopHidden ? "sm:hidden" : ""}`}
-    >
+    <div className="fixed bottom-4 right-4 z-40 flex flex-col items-end sm:bottom-7 sm:right-7 print:hidden">
       {open && (
         <section
           aria-label={`Assistant ${siteConfig.name}`}
