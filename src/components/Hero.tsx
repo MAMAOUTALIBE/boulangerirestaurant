@@ -68,12 +68,6 @@ type HeroSlide = HeroImageSlide | HeroVideoSlide;
 
 const heroSlides = [
   {
-    type: "image",
-    label: "Plateau BBQ",
-    src: "/images/hero-slide-plateau-grillades-bbq.png",
-    alt: "Grand plateau barbecue avec steaks grillés, pommes de terre, maïs, sauces et garnitures",
-  },
-  {
     type: "video",
     label: "Grillades animées",
     src: "/videos/hero-grillades-animees.mp4",
