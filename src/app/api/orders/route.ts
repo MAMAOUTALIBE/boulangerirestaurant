@@ -5,9 +5,27 @@ import {
   getOrderByReference,
   OrderCreationError,
 } from "@/lib/orders";
+import { clientIp, rateLimit } from "@/lib/rate-limit";
+import { getSessionEmail } from "@/lib/session";
+import { isAdminEmail } from "@/lib/auth";
+
+const MAX_BODY_BYTES = 64 * 1024;
 
 /** POST /api/orders — crée une commande (validation Zod). */
 export async function POST(request: Request) {
+  const contentLength = Number(request.headers.get("content-length") ?? 0);
+  if (contentLength > MAX_BODY_BYTES) {
+    return NextResponse.json(
+      { error: "Requête trop volumineuse" },
+      { status: 413 },
+    );
+  }
+  if (!(await rateLimit(`api-order:${await clientIp()}`, 5, 10 * 60_000))) {
+    return NextResponse.json(
+      { error: "Trop de commandes. Réessayez dans quelques minutes." },
+      { status: 429 },
+    );
+  }
   const body = await request.json().catch(() => null);
   const parsed = orderSchema.safeParse(body);
   if (!parsed.success) {
@@ -63,6 +81,11 @@ export async function GET(request: Request) {
   const order = await getOrderByReference(reference);
   if (!order) {
     return NextResponse.json({ error: "Introuvable" }, { status: 404 });
+  }
+  const email = await getSessionEmail();
+  const ownsOrder = email?.toLowerCase() === order.customer.email.toLowerCase();
+  if (!ownsOrder && !isAdminEmail(email)) {
+    return NextResponse.json({ error: "Accès refusé" }, { status: 403 });
   }
   return NextResponse.json({ order });
 }

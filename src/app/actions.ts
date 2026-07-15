@@ -1,5 +1,6 @@
 "use server";
 
+import crypto from "node:crypto";
 import { z } from "zod";
 import type { OrderLine } from "@/types";
 import {
@@ -726,8 +727,20 @@ export async function getReorderItems(reference: string): Promise<
 export async function payOrder(reference: string): Promise<void> {
   const order = await getOrderByReference(reference);
   if (!order) redirect("/");
+  if (order.status !== "en attente") {
+    redirect(`/commande/${reference}`);
+  }
 
-  const result = await startCheckout(order);
+  let result;
+  try {
+    result = await startCheckout(order);
+  } catch (error) {
+    const { PaymentConfigurationError } = await import("@/lib/payment");
+    if (error instanceof PaymentConfigurationError) {
+      redirect(`/commande/${reference}?payment=unavailable`);
+    }
+    throw error;
+  }
   if (result.url) {
     redirect(result.url);
   }
@@ -821,18 +834,14 @@ export async function redeemLoyalty(): Promise<void> {
 
   const { POINTS_PER_REDEMPTION, REDEMPTION_VALUE_EUR } =
     await import("@/lib/loyalty");
-  const customer = await prisma.customer.findUnique({ where: { email } });
-  if (!customer || customer.loyaltyPoints < POINTS_PER_REDEMPTION) {
-    redirect("/compte?fid=insuffisant");
-  }
-
-  const code = `FID-${Math.floor(Date.now()).toString(36).toUpperCase().slice(-6)}`;
-  await prisma.$transaction([
-    prisma.customer.update({
-      where: { email },
+  const code = `FID-${crypto.randomBytes(6).toString("hex").toUpperCase()}`;
+  const redeemed = await prisma.$transaction(async (tx) => {
+    const debit = await tx.customer.updateMany({
+      where: { email, loyaltyPoints: { gte: POINTS_PER_REDEMPTION } },
       data: { loyaltyPoints: { decrement: POINTS_PER_REDEMPTION } },
-    }),
-    prisma.promoCode.create({
+    });
+    if (debit.count !== 1) return false;
+    await tx.promoCode.create({
       data: {
         code,
         type: "fixed",
@@ -840,8 +849,10 @@ export async function redeemLoyalty(): Promise<void> {
         active: true,
         usageLimit: 1,
       },
-    }),
-  ]);
+    });
+    return true;
+  });
+  if (!redeemed) redirect("/compte?fid=insuffisant");
   redirect(`/compte?fid=${code}`);
 }
 

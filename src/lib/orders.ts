@@ -1,5 +1,6 @@
 import "server-only";
-import type { Prisma } from "@prisma/client";
+import crypto from "node:crypto";
+import { Prisma } from "@prisma/client";
 import type {
   CartLineOption,
   Fulfillment,
@@ -9,7 +10,7 @@ import type {
 } from "@/types";
 import { prisma } from "@/lib/prisma";
 import { upsertCustomer } from "@/lib/customers";
-import { evaluatePromo, consumePromo } from "@/lib/promo";
+import { evaluatePromo } from "@/lib/promo";
 import { quoteDelivery } from "@/lib/delivery";
 import { awardPointsForOrder } from "@/lib/loyalty";
 import { formatPrice } from "@/lib/utils";
@@ -229,7 +230,8 @@ export async function createOrder({
 
   const safeTip = Math.max(0, tip);
   const total = Math.max(0, subtotal - discount) + deliveryFee + safeTip;
-  const ref = `NK-${Date.now().toString(36).toUpperCase()}`;
+  // Référence opaque : elle sert de lien de suivi et ne doit pas être devinable.
+  const ref = `NK-${crypto.randomBytes(10).toString("hex").toUpperCase()}`;
 
   // Temps de préparation = max des temps des plats (préparés en parallèle).
   const dishes = await prisma.dish.findMany({
@@ -248,72 +250,101 @@ export async function createOrder({
 
   // Décrémente le stock du jour PUIS crée la commande, de façon atomique
   // (anti-survente). Un `dailyStock` null = stock illimité → ignoré.
-  const row = await prisma.$transaction(async (tx) => {
-    const day = stockToday();
-    for (const [slug, qty] of qtyBySlug) {
-      const dish = await tx.dish.findUnique({
-        where: { slug },
-        select: {
-          name: true,
-          dailyStock: true,
-          soldToday: true,
-          stockDate: true,
-        },
-      });
-      if (!dish || dish.dailyStock == null) continue;
-      const remaining = remainingStock(dish) ?? 0;
-      if (qty > remaining) {
+  const row = await prisma
+    .$transaction(
+      async (tx) => {
+        if (appliedCode) {
+          const consumed = await tx.$executeRaw`
+        UPDATE "PromoCode"
+        SET "usedCount" = "usedCount" + 1
+        WHERE "code" = ${appliedCode}
+          AND "active" = true
+          AND ("expiresAt" IS NULL OR "expiresAt" > NOW())
+          AND ("usageLimit" IS NULL OR "usedCount" < "usageLimit")
+      `;
+          if (consumed !== 1) {
+            throw new OrderCreationError(
+              "Ce code promotionnel vient d’être utilisé ou n’est plus disponible.",
+            );
+          }
+        }
+
+        const day = stockToday();
+        for (const [slug, qty] of qtyBySlug) {
+          const dish = await tx.dish.findUnique({
+            where: { slug },
+            select: {
+              name: true,
+              dailyStock: true,
+              soldToday: true,
+              stockDate: true,
+            },
+          });
+          if (!dish || dish.dailyStock == null) continue;
+          const remaining = remainingStock(dish) ?? 0;
+          if (qty > remaining) {
+            throw new OrderCreationError(
+              remaining <= 0
+                ? `${dish.name} est épuisé pour aujourd'hui.`
+                : `Il ne reste que ${remaining} × ${dish.name} aujourd'hui.`,
+            );
+          }
+          const soldBase = dish.stockDate === day ? dish.soldToday : 0;
+          await tx.dish.update({
+            where: { slug },
+            data: { soldToday: soldBase + qty, stockDate: day },
+          });
+        }
+
+        return tx.order.create({
+          data: {
+            reference: ref,
+            status: "en attente",
+            customerName: customer.name,
+            customerEmail: customer.email.toLowerCase(),
+            customerPhone: customer.phone,
+            restaurantId: restaurant?.id,
+            customerAddress: customer.address,
+            customerNotes: customer.notes,
+            subtotal,
+            discount,
+            promoCode: appliedCode,
+            fulfillment,
+            deliveryFee,
+            tip: safeTip,
+            scheduledAt: scheduledAt ? new Date(scheduledAt) : null,
+            prepTimeMin,
+            total,
+            events: { create: { status: "en attente", actor: "client" } },
+            items: {
+              create: normalizedItems.map((i) => ({
+                dishId: i.id,
+                name: i.name,
+                price: i.price,
+                quantity: i.quantity,
+                options: i.options
+                  ? (i.options as unknown as Prisma.InputJsonValue)
+                  : undefined,
+                note: i.note,
+              })),
+            },
+          },
+          include: { items: true },
+        });
+      },
+      { isolationLevel: Prisma.TransactionIsolationLevel.Serializable },
+    )
+    .catch((error: unknown) => {
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === "P2034"
+      ) {
         throw new OrderCreationError(
-          remaining <= 0
-            ? `${dish.name} est épuisé pour aujourd'hui.`
-            : `Il ne reste que ${remaining} × ${dish.name} aujourd'hui.`,
+          "Le stock vient de changer. Vérifiez votre panier et réessayez.",
         );
       }
-      const soldBase = dish.stockDate === day ? dish.soldToday : 0;
-      await tx.dish.update({
-        where: { slug },
-        data: { soldToday: soldBase + qty, stockDate: day },
-      });
-    }
-
-    return tx.order.create({
-      data: {
-        reference: ref,
-        status: "en attente",
-        customerName: customer.name,
-        customerEmail: customer.email.toLowerCase(),
-        customerPhone: customer.phone,
-        restaurantId: restaurant?.id,
-        customerAddress: customer.address,
-        customerNotes: customer.notes,
-        subtotal,
-        discount,
-        promoCode: appliedCode,
-        fulfillment,
-        deliveryFee,
-        tip: safeTip,
-        scheduledAt: scheduledAt ? new Date(scheduledAt) : null,
-        prepTimeMin,
-        total,
-        events: { create: { status: "en attente", actor: "client" } },
-        items: {
-          create: normalizedItems.map((i) => ({
-            dishId: i.id,
-            name: i.name,
-            price: i.price,
-            quantity: i.quantity,
-            options: i.options
-              ? (i.options as unknown as Prisma.InputJsonValue)
-              : undefined,
-            note: i.note,
-          })),
-        },
-      },
-      include: { items: true },
+      throw error;
     });
-  });
-
-  if (appliedCode) await consumePromo(appliedCode);
 
   await upsertCustomer(customer.email, {
     name: customer.name,

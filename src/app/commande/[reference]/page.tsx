@@ -14,7 +14,7 @@ export const dynamic = "force-dynamic";
 
 interface PageProps {
   params: Promise<{ reference: string }>;
-  searchParams: Promise<{ paid?: string }>;
+  searchParams: Promise<{ paid?: string; payment?: string }>;
 }
 
 // Étapes de suivi selon le mode (livraison ajoute « en livraison »).
@@ -32,11 +32,16 @@ const STEP_LABEL: Record<string, string> = {
 };
 
 export default async function OrderPage({ params, searchParams }: PageProps) {
-  const [{ reference }, { paid }] = await Promise.all([params, searchParams]);
+  const [{ reference }, { paid, payment }] = await Promise.all([
+    params,
+    searchParams,
+  ]);
   const order = await getOrderByReference(reference);
   if (!order) notFound();
 
-  const isPaid = order.status !== "en attente" || paid === "1";
+  // Seul le statut confirmé par le webhook Stripe fait foi.
+  const isPaid = order.status !== "en attente";
+  const paymentPending = paid === "1" && order.status === "en attente";
   const steps = trackSteps(order.fulfillment === "livraison");
   const currentIdx = steps.indexOf(order.status as OrderStatus);
 
@@ -50,9 +55,9 @@ export default async function OrderPage({ params, searchParams }: PageProps) {
       <Header />
       <main className="min-h-screen bg-ink pb-20 pt-28">
         {/* Rafraîchit le suivi tant que la commande n'est pas terminée. */}
-        {isPaid && order.status !== "livrée" && order.status !== "annulée" && (
-          <AutoRefresh seconds={20} />
-        )}
+        {(isPaid || paymentPending) &&
+          order.status !== "livrée" &&
+          order.status !== "annulée" && <AutoRefresh seconds={20} />}
         <div className="container-page max-w-2xl">
           <Link
             href="/"
@@ -63,6 +68,24 @@ export default async function OrderPage({ params, searchParams }: PageProps) {
           </Link>
 
           <div className="mt-6 rounded-2xl border border-white/10 bg-ink-soft p-8">
+            {payment === "unavailable" && (
+              <p
+                role="alert"
+                className="mb-5 rounded-xl border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-200"
+              >
+                Le paiement en ligne est temporairement indisponible. Votre
+                commande reste enregistrée et non payée.
+              </p>
+            )}
+            {paymentPending && (
+              <p
+                role="status"
+                className="mb-5 rounded-xl border border-gold/30 bg-gold/10 p-3 text-sm text-gold"
+              >
+                Paiement reçu par Stripe, confirmation en cours. Cette page se
+                met à jour automatiquement.
+              </p>
+            )}
             <h1 className="font-display text-2xl font-bold text-cream">
               {isPaid ? "Merci, commande confirmée !" : "Commande enregistrée"}
             </h1>
@@ -178,7 +201,7 @@ export default async function OrderPage({ params, searchParams }: PageProps) {
               </div>
             </div>
 
-            {!isPaid && (
+            {!isPaid && !paymentPending && (
               <form
                 action={payOrder.bind(null, order.reference)}
                 className="mt-8"

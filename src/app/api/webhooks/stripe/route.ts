@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import { updateOrderStatus, getOrderByReference } from "@/lib/orders";
+import { isExpectedStripePayment } from "@/lib/payment-integrity";
+import { siteConfig } from "@/lib/config";
 
 // Le webhook a besoin du corps brut (raw body) pour vérifier la signature.
 export const dynamic = "force-dynamic";
@@ -50,7 +52,26 @@ export async function POST(request: Request) {
         const order = await getOrderByReference(reference);
         // Idempotence : on ne confirme le paiement que si la commande est encore
         // en attente, pour ne pas régresser une commande déjà avancée (replay du webhook).
-        if (order && order.status === "en attente") {
+        const paymentIsValid =
+          order &&
+          isExpectedStripePayment(
+            {
+              amountTotal: session.amount_total,
+              currency: session.currency,
+              paymentStatus: session.payment_status,
+            },
+            order.total,
+            siteConfig.currency,
+          );
+        if (order && !paymentIsValid) {
+          console.error("[stripe:webhook] paiement incohérent refusé", {
+            reference,
+            amountTotal: session.amount_total,
+            currency: session.currency,
+            paymentStatus: session.payment_status,
+          });
+        }
+        if (order && paymentIsValid && order.status === "en attente") {
           await updateOrderStatus(reference, "payée");
         }
       }

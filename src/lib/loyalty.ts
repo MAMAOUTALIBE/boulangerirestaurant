@@ -33,17 +33,18 @@ export const REDEMPTION_VALUE_EUR = 5;
  */
 export async function awardPointsForOrder(reference: string): Promise<void> {
   const order = await prisma.order.findUnique({ where: { reference } });
-  if (!order || order.pointsAwarded) return;
+  if (!order) return;
 
   const points = pointsForAmount(order.total);
-  await prisma.$transaction([
-    prisma.order.update({
-      where: { reference },
+  await prisma.$transaction(async (tx) => {
+    const claimed = await tx.order.updateMany({
+      where: { reference, pointsAwarded: false },
       data: { pointsAwarded: true },
-    }),
-    prisma.customer.update({
+    });
+    if (claimed.count !== 1) return;
+    await tx.customer.update({
       where: { email: order.customerEmail },
       data: { loyaltyPoints: { increment: points } },
-    }),
-  ]);
+    });
+  });
 }

@@ -20,9 +20,9 @@ export default async function AdminLayout({
   if (!email || !isAdminEmail(email)) redirect("/compte?admin=1");
 
   return (
-    <div className="min-h-screen bg-ink lg:flex">
+    <div className="flex h-dvh w-full flex-col overflow-hidden bg-ink lg:flex-row print:h-auto print:min-h-screen print:overflow-visible">
       {/* Sidebar */}
-      <aside className="border-b border-white/10 bg-ink-soft lg:flex lg:w-64 lg:shrink-0 lg:flex-col lg:border-b-0 lg:border-r print:hidden">
+      <aside className="shrink-0 border-b border-white/10 bg-ink-soft lg:flex lg:h-full lg:w-64 lg:flex-col lg:overflow-hidden lg:border-b-0 lg:border-r print:hidden">
         <div className="flex items-center gap-2 px-5 pb-1 pt-5">
           <ShieldCheck className="h-6 w-6 text-gold" />
           <span className="font-display text-lg font-bold text-cream">
@@ -33,8 +33,8 @@ export default async function AdminLayout({
       </aside>
 
       {/* Contenu */}
-      <div className="min-w-0 flex-1">
-        <header className="flex items-center justify-between gap-4 border-b border-white/10 px-6 py-4 print:hidden">
+      <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden print:overflow-visible">
+        <header className="flex shrink-0 items-center justify-between gap-4 border-b border-white/10 px-4 py-3 sm:px-6 sm:py-4 print:hidden">
           <CommandPalette />
           <div className="flex items-center gap-3">
             <OrderNotifier />
@@ -52,7 +52,9 @@ export default async function AdminLayout({
             </form>
           </div>
         </header>
-        <div className="p-6">{children}</div>
+        <main className="min-h-0 min-w-0 flex-1 overflow-y-auto overflow-x-hidden overscroll-contain p-4 pb-[calc(5.5rem+env(safe-area-inset-bottom))] sm:p-6 sm:pb-[calc(5.5rem+env(safe-area-inset-bottom))] lg:pb-6 print:overflow-visible print:p-0">
+          {children}
+        </main>
       </div>
     </div>
   );
