@@ -4,23 +4,35 @@ import {
   adminCreatePromo,
   adminTogglePromo,
   adminDeletePromo,
+  adminUpdateMarketingRule,
+  adminRunMarketingAutomations,
 } from "@/app/actions";
 import { listCustomers } from "@/lib/customers";
 import { SEGMENTS } from "@/lib/segmentation";
 import { formatPrice } from "@/lib/utils";
+import { marketingDashboard } from "@/lib/marketing-automation";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminMarketingPage({
   searchParams,
 }: {
-  searchParams: Promise<{ sent?: string; error?: string; audience?: string }>;
+  searchParams: Promise<{
+    sent?: string;
+    error?: string;
+    audience?: string;
+    automated?: string;
+    ruleSaved?: string;
+    ruleError?: string;
+  }>;
 }) {
-  const { sent, audience } = await searchParams;
-  const [count, customers, promos] = await Promise.all([
+  const { sent, audience, automated, ruleSaved, ruleError } =
+    await searchParams;
+  const [count, customers, promos, automation] = await Promise.all([
     prisma.newsletterSubscriber.count(),
     listCustomers(),
     prisma.promoCode.findMany({ orderBy: { createdAt: "desc" } }),
+    marketingDashboard(),
   ]);
 
   const resendActive = Boolean(process.env.RESEND_API_KEY);
@@ -31,12 +43,24 @@ export default async function AdminMarketingPage({
 
   // Pré-sélection si on arrive depuis « Lancer une relance » du dashboard.
   const defaultAudience = audience === "relance" ? "À risque" : "all";
+  const totalRecipients = automation.campaigns.reduce(
+    (sum, campaign) => sum + campaign.recipientCount,
+    0,
+  );
+  const totalOrders = automation.campaigns.reduce(
+    (sum, campaign) => sum + campaign.ordersCount,
+    0,
+  );
+  const totalRevenue = automation.campaigns.reduce(
+    (sum, campaign) => sum + campaign.revenue,
+    0,
+  );
 
   return (
     <div className="space-y-8">
       <h1 className="font-display text-3xl font-bold text-cream">Marketing</h1>
 
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <div className="rounded-2xl border border-white/10 bg-ink-soft p-5">
           <p className="text-sm text-muted">Abonnés newsletter</p>
           <p className="mt-1 font-display text-3xl font-bold text-cream">
@@ -55,7 +79,152 @@ export default async function AdminMarketingPage({
             {resendActive ? "✅ Resend configuré" : "⚠️ Mode simulation (logs)"}
           </p>
         </div>
+        <div className="rounded-2xl border border-white/10 bg-ink-soft p-5">
+          <p className="text-sm text-muted">Emails automatisés</p>
+          <p className="mt-1 font-display text-3xl font-bold text-cream">
+            {totalRecipients}
+          </p>
+        </div>
+        <div className="rounded-2xl border border-white/10 bg-ink-soft p-5">
+          <p className="text-sm text-muted">CA attribué aux campagnes</p>
+          <p className="mt-1 font-display text-3xl font-bold text-gold">
+            {formatPrice(totalRevenue)}
+          </p>
+          <p className="mt-1 text-xs text-muted">{totalOrders} commande(s)</p>
+        </div>
       </div>
+
+      {/* Automatisations */}
+      <section className="rounded-2xl border border-gold/25 bg-ink-soft p-6">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h2 className="font-display text-xl font-semibold text-cream">
+              Relances automatisées
+            </h2>
+            <p className="mt-1 text-sm text-muted">
+              Les règles sont désactivées par défaut. Seuls les abonnés à la
+              newsletter peuvent recevoir ces messages.
+            </p>
+          </div>
+          <form action={adminRunMarketingAutomations}>
+            <button type="submit" className="btn-primary">
+              Exécuter maintenant
+            </button>
+          </form>
+        </div>
+        {automated !== undefined && (
+          <p role="status" className="mt-3 text-sm text-green-400">
+            Automatisations exécutées : {automated} email(s) envoyé(s).
+          </p>
+        )}
+        {ruleSaved && (
+          <p role="status" className="mt-3 text-sm text-green-400">
+            Règle enregistrée.
+          </p>
+        )}
+        {ruleError === "promo" && (
+          <p role="alert" className="mt-3 text-sm text-red-400">
+            Créez et activez d’abord ce code promo dans la section « Codes promo
+            » avant d’activer la règle.
+          </p>
+        )}
+        <div className="mt-5 grid gap-4 xl:grid-cols-2">
+          {automation.rules.map((rule) => (
+            <form
+              key={rule.id}
+              action={adminUpdateMarketingRule}
+              className="rounded-xl border border-white/10 bg-ink p-4"
+            >
+              <input type="hidden" name="id" value={rule.id} />
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <h3 className="font-semibold text-cream">{rule.name}</h3>
+                  <p className="mt-0.5 text-xs text-muted">
+                    Dernière exécution :{" "}
+                    {rule.lastRunAt
+                      ? rule.lastRunAt.toLocaleString("fr-FR")
+                      : "jamais"}
+                  </p>
+                </div>
+                <label className="flex items-center gap-2 text-sm text-cream/80">
+                  <input
+                    type="checkbox"
+                    name="enabled"
+                    defaultChecked={rule.enabled}
+                    className="h-4 w-4 accent-[var(--color-accent)]"
+                  />
+                  Active
+                </label>
+              </div>
+              <div className="mt-3 grid gap-2 sm:grid-cols-2">
+                {rule.type === "inactive" && (
+                  <input
+                    name="delayDays"
+                    type="number"
+                    min="1"
+                    defaultValue={rule.delayDays ?? 30}
+                    aria-label="Nombre de jours d’inactivité"
+                    className="rounded-lg border border-white/10 bg-ink-soft px-3 py-2 text-sm text-cream"
+                  />
+                )}
+                {rule.type === "weekday" && (
+                  <select
+                    name="weekday"
+                    defaultValue={rule.weekday ?? 2}
+                    aria-label="Jour de la semaine"
+                    className="rounded-lg border border-white/10 bg-ink-soft px-3 py-2 text-sm text-cream"
+                  >
+                    {[
+                      "Dimanche",
+                      "Lundi",
+                      "Mardi",
+                      "Mercredi",
+                      "Jeudi",
+                      "Vendredi",
+                      "Samedi",
+                    ].map((day, index) => (
+                      <option key={day} value={index}>
+                        {day}
+                      </option>
+                    ))}
+                  </select>
+                )}
+                <input
+                  name="promoCode"
+                  defaultValue={rule.promoCode ?? ""}
+                  placeholder="Code promo facultatif"
+                  className="rounded-lg border border-white/10 bg-ink-soft px-3 py-2 text-sm uppercase text-cream placeholder:text-muted"
+                />
+              </div>
+              <input
+                name="subject"
+                required
+                defaultValue={rule.subject}
+                aria-label={`Sujet — ${rule.name}`}
+                className="mt-2 w-full rounded-lg border border-white/10 bg-ink-soft px-3 py-2 text-sm text-cream"
+              />
+              <textarea
+                name="body"
+                required
+                rows={3}
+                defaultValue={rule.body}
+                aria-label={`Message — ${rule.name}`}
+                className="mt-2 w-full rounded-lg border border-white/10 bg-ink-soft px-3 py-2 text-sm text-cream"
+              />
+              <p className="mt-2 text-[11px] text-muted">
+                Variables : {"{prenom}"}, {"{code}"}, {"{restaurant}"},{" "}
+                {"{plat}"}, {"{meteo}"}
+              </p>
+              <button
+                type="submit"
+                className="mt-3 rounded-lg border border-gold/40 px-4 py-2 text-sm text-gold transition hover:bg-gold/10"
+              >
+                Enregistrer la règle
+              </button>
+            </form>
+          ))}
+        </div>
+      </section>
 
       {/* Composer une campagne */}
       <section className="rounded-2xl border border-white/10 bg-ink-soft p-6">
@@ -102,10 +271,64 @@ export default async function AdminMarketingPage({
             required
             className="w-full rounded-xl border border-white/10 bg-ink px-4 py-3 text-sm text-cream placeholder:text-muted focus:border-gold/60 focus:outline-none"
           />
+          <input
+            name="promoCode"
+            placeholder="Code promo pour mesurer le CA (facultatif)"
+            className="w-full rounded-xl border border-white/10 bg-ink px-4 py-3 text-sm uppercase text-cream placeholder:text-muted focus:border-gold/60 focus:outline-none"
+          />
           <button type="submit" className="btn-primary">
             Envoyer la campagne
           </button>
         </form>
+      </section>
+
+      {/* Historique et conversions */}
+      <section className="rounded-2xl border border-white/10 bg-ink-soft p-6">
+        <h2 className="font-display text-lg font-semibold text-cream">
+          Performance des campagnes
+        </h2>
+        {automation.campaigns.length === 0 ? (
+          <p className="mt-4 text-sm text-muted">
+            Aucune campagne enregistrée.
+          </p>
+        ) : (
+          <div className="mt-4 overflow-x-auto">
+            <table className="w-full min-w-[720px] text-left text-sm">
+              <thead className="text-xs uppercase tracking-wide text-muted">
+                <tr>
+                  <th className="pb-3">Campagne</th>
+                  <th className="pb-3">Date</th>
+                  <th className="pb-3">Destinataires</th>
+                  <th className="pb-3">Code</th>
+                  <th className="pb-3">Commandes</th>
+                  <th className="pb-3 text-right">CA attribué</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-white/10">
+                {automation.campaigns.map((campaign) => (
+                  <tr key={campaign.id}>
+                    <td className="py-3 text-cream">{campaign.name}</td>
+                    <td className="py-3 text-muted">
+                      {campaign.sentAt.toLocaleDateString("fr-FR")}
+                    </td>
+                    <td className="py-3 text-cream/80">
+                      {campaign.recipientCount}
+                    </td>
+                    <td className="py-3 font-mono text-gold">
+                      {campaign.promoCode ?? "—"}
+                    </td>
+                    <td className="py-3 text-cream/80">
+                      {campaign.ordersCount}
+                    </td>
+                    <td className="py-3 text-right font-semibold text-cream">
+                      {formatPrice(campaign.revenue)}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </section>
 
       {/* Codes promo */}

@@ -204,11 +204,12 @@ export async function updateCustomerCrm(
   email: string,
   notes: string,
   tags: string[],
+  birthDate?: Date | null,
 ): Promise<void> {
   const normalized = email.toLowerCase();
   await prisma.customer.upsert({
     where: { email: normalized },
-    update: { notes, tags },
-    create: { email: normalized, notes, tags },
+    update: { notes, tags, birthDate },
+    create: { email: normalized, notes, tags, birthDate },
   });
 }

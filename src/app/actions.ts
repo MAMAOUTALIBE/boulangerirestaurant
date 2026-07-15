@@ -1209,10 +1209,19 @@ export async function adminUpdateCustomer(formData: FormData): Promise<void> {
     .split(",")
     .map((t) => t.trim())
     .filter(Boolean);
+  const birthDateRaw = String(formData.get("birthDate") ?? "").trim();
+  const birthDate = birthDateRaw
+    ? new Date(`${birthDateRaw}T00:00:00.000Z`)
+    : null;
 
   if (email) {
     const { updateCustomerCrm } = await import("@/lib/customers");
-    await updateCustomerCrm(email, notes, tags);
+    await updateCustomerCrm(
+      email,
+      notes,
+      tags,
+      birthDate && !Number.isNaN(birthDate.getTime()) ? birthDate : null,
+    );
     revalidatePath(`/admin/clients/${encodeURIComponent(email)}`);
   }
   redirect(`/admin/clients/${encodeURIComponent(email)}`);
@@ -1293,13 +1302,93 @@ export async function sendCampaign(formData: FormData): Promise<void> {
       .map((c) => c.email);
   }
 
-  const html = `<div>${body.replace(/\n/g, "<br>")}</div>`;
-  for (const to of recipients) {
-    await sendEmail({ to, subject, html });
-  }
+  const consented = new Set(
+    (
+      await prisma.newsletterSubscriber.findMany({ select: { email: true } })
+    ).map((subscriber) => subscriber.email.toLowerCase()),
+  );
+  recipients = [
+    ...new Set(recipients.map((email) => email.toLowerCase())),
+  ].filter((email) => consented.has(email));
+  const runKey = crypto.randomBytes(8).toString("hex");
+  const { dispatchMarketingCampaign } =
+    await import("@/lib/marketing-automation");
+  const sent = await dispatchMarketingCampaign({
+    name: `Campagne manuelle — ${subject}`,
+    type: "manual",
+    subject,
+    body,
+    promoCode:
+      String(formData.get("promoCode") ?? "")
+        .trim()
+        .toUpperCase() || null,
+    recipients: recipients.map((email) => ({
+      email,
+      dedupeKey: `manual:${runKey}:${email}`,
+    })),
+  });
 
   revalidatePath("/admin/marketing");
-  redirect(`/admin/marketing?sent=${recipients.length}`);
+  redirect(`/admin/marketing?sent=${sent}`);
+}
+
+/** Back-office : met à jour et active/désactive une règle marketing. */
+export async function adminUpdateMarketingRule(
+  formData: FormData,
+): Promise<void> {
+  if (!isAdminEmail(await getSessionEmail())) redirect("/compte");
+  const id = String(formData.get("id") ?? "");
+  const subject = String(formData.get("subject") ?? "").trim();
+  const body = String(formData.get("body") ?? "").trim();
+  if (!id || !subject || !body) redirect("/admin/marketing?ruleError=1");
+  const weekdayRaw = String(formData.get("weekday") ?? "").trim();
+  const delayRaw = String(formData.get("delayDays") ?? "").trim();
+  const promoCode = String(formData.get("promoCode") ?? "")
+    .trim()
+    .toUpperCase();
+  const enabled = formData.get("enabled") === "on";
+  if (
+    enabled &&
+    promoCode &&
+    !(await prisma.promoCode.findFirst({
+      where: { code: promoCode, active: true },
+      select: { id: true },
+    }))
+  ) {
+    redirect("/admin/marketing?ruleError=promo");
+  }
+  const parsedDelay = Number(delayRaw);
+  const parsedWeekday = Number(weekdayRaw);
+  await prisma.marketingRule.update({
+    where: { id },
+    data: {
+      enabled,
+      subject,
+      body,
+      promoCode: promoCode || null,
+      delayDays:
+        delayRaw && Number.isFinite(parsedDelay)
+          ? Math.max(1, Math.round(parsedDelay))
+          : null,
+      weekday:
+        weekdayRaw && Number.isFinite(parsedWeekday)
+          ? Math.min(6, Math.max(0, Math.round(parsedWeekday)))
+          : null,
+    },
+  });
+  revalidatePath("/admin/marketing");
+  redirect("/admin/marketing?ruleSaved=1");
+}
+
+/** Back-office : exécute immédiatement toutes les règles actives. */
+export async function adminRunMarketingAutomations(): Promise<void> {
+  if (!isAdminEmail(await getSessionEmail())) redirect("/compte");
+  const { runMarketingAutomations } =
+    await import("@/lib/marketing-automation");
+  const results = await runMarketingAutomations();
+  const sent = results.reduce((sum, result) => sum + result.sent, 0);
+  revalidatePath("/admin/marketing");
+  redirect(`/admin/marketing?automated=${sent}`);
 }
 
 /** Génère un slug URL à partir d'un texte. */

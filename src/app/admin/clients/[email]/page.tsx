@@ -109,6 +109,26 @@ export default async function ClientDetailPage({
             <input type="hidden" name="email" value={d.email} />
             <div>
               <label
+                htmlFor="birthDate"
+                className="mb-1.5 block text-sm text-cream/80"
+              >
+                Date d’anniversaire
+              </label>
+              <input
+                id="birthDate"
+                name="birthDate"
+                type="date"
+                defaultValue={
+                  d.customer?.birthDate?.toISOString().slice(0, 10) ?? ""
+                }
+                className="w-full rounded-xl border border-white/10 bg-ink px-4 py-3 text-sm text-cream focus:border-gold/60 focus:outline-none"
+              />
+              <p className="mt-1 text-xs text-muted">
+                Utilisée uniquement si le client accepte la newsletter.
+              </p>
+            </div>
+            <div>
+              <label
                 htmlFor="notes"
                 className="mb-1.5 block text-sm text-cream/80"
               >

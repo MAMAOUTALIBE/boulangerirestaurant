@@ -9,11 +9,11 @@ datasource db {
 }
 
 model Order {
-  id        String      @id @default(cuid())
-  reference String      @unique
-  createdAt DateTime    @default(now())
+  id        String   @id @default(cuid())
+  reference String   @unique
+  createdAt DateTime @default(now())
   // Statut : en attente | payée | en préparation | prête | livrée | annulée
-  status    String      @default("en attente")
+  status    String   @default("en attente")
 
   customerName    String
   customerEmail   String
@@ -48,19 +48,19 @@ model Order {
 
 /// Restaurant géré sur la plateforme (multi-établissement).
 model Restaurant {
-  id                        String   @id @default(cuid())
-  slug                      String   @unique
-  name                      String
-  active                    Boolean  @default(true)
-  stripeAccountId           String?  @unique
-  stripeOnboardingComplete  Boolean  @default(false)
-  stripeChargesEnabled      Boolean  @default(false)
-  stripePayoutsEnabled      Boolean  @default(false)
-  stripeDetailsSubmitted    Boolean  @default(false)
-  stripeLastSyncedAt        DateTime?
-  createdAt                 DateTime @default(now())
-  updatedAt                 DateTime @updatedAt
-  orders                    Order[]
+  id                       String    @id @default(cuid())
+  slug                     String    @unique
+  name                     String
+  active                   Boolean   @default(true)
+  stripeAccountId          String?   @unique
+  stripeOnboardingComplete Boolean   @default(false)
+  stripeChargesEnabled     Boolean   @default(false)
+  stripePayoutsEnabled     Boolean   @default(false)
+  stripeDetailsSubmitted   Boolean   @default(false)
+  stripeLastSyncedAt       DateTime?
+  createdAt                DateTime  @default(now())
+  updatedAt                DateTime  @updatedAt
+  orders                   Order[]
 }
 
 /// Livreur « maison ».
@@ -87,21 +87,21 @@ model OrderEvent {
 
 /// Code promotionnel géré en base.
 model PromoCode {
-  id         String   @id @default(cuid())
-  code       String   @unique
+  id         String    @id @default(cuid())
+  code       String    @unique
   /// "percent" (ex: 10 = -10%) ou "fixed" (ex: 5 = -5€)
-  type       String   @default("percent")
+  type       String    @default("percent")
   value      Float
-  active     Boolean  @default(true)
+  active     Boolean   @default(true)
   expiresAt  DateTime?
   usageLimit Int?
-  usedCount  Int      @default(0)
-  createdAt  DateTime @default(now())
+  usedCount  Int       @default(0)
+  createdAt  DateTime  @default(now())
 }
 
 model OrderLine {
-  id       String @id @default(cuid())
-  order    Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  id       String  @id @default(cuid())
+  order    Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
   orderId  String
   dishId   String
   name     String
@@ -153,37 +153,37 @@ model DemoLead {
 
 /// Catégorie de menu (Entrées, Plats, Desserts, Boissons…).
 model Category {
-  id        String   @id @default(cuid())
-  slug      String   @unique
+  id        String @id @default(cuid())
+  slug      String @unique
   name      String
-  sortOrder Int      @default(0)
+  sortOrder Int    @default(0)
   dishes    Dish[]
 }
 
 /// Plat du menu (éditable depuis le back-office).
 model Dish {
-  id          String        @id @default(cuid())
-  slug        String        @unique
-  name        String
-  description String
-  price       Float
-  image       String
-  tag         String?
-  available   Boolean       @default(true)
+  id           String        @id @default(cuid())
+  slug         String        @unique
+  name         String
+  description  String
+  price        Float
+  image        String
+  tag          String?
+  available    Boolean       @default(true)
   /// Stock du jour (null = illimité). Limite les ventes et affiche « épuisé ».
-  dailyStock  Int?
+  dailyStock   Int?
   /// Unités déjà vendues pour la date `stockDate` (compteur quotidien).
-  soldToday   Int           @default(0)
+  soldToday    Int           @default(0)
   /// Date (AAAA-MM-JJ) à laquelle se rapporte `soldToday` (reset paresseux).
-  stockDate   String?
-  sortOrder   Int           @default(0)
+  stockDate    String?
+  sortOrder    Int           @default(0)
   /// Temps de préparation estimé du plat (minutes) — sert au calcul d'ETA.
-  prepMinutes Int           @default(15)
-  category    Category?     @relation(fields: [categoryId], references: [id])
-  categoryId  String?
+  prepMinutes  Int           @default(15)
+  category     Category?     @relation(fields: [categoryId], references: [id])
+  categoryId   String?
   optionGroups OptionGroup[]
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
 }
 
 /// Groupe d'options d'un plat (ex: « Accompagnement », « Suppléments »).
@@ -280,18 +280,75 @@ model DeliveryZone {
 
 /// Fiche client consolidée (CRM), clé = email.
 model Customer {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  name      String?
-  phone     String?
+  id            String    @id @default(cuid())
+  email         String    @unique
+  name          String?
+  phone         String?
+  /// Date d'anniversaire utilisée uniquement pour les relances consenties.
+  birthDate     DateTime?
   /// Notes internes (allergies, préférences, incidents…).
-  notes     String   @default("")
+  notes         String    @default("")
   /// Étiquettes de segmentation (VIP, habitué, à relancer…).
-  tags      String[] @default([])
+  tags          String[]  @default([])
   /// Points de fidélité cumulés.
-  loyaltyPoints Int   @default(0)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  loyaltyPoints Int       @default(0)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+/// Règle de relance automatique configurable depuis le CRM.
+model MarketingRule {
+  id          String              @id
+  name        String
+  type        String
+  enabled     Boolean             @default(false)
+  subject     String
+  body        String
+  promoCode   String?
+  delayDays   Int?
+  weekday     Int?
+  weatherKind String?
+  lastRunAt   DateTime?
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+  campaigns   MarketingCampaign[]
+
+  @@index([enabled])
+  @@index([type])
+}
+
+/// Exécution manuelle ou automatique d'une campagne marketing.
+model MarketingCampaign {
+  id             String              @id @default(cuid())
+  rule           MarketingRule?      @relation(fields: [ruleId], references: [id], onDelete: SetNull)
+  ruleId         String?
+  name           String
+  type           String
+  subject        String
+  promoCode      String?
+  recipientCount Int                 @default(0)
+  sentAt         DateTime            @default(now())
+  createdAt      DateTime            @default(now())
+  dispatches     MarketingDispatch[]
+
+  @@index([ruleId])
+  @@index([sentAt])
+  @@index([promoCode])
+}
+
+/// Envoi individuel, dédupliqué, permettant de mesurer la conversion.
+model MarketingDispatch {
+  id         String            @id @default(cuid())
+  campaign   MarketingCampaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  campaignId String
+  email      String
+  status     String            @default("envoyé")
+  dedupeKey  String            @unique
+  sentAt     DateTime          @default(now())
+
+  @@index([campaignId])
+  @@index([email])
+  @@index([sentAt])
 }
 
 /// Réservation de table.
@@ -301,13 +358,13 @@ model Reservation {
   createdAt DateTime @default(now())
   status    String   @default("en attente") // en attente | confirmée | annulée
 
-  name      String
-  email     String
-  phone     String
-  date      String // jour souhaité (AAAA-MM-JJ)
-  time      String // créneau souhaité (HH:MM)
-  guests    Int
-  notes     String?
+  name   String
+  email  String
+  phone  String
+  date   String // jour souhaité (AAAA-MM-JJ)
+  time   String // créneau souhaité (HH:MM)
+  guests Int
+  notes  String?
 
   @@index([email])
 }
@@ -330,19 +387,19 @@ model CateringRequest {
 
 /// Demande de devis sur-mesure.
 model CustomRequest {
-  id             String   @id @default(cuid())
-  reference      String   @unique
-  createdAt      DateTime @default(now())
+  id        String   @id @default(cuid())
+  reference String   @unique
+  createdAt DateTime @default(now())
   /// nouveau | devis envoyé | confirmé | prêt | récupéré | annulé
-  status         String   @default("nouveau")
+  status    String   @default("nouveau")
 
   name           String
   email          String
   phone          String
   occasion       String
   servings       Int
-  preferences    String   @map("flavor")
-  message        String?  @map("messageOnCake")
+  preferences    String  @map("flavor")
+  message        String? @map("messageOnCake")
   pickupDate     String
   pickupTime     String?
   inspirationUrl String?
