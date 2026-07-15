@@ -1,4 +1,4 @@
-import { Moon, Palette, ShieldCheck, Sun } from "lucide-react";
+import { ShieldCheck } from "lucide-react";
 import { adminEmails } from "@/lib/auth";
 import { siteConfig } from "@/lib/config";
 import { prisma } from "@/lib/prisma";
@@ -7,7 +7,6 @@ import {
   adminDeleteZone,
   adminUpdateHours,
   adminUpdateOrderingSettings,
-  adminUpdateSiteTheme,
   adminCreateRestaurant,
   adminCreateDriver,
   adminOpenRestaurantStripeOnboarding,
@@ -67,66 +66,6 @@ export default async function AdminParametresPage() {
   return (
     <div className="space-y-8">
       <h1 className="font-display text-3xl font-bold text-cream">Paramètres</h1>
-
-      {/* Apparence du site public */}
-      <section className="rounded-2xl border border-white/10 bg-ink-soft p-6">
-        <h2 className="flex items-center gap-2 font-display text-lg font-semibold text-cream">
-          <Palette className="h-5 w-5 text-gold" />
-          Apparence du site public
-        </h2>
-        <p className="mt-2 text-sm text-muted">
-          Ce choix s’applique à tous les visiteurs. Le CRM conserve toujours son
-          apparence sombre.
-        </p>
-        <div className="mt-5 grid gap-3 sm:grid-cols-2">
-          {[
-            {
-              id: "dark",
-              label: "Sombre — par défaut",
-              description: "Fond noir et cartes blanc cassé.",
-              Icon: Moon,
-            },
-            {
-              id: "light",
-              label: "Clair",
-              description: "Fond blanc cassé et cartes noires.",
-              Icon: Sun,
-            },
-          ].map(({ id, label, description, Icon }) => {
-            const active = (setting?.siteTheme ?? "dark") === id;
-            return (
-              <form key={id} action={adminUpdateSiteTheme}>
-                <input type="hidden" name="theme" value={id} />
-                <button
-                  type="submit"
-                  aria-pressed={active}
-                  className={`flex w-full items-center gap-4 rounded-2xl border p-4 text-left transition ${
-                    active
-                      ? "border-gold bg-gold/10"
-                      : "border-white/10 bg-ink hover:border-gold/50"
-                  }`}
-                >
-                  <span
-                    className={`grid h-11 w-11 shrink-0 place-items-center rounded-full ${
-                      active ? "bg-gold text-ink" : "bg-white/10 text-gold"
-                    }`}
-                  >
-                    <Icon className="h-5 w-5" />
-                  </span>
-                  <span>
-                    <span className="block font-semibold text-cream">
-                      {label}
-                    </span>
-                    <span className="mt-1 block text-xs text-muted">
-                      {description}
-                    </span>
-                  </span>
-                </button>
-              </form>
-            );
-          })}
-        </div>
-      </section>
 
       {/* Administrateurs */}
       <section className="rounded-2xl border border-white/10 bg-ink-soft p-6">

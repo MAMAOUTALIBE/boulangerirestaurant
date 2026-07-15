@@ -20,7 +20,7 @@ export default async function AdminLayout({
   if (!email || !isAdminEmail(email)) redirect("/compte?admin=1");
 
   return (
-    <div className="admin-theme min-h-screen bg-ink text-cream lg:flex">
+    <div className="min-h-screen bg-ink lg:flex">
       {/* Sidebar */}
       <aside className="border-b border-white/10 bg-ink-soft lg:flex lg:w-64 lg:shrink-0 lg:flex-col lg:border-b-0 lg:border-r print:hidden">
         <div className="flex items-center gap-2 px-5 pb-1 pt-5">

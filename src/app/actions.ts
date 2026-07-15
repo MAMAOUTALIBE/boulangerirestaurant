@@ -1428,23 +1428,6 @@ export async function adminUpdateOrderingSettings(
   redirect("/admin/parametres");
 }
 
-/** Back-office : choisit l'apparence globale du site public. */
-export async function adminUpdateSiteTheme(formData: FormData): Promise<void> {
-  if (!isAdminEmail(await getSessionEmail())) redirect("/compte?admin=1");
-
-  const parsed = z.enum(["dark", "light"]).safeParse(formData.get("theme"));
-  if (!parsed.success) redirect("/admin/parametres?themeError=invalid");
-
-  await prisma.orderingSetting.upsert({
-    where: { id: "default" },
-    update: { siteTheme: parsed.data },
-    create: { id: "default", siteTheme: parsed.data },
-  });
-  revalidatePath("/", "layout");
-  revalidatePath("/admin/parametres");
-  redirect("/admin/parametres?themeSaved=1");
-}
-
 /** Back-office : ajoute un restaurant (socle multi-restaurant). */
 export async function adminCreateRestaurant(formData: FormData): Promise<void> {
   if (!isAdminEmail(await getSessionEmail())) redirect("/compte");

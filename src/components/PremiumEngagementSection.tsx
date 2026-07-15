@@ -78,9 +78,9 @@ export async function PremiumEngagementSection() {
   return (
     <section
       id="avis-clients"
-      className="scroll-mt-24 bg-ink px-4 py-4 text-cream sm:px-6 sm:py-6 lg:px-8"
+      className="scroll-mt-24 bg-[#050505] px-4 py-4 text-cream sm:px-6 sm:py-6 lg:px-8"
     >
-      <div className="mx-auto max-w-[1600px] overflow-hidden rounded-3xl border border-white/[0.08] bg-ink shadow-[0_30px_80px_-60px_rgba(216,154,28,0.72)]">
+      <div className="mx-auto max-w-[1600px] overflow-hidden rounded-3xl border border-white/[0.08] bg-[radial-gradient(circle_at_top,rgba(216,154,28,0.11),transparent_42%),#080808] shadow-[0_30px_80px_-60px_rgba(216,154,28,0.72)]">
         <div className="px-4 pb-5 pt-4 sm:px-8 lg:px-8">
           <MobileTestimonialsCompact />
 

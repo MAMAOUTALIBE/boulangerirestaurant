@@ -257,8 +257,6 @@ model OpeningHour {
 /// Réglages de prise de commande (singleton, id = "default").
 model OrderingSetting {
   id              String @id @default("default")
-  /// Apparence publique : dark (défaut) | light.
-  siteTheme       String @default("dark")
   slotIntervalMin Int    @default(15)
   leadTimeMin     Int    @default(20)
   capacityPerSlot Int    @default(8)

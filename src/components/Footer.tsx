@@ -201,7 +201,7 @@ const payments = ["VISA", "Mastercard", "PayPal", "Apple Pay"];
 /** Pied de page complet : logo, réseaux, liens, contact, newsletter, paiements. */
 export function Footer() {
   return (
-    <footer className="border-t border-gold/15 bg-ink">
+    <footer className="border-t border-gold/15 bg-[radial-gradient(circle_at_top,rgba(245,158,11,0.08),transparent_34%),linear-gradient(180deg,#111111,#070707)]">
       <MobileFooter />
       <div className="container-page hidden py-12 sm:block">
         <nav
@@ -346,7 +346,7 @@ export function Footer() {
 function MobileFooter() {
   return (
     <div className="sm:hidden">
-      <div className="mx-auto max-w-[48rem] border-x border-white/[0.08] bg-ink px-4 pb-5 pt-7">
+      <div className="mx-auto max-w-[48rem] border-x border-white/[0.08] bg-[radial-gradient(circle_at_top,rgba(245,158,11,0.08),transparent_34%),linear-gradient(180deg,#080808,#050505)] px-4 pb-5 pt-7">
         <Logo className="mx-auto w-fit justify-center" />
 
         <p className="mx-auto mt-3 max-w-xs text-center text-sm leading-5 text-cream/70">

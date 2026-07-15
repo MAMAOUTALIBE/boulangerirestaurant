@@ -19,26 +19,6 @@
   color-scheme: dark;
 }
 
-:root[data-site-theme="light"] {
-  --color-ink: 248 243 234;
-  --color-ink-soft: 255 252 247;
-  --color-ink-800: 239 232 221;
-  --color-ink-700: 225 216 202;
-  --color-cream: 10 10 10;
-  --color-muted: 92 86 78;
-  color-scheme: light;
-}
-
-.admin-theme {
-  --color-ink: 8 8 8;
-  --color-ink-soft: 17 17 17;
-  --color-ink-800: 26 26 26;
-  --color-ink-700: 38 38 38;
-  --color-cream: 248 243 234;
-  --color-muted: 163 163 163;
-  color-scheme: dark;
-}
-
 * {
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;

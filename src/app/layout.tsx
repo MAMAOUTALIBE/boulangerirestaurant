@@ -9,7 +9,6 @@ import { CookieConsent } from "@/components/CookieConsent";
 import { ServiceWorkerRegister } from "@/components/ServiceWorkerRegister";
 import { AiAssistant } from "@/components/AiAssistant";
 import { siteConfig } from "@/lib/config";
-import { prisma } from "@/lib/prisma";
 
 const sans = Inter({
   subsets: ["latin"],
@@ -73,19 +72,11 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const appearance = await prisma.orderingSetting
-    .findUnique({
-      where: { id: "default" },
-      select: { siteTheme: true },
-    })
-    .catch(() => null);
-  const siteTheme = appearance?.siteTheme === "light" ? "light" : "dark";
-
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Restaurant",
@@ -109,7 +100,6 @@ export default async function RootLayout({
   return (
     <html
       lang="fr"
-      data-site-theme={siteTheme}
       data-scroll-behavior="smooth"
       className={`${sans.variable} ${display.variable}`}
     >
