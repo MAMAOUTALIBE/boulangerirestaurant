@@ -41,7 +41,7 @@ A running PostgreSQL instance and `DATABASE_URL` are **required** even for local
 ### Layers
 
 - **Server Actions** (`src/app/actions.ts`) are the primary mutation entry point — every form posts to one. They follow a fixed pattern: honeypot bot check (`isBot`) → `rateLimit(...)` → Zod `safeParse` → call a `src/lib/*` function → `revalidatePath`/`redirect`. Admin actions are prefixed `admin*` and re-check `isAdminEmail`.
-- **Domain logic** lives in `src/lib/*.ts`, each file marked `import "server-only"` (orders, payment, auth, customers, promo, delivery, loyalty, slots, reviews, segmentation, stripe-connect, email, sms, assistant, plus restaurant features: `stock`, `seasonal`, `antiwaste`, `service-alert`, `social-order`…). Keep business rules here, not in components or routes. A few helpers are deliberately **pure / framework-free** (no `server-only`, no DB) so they can be unit-tested in isolation — `stock.ts`, `service-alert.ts`, `social-order.ts` (see their colocated `*.test.ts`).
+- **Domain logic** lives in `src/lib/*.ts`, each file marked `import "server-only"` (orders, payment, auth, customers, promo, delivery, loyalty, slots, reviews, segmentation, stripe-connect, email, sms, assistant, demo-leads, plus restaurant features: `stock`, `seasonal`, `antiwaste`, `service-alert`, `social-order`…). Keep business rules here, not in components or routes. A few helpers are deliberately **pure / framework-free** (no `server-only`, no DB) so they can be unit-tested in isolation — `stock.ts`, `service-alert.ts`, `social-order.ts`, `analytics.ts`, `segmentation.ts`, `validation.ts`, `utils.ts` (see their colocated `*.test.ts`; `analytics.ts` powers the revenue forecast + peak-hours heatmap on `/admin/rapports`).
 - **API routes** (`src/app/api/*`) serve JSON/CSV and webhooks. The Stripe webhook (`/api/webhooks/stripe`) is the **source of truth** for payment confirmation (reads the raw body to verify the signature) — the browser redirect is not trusted.
 - **Prisma client** is a `globalThis` singleton (`src/lib/prisma.ts`) to survive dev hot-reload.
 
@@ -68,6 +68,10 @@ Four self-contained features, each with a `src/lib` module, a public route, an `
 - **Réservations** (`/reservation`, `/admin/reservations`, `Reservation`): table/event booking requests.
 - **Traiteur** (`/traiteur`, `/admin/traiteur`, `CateringRequest`): catering quote requests.
 - **Galerie** (`/galerie`, no model, no lib): static showcase. The media list is **hard-coded inline** in `src/components/GallerySection.tsx` (a 3-card carousel) referencing files under `public/images` and `public/videos` — to add a photo/video, edit that array (instructions are in a comment at the top of the file), don't look for a DB or admin screen.
+
+### Demo-lead capture (`demo-leads.ts`, `/admin/leads`, `DemoLead`)
+
+A cross-cutting **lead tracker** layered on top of the public forms for demo/prospecting: most Server Actions call `recordDemoLead({ source, … })` (newsletter, panier, commande, réservation, contact, traiteur, sur-mesure, saison, anti-gaspi) after their real work. It upserts a `DemoLead` (dedup + `visits` counter + `converted` flag) so `/admin/leads` shows who interacted and from where. Fire-and-forget — it must never block or fail the underlying action. When adding a new public form, mirror the pattern with the appropriate `DemoLeadSource`.
 
 ### Admin screens beyond CRUD
 
@@ -106,6 +110,7 @@ When a new order lands, `notifyOrderChannels` (`src/lib/order-notifications.ts`,
 - Prettier: double quotes, semicolons, trailing commas, 80 cols, `prettier-plugin-tailwindcss` (keep Tailwind class order). Run `npm run format` before finishing.
 - Tests are Vitest + Testing Library (`jsdom`), colocated as `*.test.ts(x)`. The Vitest setup clears `localStorage` after each test.
 - Theme colors are centralized in `tailwind.config.ts` (`ink`, `cream`, `gold`, `forest`, `muted`) — use these tokens, not raw hex.
+- Site identity (name, description, contact phone/email/address, opening hours, SEO/QR/social defaults) is the single `siteConfig` in `src/lib/config.ts` — read it (or the derived `phoneHref`/`emailHref`/`mapsHref` in `src/lib/contactLinks.ts`), don't hard-code these anywhere.
 - Money is rounded with the `roundCurrency` helper (cents precision); don't introduce float drift.
 
 ## Deployment
