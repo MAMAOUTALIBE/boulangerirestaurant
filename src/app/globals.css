@@ -3,8 +3,40 @@
 @tailwind utilities;
 
 :root {
-  --background: #080808;
-  --foreground: #f8f3ea;
+  --color-ink: 8 8 8;
+  --color-ink-soft: 17 17 17;
+  --color-ink-800: 26 26 26;
+  --color-ink-700: 38 38 38;
+  --color-cream: 248 243 234;
+  --color-gold: 245 158 11;
+  --color-gold-600: 217 119 6;
+  --color-gold-400: 251 191 36;
+  --color-forest: 18 53 36;
+  --color-forest-600: 27 94 54;
+  --color-muted: 163 163 163;
+  --background: rgb(var(--color-ink));
+  --foreground: rgb(var(--color-cream));
+  color-scheme: dark;
+}
+
+:root[data-site-theme="light"] {
+  --color-ink: 248 243 234;
+  --color-ink-soft: 255 252 247;
+  --color-ink-800: 239 232 221;
+  --color-ink-700: 225 216 202;
+  --color-cream: 10 10 10;
+  --color-muted: 92 86 78;
+  color-scheme: light;
+}
+
+.admin-theme {
+  --color-ink: 8 8 8;
+  --color-ink-soft: 17 17 17;
+  --color-ink-800: 26 26 26;
+  --color-ink-700: 38 38 38;
+  --color-cream: 248 243 234;
+  --color-muted: 163 163 163;
+  color-scheme: dark;
 }
 
 * {
@@ -20,6 +52,17 @@ body {
   color: var(--foreground);
   background: var(--background);
   overflow-x: hidden;
+}
+
+body,
+header,
+main,
+footer,
+aside {
+  transition:
+    background-color 220ms ease,
+    border-color 220ms ease,
+    color 220ms ease;
 }
 
 @layer components {

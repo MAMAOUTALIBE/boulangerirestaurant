@@ -85,10 +85,10 @@ async function main() {
   // Établissement par défaut (base mono-site aujourd'hui, prêt multi-sites).
   const defaultRestaurant = await prisma.restaurant.upsert({
     where: { slug: "anatolia-grill" },
-    update: { name: "Anatolia Grill", active: true },
+    update: { name: "Restaurant", active: true },
     create: {
       slug: "anatolia-grill",
-      name: "Anatolia Grill",
+      name: "Restaurant",
       active: true,
     },
   });

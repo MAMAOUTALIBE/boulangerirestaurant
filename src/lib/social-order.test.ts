@@ -54,7 +54,7 @@ describe("social order helpers", () => {
   });
 
   it("génère des URLs WhatsApp et Telegram encodées", () => {
-    const message = "Bonjour Anatolia Grill\nCommande test";
+    const message = "Bonjour Restaurant\nCommande test";
 
     expect(buildWhatsAppOrderUrl(message)).toMatch(
       /^https:\/\/wa\.me\/33775787825\?text=/,

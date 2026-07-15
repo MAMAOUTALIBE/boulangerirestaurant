@@ -8,8 +8,8 @@ const telegramUrl = telegramOrderUsername
 
 /** Configuration centrale du site (SEO, QR code, emails, coordonnées). */
 export const siteConfig = {
-  name: "Anatolia Grill",
-  shortName: "Anatolia",
+  name: "Restaurant",
+  shortName: "Restaurant",
   description:
     "Restaurant turc : grillades au charbon, kebabs, pide, lahmacun, mezze et desserts maison. Sur place, à emporter ou en livraison.",
   /** URL publique (override en prod via NEXT_PUBLIC_SITE_URL). */

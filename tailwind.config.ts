@@ -11,22 +11,22 @@ const config: Config = {
       colors: {
         // Palette restaurant
         ink: {
-          DEFAULT: "#080808", // Noir profond
-          soft: "#111111", // Noir secondaire
-          800: "#1a1a1a",
-          700: "#262626",
+          DEFAULT: "rgb(var(--color-ink) / <alpha-value>)",
+          soft: "rgb(var(--color-ink-soft) / <alpha-value>)",
+          800: "rgb(var(--color-ink-800) / <alpha-value>)",
+          700: "rgb(var(--color-ink-700) / <alpha-value>)",
         },
-        cream: "#F8F3EA", // Blanc cassé
+        cream: "rgb(var(--color-cream) / <alpha-value>)",
         gold: {
-          DEFAULT: "#F59E0B", // Orange doré
-          600: "#D97706",
-          400: "#FBBF24",
+          DEFAULT: "rgb(var(--color-gold) / <alpha-value>)",
+          600: "rgb(var(--color-gold-600) / <alpha-value>)",
+          400: "rgb(var(--color-gold-400) / <alpha-value>)",
         },
         forest: {
-          DEFAULT: "#123524", // Vert profond
-          600: "#1B5E36",
+          DEFAULT: "rgb(var(--color-forest) / <alpha-value>)",
+          600: "rgb(var(--color-forest-600) / <alpha-value>)",
         },
-        muted: "#A3A3A3", // Gris texte
+        muted: "rgb(var(--color-muted) / <alpha-value>)",
       },
       screens: {
         "3xl": "1920px",
@@ -39,7 +39,7 @@ const config: Config = {
       boxShadow: {
         soft: "0 10px 40px -12px rgba(0,0,0,0.25)",
         card: "0 18px 50px -20px rgba(0,0,0,0.45)",
-        glow: "0 0 0 1px rgba(245,158,11,0.25), 0 12px 40px -12px rgba(245,158,11,0.35)",
+        glow: "0 0 0 1px rgb(var(--color-gold) / 0.25), 0 12px 40px -12px rgb(var(--color-gold) / 0.35)",
       },
       borderRadius: {
         xl2: "1.25rem",
@@ -59,9 +59,9 @@ const config: Config = {
       },
       backgroundImage: {
         "hero-radial":
-          "radial-gradient(1200px 600px at 70% 10%, rgba(245,158,11,0.18), transparent 60%)",
+          "radial-gradient(1200px 600px at 70% 10%, rgb(var(--color-gold) / 0.18), transparent 60%)",
         kente:
-          "repeating-linear-gradient(45deg, rgba(245,158,11,0.08) 0 10px, transparent 10px 20px)",
+          "repeating-linear-gradient(45deg, rgb(var(--color-gold) / 0.08) 0 10px, transparent 10px 20px)",
       },
     },
   },

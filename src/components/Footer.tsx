@@ -201,7 +201,7 @@ const payments = ["VISA", "Mastercard", "PayPal", "Apple Pay"];
 /** Pied de page complet : logo, réseaux, liens, contact, newsletter, paiements. */
 export function Footer() {
   return (
-    <footer className="border-t border-gold/15 bg-[radial-gradient(circle_at_top,rgba(245,158,11,0.08),transparent_34%),linear-gradient(180deg,#111111,#070707)]">
+    <footer className="border-t border-gold/15 bg-ink">
       <MobileFooter />
       <div className="container-page hidden py-12 sm:block">
         <nav
@@ -212,16 +212,16 @@ export function Footer() {
             <Link
               key={href}
               href={href}
-              className="group flex min-h-24 items-center gap-4 rounded-[22px] border border-white/10 bg-white/[0.035] p-4 transition hover:-translate-y-0.5 hover:border-gold/55 hover:bg-white/[0.06]"
+              className="group flex min-h-24 items-center gap-4 rounded-[22px] border border-gold/20 bg-cream p-4 shadow-[0_24px_60px_-42px_rgba(0,0,0,0.75)] transition hover:-translate-y-0.5 hover:border-gold/55"
             >
               <span className="grid h-12 w-12 shrink-0 place-items-center rounded-full border border-gold/35 bg-gold/10 text-gold transition group-hover:bg-gold group-hover:text-ink">
                 <Icon className="h-5 w-5" />
               </span>
               <span className="min-w-0">
-                <span className="block font-display text-xl font-bold leading-tight text-cream transition group-hover:text-white">
+                <span className="block font-display text-xl font-bold leading-tight text-ink transition group-hover:text-gold-600">
                   {label}
                 </span>
-                <span className="mt-1 block text-sm leading-5 text-cream/60">
+                <span className="mt-1 block text-sm leading-5 text-ink/60">
                   {description}
                 </span>
               </span>
@@ -311,11 +311,11 @@ export function Footer() {
               </ul>
             </section>
 
-            <section className="rounded-[22px] border border-white/10 bg-black/20 p-5">
-              <h4 className="font-display text-xl font-semibold text-cream">
+            <section className="rounded-[22px] border border-gold/20 bg-cream p-5 text-ink shadow-[0_24px_60px_-42px_rgba(0,0,0,0.75)] [&_input]:border-ink/15 [&_input]:bg-white [&_input]:text-ink [&_input]:placeholder:text-ink/45">
+              <h4 className="font-display text-xl font-semibold text-ink">
                 Newsletter
               </h4>
-              <p className="mt-3 text-sm leading-5 text-muted">
+              <p className="mt-3 text-sm leading-5 text-ink/60">
                 Recevez nos offres, nouveautés et spécialités du moment.
               </p>
               <NewsletterForm />
@@ -346,7 +346,7 @@ export function Footer() {
 function MobileFooter() {
   return (
     <div className="sm:hidden">
-      <div className="mx-auto max-w-[48rem] border-x border-white/[0.08] bg-[radial-gradient(circle_at_top,rgba(245,158,11,0.08),transparent_34%),linear-gradient(180deg,#080808,#050505)] px-4 pb-5 pt-7">
+      <div className="mx-auto max-w-[48rem] border-x border-white/[0.08] bg-ink px-4 pb-5 pt-7">
         <Logo className="mx-auto w-fit justify-center" />
 
         <p className="mx-auto mt-3 max-w-xs text-center text-sm leading-5 text-cream/70">
@@ -412,12 +412,12 @@ function MobileFooter() {
 
         <MobileInformationPanel className="mt-7" />
 
-        <section className="mt-5 rounded-2xl border border-white/10 bg-white/[0.035] p-3 shadow-[0_24px_70px_-58px_rgba(255,255,255,0.7)]">
+        <section className="mt-5 rounded-2xl border border-gold/20 bg-cream p-3 text-ink shadow-[0_24px_70px_-48px_rgba(0,0,0,0.8)]">
           <FooterMobileHeading>Newsletter</FooterMobileHeading>
-          <p className="text-cream/78 mt-2 text-sm leading-5">
+          <p className="mt-2 text-sm leading-5 text-ink/70">
             Recevez nos offres, nouveautés et spécialités du moment
           </p>
-          <div className="[&_button]:h-11 [&_button]:w-11 [&_button]:shrink-0 [&_button]:px-0 [&_input]:h-11 [&_input]:bg-black/35 [&_input]:text-sm">
+          <div className="[&_button]:h-11 [&_button]:w-11 [&_button]:shrink-0 [&_button]:px-0 [&_input]:h-11 [&_input]:border-ink/15 [&_input]:bg-white [&_input]:text-sm [&_input]:text-ink [&_input]:placeholder:text-ink/45">
             <NewsletterForm />
           </div>
         </section>

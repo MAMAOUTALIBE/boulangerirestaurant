@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Flame } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { siteConfig } from "@/lib/config";
 
 interface LogoProps {
   className?: string;
@@ -8,13 +9,13 @@ interface LogoProps {
   tone?: "light" | "dark";
 }
 
-/** Logo Anatolia Grill. */
+/** Logo du restaurant. */
 export function Logo({ className, tone = "light" }: LogoProps) {
   return (
     <Link
       href="/"
       className={cn("group flex items-center gap-3.5", className)}
-      aria-label="Anatolia Grill — Accueil"
+      aria-label={`${siteConfig.name} — Accueil`}
     >
       <span
         className={cn(
@@ -33,7 +34,7 @@ export function Logo({ className, tone = "light" }: LogoProps) {
             tone === "light" ? "text-cream" : "text-ink",
           )}
         >
-          Anatolia Grill
+          {siteConfig.name}
         </span>
       </span>
     </Link>

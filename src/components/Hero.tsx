@@ -79,7 +79,7 @@ const heroSlides = [
   },
   {
     type: "image",
-    label: "Anatolia Grill",
+    label: "Restaurant",
     src: "/images/hero-plateau-turc-premium.png",
     alt: "Grand plateau de grillades turques : kebabs, brochettes, côtelettes d'agneau, riz et pain",
   },
@@ -290,7 +290,7 @@ export function Hero() {
 
             <div className="relative z-20">
               <h1 className="font-display text-[2.65rem] font-bold leading-[0.98] text-[#F8F3EA] drop-shadow-[0_3px_8px_rgba(0,0,0,0.96)] min-[390px]:text-5xl sm:text-6xl lg:text-[4.15rem] xl:text-[4.8rem] 3xl:text-[5.8rem] 4xl:text-[6.5rem]">
-                <span className="block text-[#D89A1C]">Anatolia Grill</span>
+                <span className="block text-[#D89A1C]">{siteConfig.name}</span>
               </h1>
 
               <p className="text-[#F8F3EA]/88 mt-3 max-w-[18rem] text-sm font-semibold leading-5 drop-shadow-[0_2px_5px_rgba(0,0,0,0.98)] sm:mt-5 sm:max-w-xl sm:text-xl sm:leading-8 3xl:max-w-3xl 3xl:text-2xl 3xl:leading-10">

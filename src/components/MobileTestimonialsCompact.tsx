@@ -63,12 +63,12 @@ export function MobileTestimonialsCompact() {
   return (
     <>
       <div className="sm:hidden">
-        <div className="rounded-[1.75rem] border border-gold/25 bg-[radial-gradient(circle_at_top,rgba(216,154,28,0.16),rgba(8,8,8,0)_38%),linear-gradient(145deg,#10100f,#070707)] px-4 py-5 shadow-[0_24px_70px_-54px_rgba(216,154,28,0.75)]">
+        <div className="rounded-[1.75rem] border border-gold/25 bg-cream px-4 py-5 shadow-[0_24px_70px_-48px_rgba(0,0,0,0.8)]">
           <div className="mx-auto grid h-11 w-11 place-items-center rounded-full border border-gold/45 text-gold">
             <MessageCircle className="h-5 w-5" />
           </div>
 
-          <h2 className="mt-3 text-center font-display text-2xl font-bold uppercase tracking-[0.08em] text-cream">
+          <h2 className="mt-3 text-center font-display text-2xl font-bold uppercase tracking-[0.08em] text-ink">
             Ils parlent de <span className="text-gold">nous</span>
           </h2>
 
@@ -76,25 +76,25 @@ export function MobileTestimonialsCompact() {
 
           <div className="mt-4 text-center">
             <MobileStars />
-            <p className="mt-2 text-base font-semibold text-cream">
+            <p className="mt-2 text-base font-semibold text-ink">
               4,8/5 sur Google
             </p>
-            <p className="mt-1 text-xs font-medium text-cream/60">
+            <p className="mt-1 text-xs font-medium text-ink/60">
               Basé sur +230 avis clients
             </p>
           </div>
 
-          <div className="mt-4 border-y border-white/[0.08] py-4">
+          <div className="mt-4 border-y border-ink/10 py-4">
             <div className="flex items-start gap-3">
               <GoogleBadge />
               <div className="min-w-0">
-                <blockquote className="text-sm font-medium leading-6 text-cream/90">
+                <blockquote className="text-sm font-medium leading-6 text-ink/90">
                   <span className="text-gold">&ldquo;</span>
                   Les grillades sont savoureuses et parfaitement cuites au
                   charbon. Un vrai régal !
                   <span className="text-gold">&rdquo;</span>
                 </blockquote>
-                <p className="mt-2 text-sm font-semibold text-cream/75">
+                <p className="mt-2 text-sm font-semibold text-ink/70">
                   — Marie L.
                 </p>
               </div>

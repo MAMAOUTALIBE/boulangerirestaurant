@@ -1,9 +1,10 @@
 import type { MetadataRoute } from "next";
+import { siteConfig } from "@/lib/config";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Anatolia Grill",
-    short_name: "Anatolia",
+    name: siteConfig.name,
+    short_name: siteConfig.shortName,
     description:
       "Commandez nos grillades, kebabs et spécialités turques en ligne.",
     start_url: "/",
