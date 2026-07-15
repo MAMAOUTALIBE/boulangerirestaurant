@@ -290,7 +290,7 @@ export function Hero() {
 
             <div className="relative z-20">
               <h1 className="font-display text-[2.65rem] font-bold leading-[0.98] text-[#F8F3EA] drop-shadow-[0_3px_8px_rgba(0,0,0,0.96)] min-[390px]:text-5xl sm:text-6xl lg:text-[4.15rem] xl:text-[4.8rem] 3xl:text-[5.8rem] 4xl:text-[6.5rem]">
-                <span className="block text-[#D89A1C]">{siteConfig.name}</span>
+                <span className="block text-gold">{siteConfig.name}</span>
               </h1>
 
               <p className="text-[#F8F3EA]/88 mt-3 max-w-[18rem] text-sm font-semibold leading-5 drop-shadow-[0_2px_5px_rgba(0,0,0,0.98)] sm:mt-5 sm:max-w-xl sm:text-xl sm:leading-8 3xl:max-w-3xl 3xl:text-2xl 3xl:leading-10">
@@ -300,7 +300,7 @@ export function Hero() {
               <div className="mt-5 hidden flex-col gap-3 sm:mt-6 sm:flex sm:flex-row sm:flex-wrap 3xl:gap-4">
                 <Link
                   href="/commander"
-                  className="inline-flex min-h-[3.5rem] w-full items-center justify-center gap-3 rounded-full bg-[#D89A1C] px-8 py-3 text-base font-black text-[#050505] shadow-[0_24px_58px_-24px_rgba(216,154,28,0.98)] transition hover:-translate-y-1 hover:bg-[#f0ad2f] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D89A1C]/70 sm:min-h-[3.75rem] sm:w-auto sm:px-10 sm:py-3.5 sm:text-lg 3xl:min-h-[4.4rem] 3xl:px-12 3xl:text-xl"
+                  className="inline-flex min-h-[3.5rem] w-full items-center justify-center gap-3 rounded-full bg-gold px-8 py-3 text-base font-black text-ink shadow-glow transition hover:-translate-y-1 hover:bg-gold-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70 sm:min-h-[3.75rem] sm:w-auto sm:px-10 sm:py-3.5 sm:text-lg 3xl:min-h-[4.4rem] 3xl:px-12 3xl:text-xl"
                 >
                   <ShoppingBag className="h-5 w-5 3xl:h-6 3xl:w-6" />
                   Commander
@@ -318,7 +318,7 @@ export function Hero() {
                   <span className="hidden basis-full sm:block" aria-hidden />
                   <Link
                     href="/menu"
-                    className="inline-flex min-h-[3rem] flex-1 items-center justify-center gap-2 rounded-full border border-white/25 bg-black/20 px-4 py-2.5 text-sm font-bold text-[#F8F3EA] transition hover:-translate-y-1 hover:border-[#D89A1C]/70 hover:bg-black/35 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50 sm:flex-none sm:gap-2.5 sm:px-6 3xl:min-h-[3.6rem] 3xl:px-8 3xl:text-base"
+                    className="inline-flex min-h-[3rem] flex-1 items-center justify-center gap-2 rounded-full border border-white/25 bg-black/20 px-4 py-2.5 text-sm font-bold text-[#F8F3EA] transition hover:-translate-y-1 hover:border-gold/70 hover:bg-black/35 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50 sm:flex-none sm:gap-2.5 sm:px-6 3xl:min-h-[3.6rem] 3xl:px-8 3xl:text-base"
                   >
                     <UtensilsCrossed className="h-4 w-4 3xl:h-5 3xl:w-5" />
                     <span className="whitespace-nowrap">Voir le menu</span>
@@ -337,9 +337,9 @@ export function Hero() {
                     aria-label={`Afficher ${slide.label}`}
                     aria-current={index === activeSlide ? "true" : undefined}
                     onClick={() => setActiveSlide(index)}
-                    className={`h-2 rounded-full transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D89A1C]/70 3xl:h-2.5 ${
+                    className={`h-2 rounded-full transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70 3xl:h-2.5 ${
                       index === activeSlide
-                        ? "w-8 bg-[#D89A1C] 3xl:w-10"
+                        ? "w-8 bg-gold 3xl:w-10"
                         : "w-2 bg-white/45 hover:bg-white/75 3xl:w-2.5"
                     }`}
                   />
@@ -358,7 +358,7 @@ export function Hero() {
             {[...serviceHighlights, ...serviceHighlights].map(
               ({ title, Icon }, index) => (
                 <span key={`${title}-${index}`} className="hero-service-chip">
-                  <Icon className="h-4 w-4 shrink-0 text-[#D89A1C]" />
+                  <Icon className="h-4 w-4 shrink-0 text-gold" />
                   <span>{title}</span>
                 </span>
               ),
@@ -379,7 +379,7 @@ export function Hero() {
                 key={title}
                 className="flex items-center gap-4 border-t border-white/10 px-5 py-4 first:border-t-0 sm:px-6 lg:border-l lg:border-t-0 lg:px-7 lg:first:border-l-0 3xl:gap-5 3xl:px-9 3xl:py-6"
               >
-                <span className="border-[#D89A1C]/58 bg-black/28 flex h-12 w-12 shrink-0 items-center justify-center rounded-full border text-[#D89A1C] sm:h-14 sm:w-14 3xl:h-16 3xl:w-16">
+                <span className="bg-black/28 flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-gold/60 text-gold sm:h-14 sm:w-14 3xl:h-16 3xl:w-16">
                   <Icon className="h-5 w-5 3xl:h-6 3xl:w-6" />
                 </span>
                 <span className="min-w-0">

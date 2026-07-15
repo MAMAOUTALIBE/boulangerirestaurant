@@ -1428,6 +1428,27 @@ export async function adminUpdateOrderingSettings(
   redirect("/admin/parametres");
 }
 
+/** Back-office : choisit la palette d'accent globale du site public. */
+export async function adminUpdateColorPalette(
+  formData: FormData,
+): Promise<void> {
+  if (!isAdminEmail(await getSessionEmail())) redirect("/compte?admin=1");
+
+  const parsed = z
+    .enum(["ambre", "terracotta", "emeraude"])
+    .safeParse(formData.get("palette"));
+  if (!parsed.success) redirect("/admin/parametres?paletteError=invalid");
+
+  await prisma.orderingSetting.upsert({
+    where: { id: "default" },
+    update: { colorPalette: parsed.data },
+    create: { id: "default", colorPalette: parsed.data },
+  });
+  revalidatePath("/", "layout");
+  revalidatePath("/admin/parametres");
+  redirect("/admin/parametres?paletteSaved=1");
+}
+
 /** Back-office : ajoute un restaurant (socle multi-restaurant). */
 export async function adminCreateRestaurant(formData: FormData): Promise<void> {
   if (!isAdminEmail(await getSessionEmail())) redirect("/compte");

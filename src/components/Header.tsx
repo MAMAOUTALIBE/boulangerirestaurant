@@ -122,9 +122,9 @@ export function Header() {
               href={href}
               className="text-cream/88 group relative inline-flex items-center gap-2 text-sm font-semibold transition hover:text-white 2xl:gap-2.5 2xl:text-base 3xl:text-lg"
             >
-              <Icon className="h-[1.125rem] w-[1.125rem] text-[#D89A1C] 2xl:h-5 2xl:w-5" />
+              <Icon className="h-[1.125rem] w-[1.125rem] text-gold 2xl:h-5 2xl:w-5" />
               {t(labelKey, label)}
-              <span className="absolute -bottom-2 left-1/2 h-px w-0 -translate-x-1/2 bg-[#D89A1C] transition-all duration-300 group-hover:w-full" />
+              <span className="absolute -bottom-2 left-1/2 h-px w-0 -translate-x-1/2 bg-gold transition-all duration-300 group-hover:w-full" />
             </a>
           ))}
 
@@ -134,10 +134,10 @@ export function Header() {
               className="text-cream/88 relative inline-flex items-center gap-2 text-sm font-semibold transition hover:text-white focus:outline-none 2xl:gap-2.5 2xl:text-base 3xl:text-lg"
               aria-haspopup="true"
             >
-              <ChefHat className="h-[1.125rem] w-[1.125rem] text-[#D89A1C] 2xl:h-5 2xl:w-5" />
+              <ChefHat className="h-[1.125rem] w-[1.125rem] text-gold 2xl:h-5 2xl:w-5" />
               {t("nav.offers", "Groupes & événements")}
-              <ChevronDown className="h-4 w-4 text-[#D89A1C] transition group-focus-within/offers:rotate-180 group-hover/offers:rotate-180" />
-              <span className="absolute -bottom-2 left-1/2 h-px w-0 -translate-x-1/2 bg-[#D89A1C] transition-all duration-300 group-focus-within/offers:w-full group-hover/offers:w-full" />
+              <ChevronDown className="h-4 w-4 text-gold transition group-focus-within/offers:rotate-180 group-hover/offers:rotate-180" />
+              <span className="absolute -bottom-2 left-1/2 h-px w-0 -translate-x-1/2 bg-gold transition-all duration-300 group-focus-within/offers:w-full group-hover/offers:w-full" />
             </button>
 
             <div className="pointer-events-none invisible absolute left-1/2 top-full z-50 mt-5 w-[30rem] -translate-x-1/2 translate-y-2 rounded-[18px] border border-gold/30 bg-[linear-gradient(135deg,rgba(8,8,8,0.98)_0%,rgba(22,18,13,0.98)_68%,rgba(50,34,12,0.98)_100%)] p-2.5 opacity-0 shadow-[0_30px_90px_-45px_rgba(0,0,0,0.95)] backdrop-blur-2xl transition duration-200 group-focus-within/offers:pointer-events-auto group-focus-within/offers:visible group-focus-within/offers:translate-y-0 group-focus-within/offers:opacity-100 group-hover/offers:pointer-events-auto group-hover/offers:visible group-hover/offers:translate-y-0 group-hover/offers:opacity-100 3xl:w-[34rem]">
@@ -173,7 +173,7 @@ export function Header() {
           className="border-white/28 bg-black/32 hidden h-14 min-w-0 items-center gap-3 rounded-full border px-4 text-cream shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] transition focus-within:border-gold/70 xl:flex 2xl:h-16 2xl:px-5 3xl:h-[4.5rem] 3xl:px-6"
           role="search"
         >
-          <Search className="h-5 w-5 shrink-0 text-[#D89A1C] 3xl:h-6 3xl:w-6" />
+          <Search className="h-5 w-5 shrink-0 text-gold 3xl:h-6 3xl:w-6" />
           <input
             name="q"
             type="search"
@@ -193,20 +193,20 @@ export function Header() {
         <div className="flex items-center gap-2 sm:gap-3 lg:gap-3 2xl:gap-4">
           <a
             href={phoneHref}
-            className="bg-black/28 hidden min-h-[3rem] items-center justify-center gap-2 rounded-full border border-white/15 px-4 py-2 text-sm font-bold text-cream transition hover:-translate-y-0.5 hover:border-[#D89A1C]/70 hover:text-[#D89A1C] 2xl:inline-flex 3xl:min-h-[3.5rem] 3xl:px-5 3xl:text-base"
+            className="bg-black/28 hidden min-h-[3rem] items-center justify-center gap-2 rounded-full border border-white/15 px-4 py-2 text-sm font-bold text-cream transition hover:-translate-y-0.5 hover:border-gold/70 hover:text-gold 2xl:inline-flex 3xl:min-h-[3.5rem] 3xl:px-5 3xl:text-base"
           >
-            <Phone className="h-4 w-4 text-[#D89A1C]" />
+            <Phone className="h-4 w-4 text-gold" />
             {siteConfig.contact.phone}
           </a>
 
           <button
             aria-label={`Voir le panier (${cartCount} article${cartCount > 1 ? "s" : ""})`}
             onClick={() => setCartOpen(true)}
-            className="relative grid h-11 w-11 place-items-center rounded-full border border-white/15 bg-white/[0.03] text-cream transition hover:-translate-y-0.5 hover:border-[#D89A1C]/70 hover:text-[#D89A1C] sm:h-12 sm:w-12 lg:h-[3.25rem] lg:w-[3.25rem] 2xl:h-14 2xl:w-14 3xl:h-16 3xl:w-16"
+            className="relative grid h-11 w-11 place-items-center rounded-full border border-white/15 bg-white/[0.03] text-cream transition hover:-translate-y-0.5 hover:border-gold/70 hover:text-gold sm:h-12 sm:w-12 lg:h-[3.25rem] lg:w-[3.25rem] 2xl:h-14 2xl:w-14 3xl:h-16 3xl:w-16"
           >
             <ShoppingBag className="h-5 w-5 2xl:h-6 2xl:w-6" />
             {cartCount > 0 && (
-              <span className="absolute -right-1 -top-1 grid h-5 w-5 place-items-center rounded-full bg-[#D89A1C] text-[11px] font-bold text-[#050505]">
+              <span className="absolute -right-1 -top-1 grid h-5 w-5 place-items-center rounded-full bg-gold text-[11px] font-bold text-ink">
                 {cartCount}
               </span>
             )}
@@ -214,7 +214,7 @@ export function Header() {
 
           <a
             href="/commander"
-            className="hidden min-h-[3.25rem] items-center justify-center gap-2.5 rounded-full bg-[#D89A1C] px-5 py-3 text-sm font-bold text-[#050505] shadow-[0_16px_42px_-24px_rgba(216,154,28,0.95)] transition hover:-translate-y-0.5 hover:bg-[#f0ad2f] sm:inline-flex lg:px-6 xl:px-7 2xl:min-h-[3.5rem] 2xl:gap-3 2xl:px-9 2xl:text-base 3xl:min-h-[4rem] 3xl:px-10 3xl:text-lg"
+            className="hidden min-h-[3.25rem] items-center justify-center gap-2.5 rounded-full bg-gold px-5 py-3 text-sm font-bold text-ink shadow-glow transition hover:-translate-y-0.5 hover:bg-gold-400 sm:inline-flex lg:px-6 xl:px-7 2xl:min-h-[3.5rem] 2xl:gap-3 2xl:px-9 2xl:text-base 3xl:min-h-[4rem] 3xl:px-10 3xl:text-lg"
           >
             <ShoppingBag className="h-5 w-5" />
             {t("cta.order", "Commander")}
@@ -223,7 +223,7 @@ export function Header() {
           <button
             aria-label="Ouvrir le menu"
             onClick={() => setOpen(true)}
-            className="grid h-11 w-11 place-items-center rounded-full border border-white/15 bg-white/[0.03] text-cream transition hover:border-[#D89A1C]/70 hover:text-[#D89A1C] sm:h-12 sm:w-12 lg:hidden"
+            className="grid h-11 w-11 place-items-center rounded-full border border-white/15 bg-white/[0.03] text-cream transition hover:border-gold/70 hover:text-gold sm:h-12 sm:w-12 lg:hidden"
           >
             <Menu className="h-5 w-5" />
           </button>

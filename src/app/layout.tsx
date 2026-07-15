@@ -9,6 +9,7 @@ import { CookieConsent } from "@/components/CookieConsent";
 import { ServiceWorkerRegister } from "@/components/ServiceWorkerRegister";
 import { AiAssistant } from "@/components/AiAssistant";
 import { siteConfig } from "@/lib/config";
+import { prisma } from "@/lib/prisma";
 
 const sans = Inter({
   subsets: ["latin"],
@@ -72,11 +73,23 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const appearance = await prisma.orderingSetting
+    .findUnique({
+      where: { id: "default" },
+      select: { colorPalette: true },
+    })
+    .catch(() => null);
+  const colorPalette =
+    appearance?.colorPalette === "terracotta" ||
+    appearance?.colorPalette === "emeraude"
+      ? appearance.colorPalette
+      : "ambre";
+
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Restaurant",
@@ -100,6 +113,7 @@ export default function RootLayout({
   return (
     <html
       lang="fr"
+      data-color-palette={colorPalette}
       data-scroll-behavior="smooth"
       className={`${sans.variable} ${display.variable}`}
     >

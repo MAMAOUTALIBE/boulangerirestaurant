@@ -1,4 +1,4 @@
-import { ShieldCheck } from "lucide-react";
+import { Palette, ShieldCheck } from "lucide-react";
 import { adminEmails } from "@/lib/auth";
 import { siteConfig } from "@/lib/config";
 import { prisma } from "@/lib/prisma";
@@ -7,6 +7,7 @@ import {
   adminDeleteZone,
   adminUpdateHours,
   adminUpdateOrderingSettings,
+  adminUpdateColorPalette,
   adminCreateRestaurant,
   adminCreateDriver,
   adminOpenRestaurantStripeOnboarding,
@@ -66,6 +67,69 @@ export default async function AdminParametresPage() {
   return (
     <div className="space-y-8">
       <h1 className="font-display text-3xl font-bold text-cream">Paramètres</h1>
+
+      <section className="rounded-2xl border border-white/10 bg-ink-soft p-6">
+        <h2 className="flex items-center gap-2 font-display text-lg font-semibold text-cream">
+          <Palette className="h-5 w-5 text-gold" />
+          Couleurs du site public
+        </h2>
+        <p className="mt-2 text-sm text-muted">
+          La palette sélectionnée s’applique à tous les visiteurs. Les fonds et
+          les cartes ne changent pas.
+        </p>
+        <div className="mt-5 grid gap-3 sm:grid-cols-3">
+          {[
+            {
+              id: "ambre",
+              label: "Ambre",
+              color: "#F59E0B",
+              description: "Palette actuelle",
+            },
+            {
+              id: "terracotta",
+              label: "Terracotta",
+              color: "#EF7045",
+              description: "Chaleureux",
+            },
+            {
+              id: "emeraude",
+              label: "Émeraude",
+              color: "#34D399",
+              description: "Frais et élégant",
+            },
+          ].map(({ id, label, color, description }) => {
+            const active = (setting?.colorPalette ?? "ambre") === id;
+            return (
+              <form key={id} action={adminUpdateColorPalette}>
+                <input type="hidden" name="palette" value={id} />
+                <button
+                  type="submit"
+                  aria-pressed={active}
+                  className={`flex w-full items-center gap-3 rounded-2xl border p-4 text-left transition ${
+                    active
+                      ? "border-gold bg-gold/10"
+                      : "border-white/10 bg-ink hover:border-white/30"
+                  }`}
+                >
+                  <span
+                    className="h-10 w-10 shrink-0 rounded-full border-4 border-white/15"
+                    style={{ backgroundColor: color }}
+                    aria-hidden="true"
+                  />
+                  <span>
+                    <span className="block font-semibold text-cream">
+                      {label}
+                    </span>
+                    <span className="mt-0.5 block text-xs text-muted">
+                      {description}
+                    </span>
+                  </span>
+                </button>
+              </form>
+            );
+          })}
+        </div>
+      </section>
 
       {/* Administrateurs */}
       <section className="rounded-2xl border border-white/10 bg-ink-soft p-6">
