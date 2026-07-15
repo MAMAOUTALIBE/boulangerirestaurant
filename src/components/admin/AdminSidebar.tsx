@@ -1,6 +1,6 @@
 "use client";
 
-import { Fragment, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -25,7 +25,10 @@ import {
   Home,
   Store,
   Megaphone,
+  FlaskConical,
   ChevronDown,
+  Ellipsis,
+  X,
   type LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -81,6 +84,7 @@ const groups: NavGroup[] = [
     Icon: Megaphone,
     items: [
       { href: "/admin/leads", label: "Leads tests", Icon: Users },
+      { href: "/admin/tests", label: "Qui teste", Icon: FlaskConical },
       { href: "/admin/avis", label: "Avis", Icon: Star },
       { href: "/admin/marketing", label: "Marketing", Icon: Mail },
       { href: "/admin/rapports", label: "Rapports", Icon: BarChart3 },
@@ -101,6 +105,7 @@ const STORAGE_KEY = "crm-sidebar-groups";
 
 export function AdminSidebar() {
   const pathname = usePathname();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const isActive = (link: NavLink) =>
     link.href === "/"
@@ -145,6 +150,10 @@ export function AdminSidebar() {
       return next;
     });
 
+  useEffect(() => {
+    setMobileMenuOpen(false);
+  }, [pathname]);
+
   const renderLink = (
     link: NavLink,
     opts?: { sub?: boolean; muted?: boolean },
@@ -172,29 +181,82 @@ export function AdminSidebar() {
 
   return (
     <>
-      {/* Mobile / tablette : barre horizontale qui défile — groupes aplatis,
-          séparés par un trait, pour que tout reste accessible sans déroulant. */}
-      <nav className="flex gap-1 overflow-x-auto p-3 lg:hidden">
-        {topLinks.map((l) => renderLink(l))}
-        {groups.map((g) => (
-          <Fragment key={g.id}>
-            <span
-              className="mx-1 my-1 w-px shrink-0 self-stretch bg-white/10"
-              aria-hidden
-            />
-            {g.items.map((l) => renderLink(l))}
-          </Fragment>
-        ))}
-        <span
-          className="mx-1 my-1 w-px shrink-0 self-stretch bg-white/10"
-          aria-hidden
+      {/* Mobile / tablette : barre fixe sans débordement et menu secondaire. */}
+      {mobileMenuOpen && (
+        <button
+          type="button"
+          className="fixed inset-0 z-40 bg-black/55 lg:hidden"
+          onClick={() => setMobileMenuOpen(false)}
+          aria-label="Fermer le menu du CRM"
         />
-        {renderLink(settingsLink)}
-        {renderLink(backLink, { muted: true })}
+      )}
+      {mobileMenuOpen && (
+        <div className="fixed inset-x-3 bottom-[calc(5.25rem+env(safe-area-inset-bottom))] z-50 max-h-[min(70dvh,34rem)] overflow-y-auto rounded-2xl border border-white/10 bg-ink-soft p-3 shadow-2xl lg:hidden">
+          <div className="mb-2 flex items-center justify-between px-2">
+            <p className="font-display text-lg font-bold text-cream">
+              Toutes les rubriques
+            </p>
+            <button
+              type="button"
+              onClick={() => setMobileMenuOpen(false)}
+              className="rounded-full p-2 text-muted transition hover:bg-white/5 hover:text-cream"
+              aria-label="Fermer le menu du CRM"
+            >
+              <X className="h-5 w-5" />
+            </button>
+          </div>
+          <nav
+            aria-label="Toutes les rubriques du CRM"
+            className="grid grid-cols-2 gap-1 sm:grid-cols-3"
+          >
+            {topLinks.slice(4).map((l) => renderLink(l))}
+            {groups.flatMap((g) => g.items).map((l) => renderLink(l))}
+            {renderLink(settingsLink)}
+            {renderLink(backLink, { muted: true })}
+          </nav>
+        </div>
+      )}
+      <nav
+        aria-label="Navigation principale du CRM"
+        className="fixed inset-x-0 bottom-0 z-50 grid grid-cols-5 border-t border-white/10 bg-ink-soft/95 px-1 pb-[env(safe-area-inset-bottom)] shadow-[0_-10px_35px_rgba(0,0,0,0.35)] backdrop-blur-xl lg:hidden"
+      >
+        {topLinks.slice(0, 4).map((link) => {
+          const active = isActive(link);
+          return (
+            <Link
+              key={link.href}
+              href={link.href}
+              className={cn(
+                "flex min-w-0 flex-col items-center gap-1 px-1 py-2.5 text-[0.65rem] font-medium transition",
+                active ? "text-gold" : "text-cream/70 hover:text-cream",
+              )}
+            >
+              <link.Icon className="h-5 w-5 shrink-0" />
+              <span className="w-full truncate text-center">{link.label}</span>
+            </Link>
+          );
+        })}
+        <button
+          type="button"
+          onClick={() => setMobileMenuOpen((value) => !value)}
+          aria-expanded={mobileMenuOpen}
+          className={cn(
+            "flex min-w-0 flex-col items-center gap-1 px-1 py-2.5 text-[0.65rem] font-medium transition",
+            mobileMenuOpen ||
+              activeGroupId ||
+              topLinks.slice(4).some(isActive) ||
+              isActive(settingsLink)
+              ? "text-gold"
+              : "text-cream/70 hover:text-cream",
+          )}
+        >
+          <Ellipsis className="h-5 w-5 shrink-0" />
+          <span>Plus</span>
+        </button>
       </nav>
 
       {/* Desktop : colonne verticale avec groupes déroulants. */}
-      <nav className="hidden p-4 lg:flex lg:flex-1 lg:flex-col lg:gap-1">
+      <nav className="hidden p-4 lg:flex lg:min-h-0 lg:flex-1 lg:flex-col lg:gap-1 lg:overflow-y-auto lg:overscroll-contain">
         {topLinks.map((l) => renderLink(l))}
 
         {groups.map((g) => {
