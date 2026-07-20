@@ -1,13 +1,12 @@
 import { NextResponse } from "next/server";
-import { getSessionEmail } from "@/lib/session";
-import { isAdminEmail } from "@/lib/auth";
+import { isAdminSession } from "@/lib/session";
 import { getAllOrders } from "@/lib/orders";
 
 export const dynamic = "force-dynamic";
 
 /** GET /api/admin/finance.csv — synthèse financière journalière (admin). */
 export async function GET() {
-  if (!isAdminEmail(await getSessionEmail())) {
+  if (!(await isAdminSession())) {
     return NextResponse.json({ error: "Accès refusé" }, { status: 403 });
   }
 

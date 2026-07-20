@@ -1,12 +1,11 @@
 import { redirect } from "next/navigation";
 import { ShieldCheck, LogOut } from "lucide-react";
-import { getSessionEmail } from "@/lib/session";
-import { isAdminEmail } from "@/lib/auth";
+import { getSessionEmail, isAdminSession } from "@/lib/session";
 import { logout } from "@/app/actions";
 import { AdminSidebar } from "@/components/admin/AdminSidebar";
 import { OrderNotifier } from "@/components/admin/OrderNotifier";
 import { CommandPalette } from "@/components/admin/CommandPalette";
-import { siteConfig } from "@/lib/config";
+import { getSiteConfig } from "@/lib/site-settings";
 
 export const dynamic = "force-dynamic";
 
@@ -15,9 +14,11 @@ export default async function AdminLayout({
 }: {
   children: React.ReactNode;
 }) {
-  // Garde d'accès centralisée pour toutes les routes /admin/*.
+  // Garde d'accès centralisée pour toutes les routes /admin/* :
+  // exige une session de rôle admin (mot de passe), pas seulement un email allowlisté.
+  const siteConfig = await getSiteConfig();
   const email = await getSessionEmail();
-  if (!email || !isAdminEmail(email)) redirect("/compte?admin=1");
+  if (!(await isAdminSession())) redirect("/compte?admin=1");
 
   return (
     <div className="flex h-dvh w-full flex-col overflow-hidden bg-ink lg:flex-row print:h-auto print:min-h-screen print:overflow-visible">

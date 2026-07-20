@@ -1,13 +1,12 @@
 import { NextResponse } from "next/server";
-import { getSessionEmail } from "@/lib/session";
-import { isAdminEmail } from "@/lib/auth";
+import { isAdminSession } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
 
 /** GET /api/admin/orders/pending — compteurs pour les notifications live. */
 export async function GET() {
-  if (!isAdminEmail(await getSessionEmail())) {
+  if (!(await isAdminSession())) {
     return NextResponse.json({ error: "Accès refusé" }, { status: 403 });
   }
   const [pending, latest] = await Promise.all([

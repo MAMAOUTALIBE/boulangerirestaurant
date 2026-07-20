@@ -2,7 +2,7 @@ import "server-only";
 import { prisma } from "@/lib/prisma";
 import { getMenuForBrowser } from "@/lib/dishes";
 import { getOrderByReference } from "@/lib/orders";
-import { siteConfig } from "@/lib/config";
+import { getSiteConfig } from "@/lib/site-settings";
 
 const DAYS = [
   "Dimanche",
@@ -146,8 +146,10 @@ async function getHoursText(): Promise<string> {
   const hours = await prisma.openingHour
     .findMany({ orderBy: { dayOfWeek: "asc" } })
     .catch(() => []);
-  if (!hours.length)
+  if (!hours.length) {
+    const siteConfig = await getSiteConfig();
     return `Horaires indicatifs : ${siteConfig.hours.summary}.`;
+  }
   return hours
     .map((h) =>
       h.closed
@@ -186,9 +188,10 @@ export async function buildSystemPrompt(
   menu: AssistantDish[],
   extraContext?: string,
 ): Promise<string> {
-  const [hoursText, deliveryText] = await Promise.all([
+  const [hoursText, deliveryText, siteConfig] = await Promise.all([
     getHoursText(),
     getDeliveryText(),
+    getSiteConfig(),
   ]);
 
   // Menu groupé par catégorie (pour suggérer une sélection cohérente).
@@ -539,9 +542,10 @@ export async function ruleBasedResponse(
   orderContext?: Awaited<ReturnType<typeof lookupOrderContext>>,
 ): Promise<AssistantFallbackResult> {
   const q = normalize(input);
-  const [hoursText, deliveryRules] = await Promise.all([
+  const [hoursText, deliveryRules, siteConfig] = await Promise.all([
     getHoursText(),
     getDeliveryRules(),
+    getSiteConfig(),
   ]);
 
   const actions: ResolvedAction[] = [];
@@ -751,56 +755,4 @@ export async function ruleBasedResponse(
       { type: "link", label: "Nous contacter", href: "/contact" },
     ],
   };
-}
-
-/**
- * Réponse de secours par règles (mots-clés) : utilisée quand aucune clé LLM
- * n'est configurée ou si l'appel au modèle échoue.
- */
-export function ruleBasedAnswer(input: string): string {
-  const q = normalize(input);
-
-  if (q.includes("whatsapp") || q.includes("telegram")) {
-    return "Ajoutez vos produits au panier, choisissez le créneau, puis utilisez les boutons WhatsApp ou Telegram dans le récapitulatif de commande.";
-  }
-  if (
-    q.includes("livraison") ||
-    q.includes("adresse") ||
-    q.includes("code postal")
-  ) {
-    return "La livraison est prévue autour de Juvisy-sur-Orge (codes postaux 91260, 91200, 91600). Le site vérifie le code postal et le minimum de commande avant validation.";
-  }
-  if (
-    q.includes("reservation") ||
-    q.includes("table") ||
-    q.includes("sur place")
-  ) {
-    return "Pour manger sur place, utilisez la page Réservation : vous choisissez la date, l'heure, le nombre de personnes et vos coordonnées.";
-  }
-  if (
-    q.includes("traiteur") ||
-    q.includes("evenement") ||
-    q.includes("devis")
-  ) {
-    return "Pour un événement, la page Traiteur permet d'envoyer une demande de devis avec le nombre d'invités, la date et le message.";
-  }
-  if (q.includes("allerg") || q.includes("halal") || q.includes("vegetar")) {
-    return "Indiquez vos contraintes dans les notes de commande. Pour les allergènes, appelez le restaurant avant de valider.";
-  }
-  if (
-    q.includes("menu") ||
-    q.includes("produit") ||
-    q.includes("kebab") ||
-    q.includes("grillade") ||
-    q.includes("prix")
-  ) {
-    return "Le menu contient les produits disponibles avec prix, options et ajout au panier. Rendez-vous sur la page Menu.";
-  }
-  if (q.includes("paiement") || q.includes("payer") || q.includes("stripe")) {
-    return "La commande se finalise depuis la page Commander. Si un moyen de paiement précis n'est pas proposé, contactez le restaurant pour confirmer la solution possible.";
-  }
-  if (q.includes("horaire") || q.includes("ouvert")) {
-    return `Les horaires affichés du restaurant sont : ${siteConfig.hours.summary}. Les créneaux disponibles sont proposés automatiquement pendant la commande.`;
-  }
-  return "Le plus rapide est de choisir Menu, ajouter vos produits au panier, puis finaliser sur Commander. Pour une demande spéciale, utilisez Contact.";
 }

@@ -1,19 +1,14 @@
 import { NextResponse } from "next/server";
-import { getSessionEmail } from "@/lib/session";
-import { isAdminEmail } from "@/lib/auth";
+import { isAdminSession } from "@/lib/session";
 import { listSiteTesters } from "@/lib/testers";
 import { STAGE_LABELS } from "@/lib/site-activity";
+import { csvRow } from "@/lib/csv";
 
 export const dynamic = "force-dynamic";
 
-function csv(value: string | number | boolean | null | undefined): string {
-  const s = value == null ? "" : String(value);
-  return /[",\n;]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
-}
-
 /** GET /api/admin/tests.csv — export « qui teste le site » (admin). */
 export async function GET(request: Request) {
-  if (!isAdminEmail(await getSessionEmail())) {
+  if (!(await isAdminSession())) {
     return NextResponse.json({ error: "Accès refusé" }, { status: 403 });
   }
 
@@ -42,7 +37,7 @@ export async function GET(request: Request) {
   ];
 
   const rows = testers.map((t) =>
-    [
+    csvRow([
       t.name,
       t.email,
       t.phone,
@@ -58,9 +53,7 @@ export async function GET(request: Request) {
       t.lastStatus,
       new Date(t.firstAt).toISOString(),
       new Date(t.lastAt).toISOString(),
-    ]
-      .map(csv)
-      .join(";"),
+    ]),
   );
 
   return new NextResponse([header.join(";"), ...rows].join("\n"), {

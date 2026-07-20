@@ -24,7 +24,12 @@ import {
 } from "@/lib/orders";
 import { startCheckout } from "@/lib/payment";
 import { upsertCustomer } from "@/lib/customers";
-import { createSession, destroySession, getSessionEmail } from "@/lib/session";
+import {
+  createSession,
+  destroySession,
+  getSessionEmail,
+  isAdminSession,
+} from "@/lib/session";
 import {
   createMagicLink,
   isAdminEmail,
@@ -32,7 +37,8 @@ import {
 } from "@/lib/auth";
 import type { OrderStatus } from "@/types";
 import { sendEmail } from "@/lib/email";
-import { siteConfig } from "@/lib/config";
+import { rawHtml, safeHtml, safeUrl } from "@/lib/html";
+import { getSiteConfig } from "@/lib/site-settings";
 import { clientIp, rateLimit } from "@/lib/rate-limit";
 import { recordDemoLead } from "@/lib/demo-leads";
 import {
@@ -55,14 +61,6 @@ function isBot(formData: FormData): boolean {
   return Boolean(formData.get("company"));
 }
 
-function escapeHtml(value: string): string {
-  return value
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#39;");
-}
 
 const TOO_MANY: ActionState = {
   ok: false,
@@ -101,6 +99,7 @@ export async function subscribeNewsletter(
   await prisma.newsletterSubscriber.create({ data: { email } });
 
   // Automation : email de bienvenue.
+  const siteConfig = await getSiteConfig();
   await sendEmail({
     to: email,
     subject: `Bienvenue chez ${siteConfig.shortName}`,
@@ -145,10 +144,11 @@ export async function sendContactMessage(
     message: msg.message,
   });
 
+  const siteConfig = await getSiteConfig();
   await sendEmail({
     to: siteConfig.contact.email,
     subject: `Nouveau message de ${msg.name}`,
-    html: `<p><strong>${msg.name}</strong> (${msg.email}, ${msg.phone}) a écrit :</p><p>${msg.message}</p>`,
+    html: safeHtml`<p><strong>${msg.name}</strong> (${msg.email}, ${msg.phone}) a écrit :</p><p>${msg.message}</p>`,
   });
 
   return { ok: true, message: "Message envoyé ! Nous vous répondrons vite." };
@@ -184,7 +184,7 @@ export async function submitReview(
 
 /** Back-office : approuve un avis. */
 export async function adminApproveReview(formData: FormData): Promise<void> {
-  if (!isAdminEmail(await getSessionEmail())) redirect("/compte");
+  if (!(await isAdminSession())) redirect("/compte");
   const id = String(formData.get("id") ?? "");
   if (id) {
     await prisma.review.update({ where: { id }, data: { approved: true } });
@@ -195,7 +195,7 @@ export async function adminApproveReview(formData: FormData): Promise<void> {
 
 /** Back-office : supprime un avis. */
 export async function adminDeleteReview(formData: FormData): Promise<void> {
-  if (!isAdminEmail(await getSessionEmail())) redirect("/compte");
+  if (!(await isAdminSession())) redirect("/compte");
   const id = String(formData.get("id") ?? "");
   if (id) {
     await prisma.review.delete({ where: { id } }).catch(() => {});
@@ -250,7 +250,7 @@ export async function createReservation(
   await sendEmail({
     to: parsed.data.email,
     subject: `Votre demande de réservation ${ref}`,
-    html: `<h1>Merci ${parsed.data.name} !</h1>
+    html: safeHtml`<h1>Merci ${parsed.data.name} !</h1>
       <p>Votre demande de réservation pour ${parsed.data.guests} personne(s)
       le ${parsed.data.date} à ${parsed.data.time} a bien été reçue
       (réf. ${ref}). Nous la confirmons sous peu.</p>`,
@@ -301,10 +301,11 @@ export async function requestCatering(
     phone: parsed.data.phone,
   });
 
+  const siteConfig = await getSiteConfig();
   await sendEmail({
     to: siteConfig.contact.email,
     subject: `Nouvelle demande traiteur de ${parsed.data.name}`,
-    html: `<p><strong>${parsed.data.name}</strong> (${parsed.data.email}, ${parsed.data.phone})
+    html: safeHtml`<p><strong>${parsed.data.name}</strong> (${parsed.data.email}, ${parsed.data.phone})
       pour ${parsed.data.guests} convives${parsed.data.eventDate ? ` le ${parsed.data.eventDate}` : ""} :</p>
       <p>${parsed.data.message}</p>`,
   });
@@ -364,26 +365,27 @@ export async function requestCustomQuote(
     phone: parsed.data.phone,
   });
 
+  const siteConfig = await getSiteConfig();
   await sendEmail({
     to: siteConfig.contact.email,
     subject: `Nouvelle demande sur-mesure de ${parsed.data.name} (${ref})`,
-    html: `<p><strong>${parsed.data.name}</strong> (${parsed.data.email}, ${parsed.data.phone})</p>
+    html: safeHtml`<p><strong>${parsed.data.name}</strong> (${parsed.data.email}, ${parsed.data.phone})</p>
       <ul>
         <li>Occasion : ${parsed.data.occasion}</li>
         <li>Convives : ${parsed.data.servings}</li>
         <li>Préférences : ${parsed.data.preferences}</li>
         <li>Retrait : ${parsed.data.pickupDate}${parsed.data.pickupTime ? ` à ${parsed.data.pickupTime}` : ""}</li>
-        ${parsed.data.message ? `<li>Message : ${parsed.data.message}</li>` : ""}
-        ${parsed.data.budget ? `<li>Budget indicatif : ${parsed.data.budget}</li>` : ""}
-        ${parsed.data.allergies ? `<li>Allergies : ${parsed.data.allergies}</li>` : ""}
-        ${parsed.data.inspirationUrl ? `<li>Inspiration : <a href="${parsed.data.inspirationUrl}">${parsed.data.inspirationUrl}</a></li>` : ""}
+        ${parsed.data.message ? rawHtml(safeHtml`<li>Message : ${parsed.data.message}</li>`) : ""}
+        ${parsed.data.budget ? rawHtml(safeHtml`<li>Budget indicatif : ${parsed.data.budget}</li>`) : ""}
+        ${parsed.data.allergies ? rawHtml(safeHtml`<li>Allergies : ${parsed.data.allergies}</li>`) : ""}
+        ${parsed.data.inspirationUrl ? rawHtml(safeHtml`<li>Inspiration : <a href="${safeUrl(parsed.data.inspirationUrl)}">${parsed.data.inspirationUrl}</a></li>`) : ""}
       </ul>
       <p>${parsed.data.details}</p>`,
   });
   await sendEmail({
     to: parsed.data.email,
     subject: `Votre demande sur-mesure ${ref}`,
-    html: `<h1>Merci ${parsed.data.name} !</h1>
+    html: safeHtml`<h1>Merci ${parsed.data.name} !</h1>
       <p>Votre demande sur-mesure pour le ${parsed.data.pickupDate}
       (réf. ${ref}) a bien été reçue. Nous revenons vers vous avec un devis
       sur mesure.</p>`,
@@ -451,15 +453,16 @@ export async function reserveSeasonal(
     await sendEmail({
       to: parsed.data.email,
       subject: `Votre précommande ${preorder.reference} — ${product.name}`,
-      html: `<h1>Merci ${parsed.data.name} !</h1>
+      html: safeHtml`<h1>Merci ${parsed.data.name} !</h1>
         <p>Votre précommande de ${preorder.quantity} × ${product.name}
         (réf. ${preorder.reference}) est confirmée, à retirer le
         ${parsed.data.pickupDate}. Paiement au retrait en boutique.</p>`,
     });
+    const siteConfig = await getSiteConfig();
     await sendEmail({
       to: siteConfig.contact.email,
       subject: `Nouvelle précommande ${product.name} (${preorder.reference})`,
-      html: `<p>${parsed.data.name} (${parsed.data.email}, ${parsed.data.phone})
+      html: safeHtml`<p>${parsed.data.name} (${parsed.data.email}, ${parsed.data.phone})
         a précommandé ${preorder.quantity} × ${product.name} pour le
         ${parsed.data.pickupDate}.</p>`,
     });
@@ -528,19 +531,22 @@ export async function reserveAntiWaste(
     await sendEmail({
       to: parsed.data.email,
       subject: `Votre panier anti-gaspi ${reservation.reference}`,
-      html: `<h1>Merci ${parsed.data.name} !</h1>
+      html: safeHtml`<h1>Merci ${parsed.data.name} !</h1>
         <p>Vous avez réservé ${reservation.quantity} panier(s) anti-gaspi
         (réf. ${reservation.reference}). Retrait ce soir entre
         ${offer.pickupStart} et ${offer.pickupEnd}. Paiement sur place.</p>`,
     });
+    const siteConfig = await getSiteConfig();
     await sendEmail({
       to: siteConfig.contact.email,
       subject: `Nouvelle réservation anti-gaspi (${reservation.reference})`,
-      html: `<p>${parsed.data.name} (${parsed.data.email}, ${parsed.data.phone})
+      html: safeHtml`<p>${parsed.data.name} (${parsed.data.email}, ${parsed.data.phone})
         a réservé ${reservation.quantity} panier(s) pour ce soir.</p>
         ${
           parsed.data.message
-            ? `<p><strong>Message client :</strong> ${escapeHtml(parsed.data.message)}</p>`
+            ? rawHtml(
+                safeHtml`<p><strong>Message client :</strong> ${parsed.data.message}</p>`,
+              )
             : ""
         }`,
     });
@@ -567,9 +573,19 @@ export async function placeOrder(
   _prev: OrderActionState | null,
   formData: FormData,
 ): Promise<OrderActionState> {
+  // Anti-abus : honeypot + rate-limit + cap de taille — alignés sur /api/orders,
+  // car cette action envoie email + SMS (coût Twilio) et décrémente le stock.
+  if (isBot(formData)) return { ok: true, message: "Commande enregistrée." };
+  if (!(await rateLimit(`order:${await clientIp()}`, 5, 10 * 60_000)))
+    return TOO_MANY;
+
+  const rawItems = String(formData.get("items") ?? "[]");
+  if (rawItems.length > 64 * 1024) {
+    return { ok: false, message: "Panier trop volumineux." };
+  }
   let items: OrderLine[] = [];
   try {
-    items = JSON.parse(String(formData.get("items") ?? "[]"));
+    items = JSON.parse(rawItems);
   } catch {
     items = [];
   }
@@ -661,6 +677,11 @@ export async function checkPromo(
   code: string,
   subtotal: number,
 ): Promise<{ ok: boolean; message: string; discount?: number }> {
+  // Anti-énumération : borne les essais de codes (l'oracle valide/expiré/épuisé
+  // + le montant de remise ne doivent pas être testables en masse).
+  if (!(await rateLimit(`promo:${await clientIp()}`, 10, 60_000))) {
+    return { ok: false, message: "Trop de tentatives. Réessayez plus tard." };
+  }
   const { evaluatePromo } = await import("@/lib/promo");
   const r = await evaluatePromo(code, subtotal);
   if (!r.valid) return { ok: false, message: r.reason ?? "Code invalide." };
@@ -700,9 +721,19 @@ export async function getReorderItems(reference: string): Promise<
     note?: string;
   }[]
 > {
+  // Réservé au propriétaire connecté (ou admin) : ne pas réexposer le détail
+  // d'une commande d'autrui à quiconque détient/devine une référence.
+  const sessionEmail = await getSessionEmail();
+  if (!sessionEmail) return [];
   const { getOrderByReference } = await import("@/lib/orders");
   const order = await getOrderByReference(reference);
   if (!order) return [];
+  if (
+    order.customer.email.toLowerCase() !== sessionEmail.toLowerCase() &&
+    !(await isAdminSession())
+  ) {
+    return [];
+  }
 
   const slugs = order.items.map((i) => i.id);
   const dishes = await prisma.dish.findMany({ where: { slug: { in: slugs } } });
@@ -725,9 +756,24 @@ export async function getReorderItems(reference: string): Promise<
  * - Sinon → simulation : la commande passe en « payée ».
  */
 export async function payOrder(reference: string): Promise<void> {
+  // Anti-abus : borne le déclenchement de paiement (spam checkout / simulation).
+  if (!(await rateLimit(`pay:${await clientIp()}`, 10, 60_000))) {
+    redirect(`/commande/${reference}?error=throttle`);
+  }
   const order = await getOrderByReference(reference);
   if (!order) redirect("/");
   if (order.status !== "en attente") {
+    redirect(`/commande/${reference}`);
+  }
+
+  // Un utilisateur connecté ne peut payer QUE sa propre commande (ou admin).
+  // Un invité (sans session) reste autorisé via la référence-capacité (80 bits).
+  const sessionEmail = await getSessionEmail();
+  if (
+    sessionEmail &&
+    sessionEmail.toLowerCase() !== order.customer.email.toLowerCase() &&
+    !(await isAdminSession())
+  ) {
     redirect(`/commande/${reference}`);
   }
 
@@ -765,7 +811,12 @@ export async function login(
   if (!parsed.success) {
     return { ok: false, message: "Adresse email invalide." };
   }
-  await createMagicLink(parsed.data.email);
+  const targetEmail = parsed.data.email.toLowerCase();
+  // Anti-bombing : limite aussi par email visé (au-delà de l'IP), pour qu'un
+  // attaquant multi-IP ne puisse pas inonder la boîte d'une victime.
+  if (!(await rateLimit(`login-email:${targetEmail}`, 5, 15 * 60_000)))
+    return TOO_MANY;
+  await createMagicLink(targetEmail);
   return {
     ok: true,
     message:
@@ -804,6 +855,18 @@ export async function adminLogin(
     };
   }
 
+  // Anti brute-force distribué : limite aussi par compte admin ciblé (au-delà
+  // de la limite par IP), pour ralentir une attaque répartie sur plusieurs IP.
+  if (
+    !(await rateLimit(
+      `admin-login-email:${parsed.data.email}`,
+      10,
+      15 * 60_000,
+    ))
+  ) {
+    return TOO_MANY;
+  }
+
   if (
     !isAdminEmail(parsed.data.email) ||
     !isValidAdminPassword(parsed.data.password)
@@ -814,7 +877,8 @@ export async function adminLogin(
     };
   }
 
-  await createSession(parsed.data.email);
+  // Rôle admin accordé UNIQUEMENT ici (après vérification du mot de passe).
+  await createSession(parsed.data.email, "admin");
   redirect("/admin");
 }
 
@@ -872,11 +936,17 @@ const VALID_STATUSES: OrderStatus[] = [
  */
 export async function adminSetOrderStatus(formData: FormData): Promise<void> {
   const email = await getSessionEmail();
-  if (!isAdminEmail(email)) redirect("/compte");
+  if (!(await isAdminSession())) redirect("/compte");
 
   const reference = String(formData.get("reference") ?? "");
   const status = String(formData.get("status") ?? "") as OrderStatus;
-  const back = String(formData.get("back") ?? "/admin/commandes");
+  const backRaw = String(formData.get("back") ?? "/admin/commandes");
+  // Anti open-redirect : n'accepte qu'un chemin interne admin (pas d'URL absolue,
+  // pas de `//host`).
+  const back =
+    backRaw.startsWith("/admin") && !backRaw.startsWith("//")
+      ? backRaw
+      : "/admin/commandes";
   if (!reference || !VALID_STATUSES.includes(status)) {
     redirect("/admin/commandes?error=1");
   }
@@ -906,7 +976,7 @@ function nextStatus(
 /** Écran de service : fait avancer une commande à l'étape suivante. */
 export async function advanceOrderStatus(formData: FormData): Promise<void> {
   const email = await getSessionEmail();
-  if (!isAdminEmail(email)) redirect("/compte");
+  if (!(await isAdminSession())) redirect("/compte");
 
   const reference = String(formData.get("reference") ?? "");
   const current = String(formData.get("current") ?? "");
@@ -947,7 +1017,7 @@ const ANTIWASTE_STATUSES = ["réservé", "récupéré", "annulé"];
 export async function adminSetReservationStatus(
   formData: FormData,
 ): Promise<void> {
-  if (!isAdminEmail(await getSessionEmail())) redirect("/compte");
+  if (!(await isAdminSession())) redirect("/compte");
   const id = String(formData.get("id") ?? "");
   const status = String(formData.get("status") ?? "");
   if (id && RESERVATION_STATUSES.includes(status)) {
@@ -961,7 +1031,7 @@ export async function adminSetReservationStatus(
 export async function adminSetCateringStatus(
   formData: FormData,
 ): Promise<void> {
-  if (!isAdminEmail(await getSessionEmail())) redirect("/compte");
+  if (!(await isAdminSession())) redirect("/compte");
   const id = String(formData.get("id") ?? "");
   const status = String(formData.get("status") ?? "");
   if (id && CATERING_STATUSES.includes(status)) {
@@ -975,7 +1045,7 @@ export async function adminSetCateringStatus(
 export async function adminSetCustomQuoteStatus(
   formData: FormData,
 ): Promise<void> {
-  if (!isAdminEmail(await getSessionEmail())) redirect("/compte");
+  if (!(await isAdminSession())) redirect("/compte");
   const id = String(formData.get("id") ?? "");
   const status = String(formData.get("status") ?? "");
   if (id && CUSTOM_QUOTE_STATUSES.includes(status)) {
@@ -989,7 +1059,7 @@ export async function adminSetCustomQuoteStatus(
 export async function adminCreateSeasonalProduct(
   formData: FormData,
 ): Promise<void> {
-  if (!isAdminEmail(await getSessionEmail())) redirect("/compte");
+  if (!(await isAdminSession())) redirect("/compte");
   const name = String(formData.get("name") ?? "").trim();
   const description = String(formData.get("description") ?? "").trim();
   const image = String(formData.get("image") ?? "").trim();
@@ -1035,7 +1105,7 @@ export async function adminCreateSeasonalProduct(
 export async function adminUpdateSeasonalProduct(
   formData: FormData,
 ): Promise<void> {
-  if (!isAdminEmail(await getSessionEmail())) redirect("/compte");
+  if (!(await isAdminSession())) redirect("/compte");
   const id = String(formData.get("id") ?? "");
   if (!id) redirect("/admin/saison?error=1");
   await prisma.seasonalProduct.update({
@@ -1064,7 +1134,7 @@ export async function adminUpdateSeasonalProduct(
 export async function adminDeleteSeasonalProduct(
   formData: FormData,
 ): Promise<void> {
-  if (!isAdminEmail(await getSessionEmail())) redirect("/compte");
+  if (!(await isAdminSession())) redirect("/compte");
   const id = String(formData.get("id") ?? "");
   if (id) {
     await prisma.seasonalProduct.delete({ where: { id } }).catch(() => {});
@@ -1077,7 +1147,7 @@ export async function adminDeleteSeasonalProduct(
 export async function adminSetSeasonalPreorderStatus(
   formData: FormData,
 ): Promise<void> {
-  if (!isAdminEmail(await getSessionEmail())) redirect("/compte");
+  if (!(await isAdminSession())) redirect("/compte");
   const id = String(formData.get("id") ?? "");
   const status = String(formData.get("status") ?? "");
   if (id && SEASONAL_PREORDER_STATUSES.includes(status)) {
@@ -1091,7 +1161,7 @@ export async function adminSetSeasonalPreorderStatus(
 export async function adminToggleSeasonalPreorderPaid(
   formData: FormData,
 ): Promise<void> {
-  if (!isAdminEmail(await getSessionEmail())) redirect("/compte");
+  if (!(await isAdminSession())) redirect("/compte");
   const id = String(formData.get("id") ?? "");
   const paid = formData.get("paid") === "true";
   if (id) {
@@ -1105,7 +1175,7 @@ export async function adminToggleSeasonalPreorderPaid(
 export async function adminUpsertAntiWasteOffer(
   formData: FormData,
 ): Promise<void> {
-  if (!isAdminEmail(await getSessionEmail())) redirect("/compte");
+  if (!(await isAdminSession())) redirect("/compte");
   const date = String(formData.get("date") ?? "").trim();
   if (!date) redirect("/admin/anti-gaspi?error=1");
   const title = String(formData.get("title") ?? "").trim() || "Panier surprise";
@@ -1141,7 +1211,7 @@ export async function adminUpsertAntiWasteOffer(
 export async function adminDeleteAntiWasteOffer(
   formData: FormData,
 ): Promise<void> {
-  if (!isAdminEmail(await getSessionEmail())) redirect("/compte");
+  if (!(await isAdminSession())) redirect("/compte");
   const id = String(formData.get("id") ?? "");
   if (id) {
     await prisma.antiWasteOffer.delete({ where: { id } }).catch(() => {});
@@ -1154,7 +1224,7 @@ export async function adminDeleteAntiWasteOffer(
 export async function adminSetAntiWasteReservationStatus(
   formData: FormData,
 ): Promise<void> {
-  if (!isAdminEmail(await getSessionEmail())) redirect("/compte");
+  if (!(await isAdminSession())) redirect("/compte");
   const id = String(formData.get("id") ?? "");
   const status = String(formData.get("status") ?? "");
   if (id && ANTIWASTE_STATUSES.includes(status)) {
@@ -1171,7 +1241,7 @@ export async function adminSetAntiWasteReservationStatus(
 export async function adminToggleAntiWasteReservationPaid(
   formData: FormData,
 ): Promise<void> {
-  if (!isAdminEmail(await getSessionEmail())) redirect("/compte");
+  if (!(await isAdminSession())) redirect("/compte");
   const id = String(formData.get("id") ?? "");
   const paid = formData.get("paid") === "true";
   if (id) {
@@ -1188,7 +1258,7 @@ export async function adminToggleAntiWasteReservationPaid(
 export async function adminToggleContactHandled(
   formData: FormData,
 ): Promise<void> {
-  if (!isAdminEmail(await getSessionEmail())) redirect("/compte");
+  if (!(await isAdminSession())) redirect("/compte");
   const id = String(formData.get("id") ?? "");
   const handled = formData.get("handled") === "true";
   if (id) {
@@ -1200,8 +1270,7 @@ export async function adminToggleContactHandled(
 
 /** Back-office : met à jour les notes/tags d'un client. */
 export async function adminUpdateCustomer(formData: FormData): Promise<void> {
-  const sessionEmail = await getSessionEmail();
-  if (!isAdminEmail(sessionEmail)) redirect("/compte");
+  if (!(await isAdminSession())) redirect("/compte");
 
   const email = String(formData.get("email") ?? "");
   const notes = String(formData.get("notes") ?? "");
@@ -1229,7 +1298,7 @@ export async function adminUpdateCustomer(formData: FormData): Promise<void> {
 
 /** Back-office : crée un code promo. */
 export async function adminCreatePromo(formData: FormData): Promise<void> {
-  if (!isAdminEmail(await getSessionEmail())) redirect("/compte");
+  if (!(await isAdminSession())) redirect("/compte");
   const code = String(formData.get("code") ?? "")
     .trim()
     .toUpperCase();
@@ -1256,7 +1325,7 @@ export async function adminCreatePromo(formData: FormData): Promise<void> {
 
 /** Back-office : active/désactive un code promo. */
 export async function adminTogglePromo(formData: FormData): Promise<void> {
-  if (!isAdminEmail(await getSessionEmail())) redirect("/compte");
+  if (!(await isAdminSession())) redirect("/compte");
   const id = String(formData.get("id") ?? "");
   const active = formData.get("active") === "true";
   if (id) {
@@ -1268,7 +1337,7 @@ export async function adminTogglePromo(formData: FormData): Promise<void> {
 
 /** Back-office : supprime un code promo. */
 export async function adminDeletePromo(formData: FormData): Promise<void> {
-  if (!isAdminEmail(await getSessionEmail())) redirect("/compte");
+  if (!(await isAdminSession())) redirect("/compte");
   const id = String(formData.get("id") ?? "");
   if (id) {
     await prisma.promoCode.delete({ where: { id } }).catch(() => {});
@@ -1282,7 +1351,7 @@ export async function adminDeletePromo(formData: FormData): Promise<void> {
  * Audience : "all" (abonnés newsletter) ou un segment client (VIP, À risque…).
  */
 export async function sendCampaign(formData: FormData): Promise<void> {
-  if (!isAdminEmail(await getSessionEmail())) redirect("/compte");
+  if (!(await isAdminSession())) redirect("/compte");
 
   const subject = String(formData.get("subject") ?? "").trim();
   const body = String(formData.get("body") ?? "").trim();
@@ -1336,7 +1405,7 @@ export async function sendCampaign(formData: FormData): Promise<void> {
 export async function adminUpdateMarketingRule(
   formData: FormData,
 ): Promise<void> {
-  if (!isAdminEmail(await getSessionEmail())) redirect("/compte");
+  if (!(await isAdminSession())) redirect("/compte");
   const id = String(formData.get("id") ?? "");
   const subject = String(formData.get("subject") ?? "").trim();
   const body = String(formData.get("body") ?? "").trim();
@@ -1382,7 +1451,7 @@ export async function adminUpdateMarketingRule(
 
 /** Back-office : exécute immédiatement toutes les règles actives. */
 export async function adminRunMarketingAutomations(): Promise<void> {
-  if (!isAdminEmail(await getSessionEmail())) redirect("/compte");
+  if (!(await isAdminSession())) redirect("/compte");
   const { runMarketingAutomations } =
     await import("@/lib/marketing-automation");
   const results = await runMarketingAutomations();
@@ -1411,7 +1480,7 @@ function parseDailyStock(raw: FormDataEntryValue | null): number | null {
 
 /** Back-office : crée un plat. */
 export async function adminCreateDish(formData: FormData): Promise<void> {
-  if (!isAdminEmail(await getSessionEmail())) redirect("/compte");
+  if (!(await isAdminSession())) redirect("/compte");
   const parsed = dishSchema.safeParse({
     name: formData.get("name"),
     description: formData.get("description"),
@@ -1449,7 +1518,7 @@ export async function adminCreateDish(formData: FormData): Promise<void> {
 
 /** Back-office : met à jour un plat (par id). */
 export async function adminUpdateDish(formData: FormData): Promise<void> {
-  if (!isAdminEmail(await getSessionEmail())) redirect("/compte");
+  if (!(await isAdminSession())) redirect("/compte");
   const id = String(formData.get("id") ?? "");
   const parsed = dishSchema.safeParse({
     name: formData.get("name"),
@@ -1481,7 +1550,7 @@ export async function adminUpdateDish(formData: FormData): Promise<void> {
 
 /** Back-office : met à jour les horaires d'ouverture d'un jour. */
 export async function adminUpdateHours(formData: FormData): Promise<void> {
-  if (!isAdminEmail(await getSessionEmail())) redirect("/compte");
+  if (!(await isAdminSession())) redirect("/compte");
   const dayOfWeek = Number(formData.get("dayOfWeek"));
   const closed = formData.get("closed") === "on";
   const open = String(formData.get("open") ?? "11:00");
@@ -1510,7 +1579,7 @@ export async function adminUpdateHours(formData: FormData): Promise<void> {
 export async function adminUpdateOrderingSettings(
   formData: FormData,
 ): Promise<void> {
-  if (!isAdminEmail(await getSessionEmail())) redirect("/compte");
+  if (!(await isAdminSession())) redirect("/compte");
   const data = {
     slotIntervalMin: Number(formData.get("slotIntervalMin") ?? 15),
     leadTimeMin: Number(formData.get("leadTimeMin") ?? 20),
@@ -1532,7 +1601,7 @@ export async function adminUpdateOrderingSettings(
 export async function adminUpdateColorPalette(
   formData: FormData,
 ): Promise<void> {
-  if (!isAdminEmail(await getSessionEmail())) redirect("/compte?admin=1");
+  if (!(await isAdminSession())) redirect("/compte?admin=1");
 
   const parsed = z
     .enum(["ambre", "terracotta", "emeraude"])
@@ -1549,9 +1618,55 @@ export async function adminUpdateColorPalette(
   redirect("/admin/parametres?paletteSaved=1");
 }
 
+/** Renvoie la chaîne nettoyée, ou `null` si vide (→ fallback sur les défauts). */
+function optionalText(value: FormDataEntryValue | null): string | null {
+  const text = typeof value === "string" ? value.trim() : "";
+  return text.length ? text : null;
+}
+
+/**
+ * Back-office : met à jour l'identité du restaurant (nom, coordonnées, réseaux…)
+ * éditable sans toucher au code. Champs vides → on retombe sur `defaultSiteConfig`.
+ */
+export async function adminUpdateSiteIdentity(
+  formData: FormData,
+): Promise<void> {
+  if (!(await isAdminSession())) redirect("/compte?admin=1");
+
+  const email = optionalText(formData.get("email"));
+  if (email && !z.string().email().safeParse(email).success) {
+    redirect("/admin/parametres?identityError=email");
+  }
+
+  const data = {
+    name: optionalText(formData.get("name")),
+    shortName: optionalText(formData.get("shortName")),
+    description: optionalText(formData.get("description")),
+    phone: optionalText(formData.get("phone")),
+    email,
+    address: optionalText(formData.get("address")),
+    city: optionalText(formData.get("city")),
+    facebook: optionalText(formData.get("facebook")),
+    instagram: optionalText(formData.get("instagram")),
+    tiktok: optionalText(formData.get("tiktok")),
+    whatsappNumber: optionalText(formData.get("whatsappNumber")),
+    telegramUsername: optionalText(formData.get("telegramUsername")),
+    hoursSummary: optionalText(formData.get("hoursSummary")),
+  };
+
+  await prisma.siteSetting.upsert({
+    where: { id: "default" },
+    update: data,
+    create: { id: "default", ...data },
+  });
+  revalidatePath("/", "layout");
+  revalidatePath("/admin/parametres");
+  redirect("/admin/parametres?identitySaved=1");
+}
+
 /** Back-office : ajoute un restaurant (socle multi-restaurant). */
 export async function adminCreateRestaurant(formData: FormData): Promise<void> {
-  if (!isAdminEmail(await getSessionEmail())) redirect("/compte");
+  if (!(await isAdminSession())) redirect("/compte");
   const name = String(formData.get("name") ?? "").trim();
   const slugInput = String(formData.get("slug") ?? "").trim();
   const active = formData.get("active") !== "false";
@@ -1574,7 +1689,7 @@ export async function adminCreateRestaurant(formData: FormData): Promise<void> {
 export async function adminUpdateRestaurantStripeAccount(
   formData: FormData,
 ): Promise<void> {
-  if (!isAdminEmail(await getSessionEmail())) redirect("/compte");
+  if (!(await isAdminSession())) redirect("/compte");
   const id = String(formData.get("id") ?? "");
   const stripeAccountIdRaw = String(
     formData.get("stripeAccountId") ?? "",
@@ -1610,7 +1725,7 @@ export async function adminUpdateRestaurantStripeAccount(
 export async function adminOpenRestaurantStripeOnboarding(
   formData: FormData,
 ): Promise<void> {
-  if (!isAdminEmail(await getSessionEmail())) redirect("/compte");
+  if (!(await isAdminSession())) redirect("/compte");
   if (!isStripeConnectConfigured()) {
     redirect("/admin/parametres?stripeError=missing-secret");
   }
@@ -1631,7 +1746,7 @@ export async function adminOpenRestaurantStripeOnboarding(
 export async function adminSyncRestaurantStripeStatus(
   formData: FormData,
 ): Promise<void> {
-  if (!isAdminEmail(await getSessionEmail())) redirect("/compte");
+  if (!(await isAdminSession())) redirect("/compte");
   if (!isStripeConnectConfigured()) {
     redirect("/admin/parametres?stripeError=missing-secret");
   }
@@ -1652,7 +1767,7 @@ export async function adminSyncRestaurantStripeStatus(
 
 /** Back-office : ajoute un livreur. */
 export async function adminCreateDriver(formData: FormData): Promise<void> {
-  if (!isAdminEmail(await getSessionEmail())) redirect("/compte");
+  if (!(await isAdminSession())) redirect("/compte");
   const name = String(formData.get("name") ?? "").trim();
   const phone = String(formData.get("phone") ?? "").trim() || null;
   if (name) {
@@ -1664,7 +1779,7 @@ export async function adminCreateDriver(formData: FormData): Promise<void> {
 
 /** Back-office : active/désactive un livreur. */
 export async function adminToggleDriver(formData: FormData): Promise<void> {
-  if (!isAdminEmail(await getSessionEmail())) redirect("/compte");
+  if (!(await isAdminSession())) redirect("/compte");
   const id = String(formData.get("id") ?? "");
   const active = formData.get("active") === "true";
   if (id) {
@@ -1679,7 +1794,7 @@ export async function adminToggleDriver(formData: FormData): Promise<void> {
  */
 export async function adminAssignDriver(formData: FormData): Promise<void> {
   const email = await getSessionEmail();
-  if (!isAdminEmail(email)) redirect("/compte");
+  if (!(await isAdminSession())) redirect("/compte");
   const reference = String(formData.get("reference") ?? "");
   const driverId = String(formData.get("driverId") ?? "") || null;
   if (reference) {
@@ -1698,12 +1813,13 @@ export async function adminAssignDriver(formData: FormData): Promise<void> {
 
 /** Back-office : relance un panier abandonné par email. */
 export async function adminRelaunchCart(formData: FormData): Promise<void> {
-  if (!isAdminEmail(await getSessionEmail())) redirect("/compte");
+  if (!(await isAdminSession())) redirect("/compte");
   const id = String(formData.get("id") ?? "");
   const cart = id
     ? await prisma.abandonedCart.findUnique({ where: { id } })
     : null;
   if (cart?.email) {
+    const siteConfig = await getSiteConfig();
     await sendEmail({
       to: cart.email,
       subject: `Votre panier vous attend chez ${siteConfig.shortName}`,
@@ -1723,7 +1839,7 @@ export async function adminRelaunchCart(formData: FormData): Promise<void> {
 
 /** Back-office : crée une catégorie de menu. */
 export async function adminCreateCategory(formData: FormData): Promise<void> {
-  if (!isAdminEmail(await getSessionEmail())) redirect("/compte");
+  if (!(await isAdminSession())) redirect("/compte");
   const name = String(formData.get("name") ?? "").trim();
   const sortOrder = Number(formData.get("sortOrder") ?? 0);
   if (name) {
@@ -1739,7 +1855,7 @@ export async function adminCreateCategory(formData: FormData): Promise<void> {
 
 /** Back-office : ajoute un groupe d'options à un plat. */
 export async function adminAddOptionGroup(formData: FormData): Promise<void> {
-  if (!isAdminEmail(await getSessionEmail())) redirect("/compte");
+  if (!(await isAdminSession())) redirect("/compte");
   const dishId = String(formData.get("dishId") ?? "");
   const name = String(formData.get("name") ?? "").trim();
   const type = String(formData.get("type") ?? "single");
@@ -1753,7 +1869,7 @@ export async function adminAddOptionGroup(formData: FormData): Promise<void> {
 
 /** Back-office : ajoute une option à un groupe. */
 export async function adminAddOption(formData: FormData): Promise<void> {
-  if (!isAdminEmail(await getSessionEmail())) redirect("/compte");
+  if (!(await isAdminSession())) redirect("/compte");
   const groupId = String(formData.get("groupId") ?? "");
   const name = String(formData.get("name") ?? "").trim();
   const priceDelta = Number(formData.get("priceDelta") ?? 0);
@@ -1768,7 +1884,7 @@ export async function adminAddOption(formData: FormData): Promise<void> {
 export async function adminDeleteOptionGroup(
   formData: FormData,
 ): Promise<void> {
-  if (!isAdminEmail(await getSessionEmail())) redirect("/compte");
+  if (!(await isAdminSession())) redirect("/compte");
   const id = String(formData.get("id") ?? "");
   if (id) {
     await prisma.optionGroup.delete({ where: { id } }).catch(() => {});
@@ -1779,7 +1895,7 @@ export async function adminDeleteOptionGroup(
 
 /** Back-office : crée/modifie une zone de livraison. */
 export async function adminUpsertZone(formData: FormData): Promise<void> {
-  if (!isAdminEmail(await getSessionEmail())) redirect("/compte");
+  if (!(await isAdminSession())) redirect("/compte");
   const postalCode = String(formData.get("postalCode") ?? "").trim();
   const fee = Number(formData.get("fee") ?? 0);
   const minOrder = Number(formData.get("minOrder") ?? 0);
@@ -1796,7 +1912,7 @@ export async function adminUpsertZone(formData: FormData): Promise<void> {
 
 /** Back-office : supprime une zone de livraison. */
 export async function adminDeleteZone(formData: FormData): Promise<void> {
-  if (!isAdminEmail(await getSessionEmail())) redirect("/compte");
+  if (!(await isAdminSession())) redirect("/compte");
   const id = String(formData.get("id") ?? "");
   if (id) {
     await prisma.deliveryZone.delete({ where: { id } }).catch(() => {});
@@ -1807,7 +1923,7 @@ export async function adminDeleteZone(formData: FormData): Promise<void> {
 
 /** Back-office : supprime un plat. */
 export async function adminDeleteDish(formData: FormData): Promise<void> {
-  if (!isAdminEmail(await getSessionEmail())) redirect("/compte");
+  if (!(await isAdminSession())) redirect("/compte");
   const id = String(formData.get("id") ?? "");
   if (id) {
     await prisma.dish.delete({ where: { id } }).catch(() => {});

@@ -1,19 +1,14 @@
 import { NextResponse } from "next/server";
-import { getSessionEmail } from "@/lib/session";
-import { isAdminEmail } from "@/lib/auth";
+import { isAdminSession } from "@/lib/session";
 import {
   DEMO_LEAD_SOURCES,
   demoLeadSourceLabels,
   listDemoLeads,
   type DemoLeadSource,
 } from "@/lib/demo-leads";
+import { csvRow } from "@/lib/csv";
 
 export const dynamic = "force-dynamic";
-
-function csv(value: string | number | boolean | null | undefined): string {
-  const s = value == null ? "" : String(value);
-  return /[",\n;]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
-}
 
 function sourceLabel(source: string): string {
   return DEMO_LEAD_SOURCES.includes(source as DemoLeadSource)
@@ -23,7 +18,7 @@ function sourceLabel(source: string): string {
 
 /** GET /api/admin/leads.csv — export des contacts de test (admin). */
 export async function GET() {
-  if (!isAdminEmail(await getSessionEmail())) {
+  if (!(await isAdminSession())) {
     return NextResponse.json({ error: "Accès refusé" }, { status: 403 });
   }
 
@@ -40,7 +35,7 @@ export async function GET() {
     "notes",
   ];
   const rows = leads.map((lead) =>
-    [
+    csvRow([
       lead.name,
       lead.phone,
       lead.email,
@@ -50,9 +45,7 @@ export async function GET() {
       lead.visits,
       lead.converted,
       lead.message,
-    ]
-      .map(csv)
-      .join(";"),
+    ]),
   );
 
   return new NextResponse([header.join(";"), ...rows].join("\n"), {

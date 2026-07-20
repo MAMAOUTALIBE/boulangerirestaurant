@@ -12,34 +12,36 @@ import {
   UtensilsCrossed,
   type LucideIcon,
 } from "lucide-react";
-import { siteConfig } from "@/lib/config";
+import { useSiteConfig } from "@/context/SiteConfigContext";
 
-const serviceHighlights: {
+function buildServiceHighlights(city: string): {
   title: string;
   detail: string;
   Icon: LucideIcon;
-}[] = [
-  {
-    title: "Click & collect",
-    detail: "Prêt au créneau choisi",
-    Icon: ShoppingBag,
-  },
-  {
-    title: "Livraison",
-    detail: "Juvisy et alentours",
-    Icon: MapPin,
-  },
-  {
-    title: "Sur place",
-    detail: "Salle conviviale",
-    Icon: UtensilsCrossed,
-  },
-  {
-    title: "Grillades au charbon",
-    detail: "Préparé minute",
-    Icon: Flame,
-  },
-];
+}[] {
+  return [
+    {
+      title: "Click & collect",
+      detail: "Prêt au créneau choisi",
+      Icon: ShoppingBag,
+    },
+    {
+      title: "Livraison",
+      detail: `${city} et alentours`,
+      Icon: MapPin,
+    },
+    {
+      title: "Sur place",
+      detail: "Salle conviviale",
+      Icon: UtensilsCrossed,
+    },
+    {
+      title: "Grillades au charbon",
+      detail: "Préparé minute",
+      Icon: Flame,
+    },
+  ];
+}
 
 const HERO_SLIDE_INTERVAL_MS = 5600;
 const HERO_VIDEO_START_AT = 1.2;
@@ -117,6 +119,8 @@ export function Hero() {
     {},
   );
   const videoRefs = useRef<Record<string, HTMLVideoElement | null>>({});
+  const siteConfig = useSiteConfig();
+  const serviceHighlights = buildServiceHighlights(siteConfig.contact.city);
 
   useEffect(() => {
     const prefersReducedMotion = window.matchMedia(

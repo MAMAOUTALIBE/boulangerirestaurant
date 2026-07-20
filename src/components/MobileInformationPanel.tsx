@@ -1,7 +1,7 @@
 import { Clock, Mail, MapPin, Phone, UtensilsCrossed } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
-import { siteConfig } from "@/lib/config";
-import { emailHref, mapsHref, phoneHref } from "@/lib/contactLinks";
+import { getSiteConfig } from "@/lib/site-settings";
+import { buildContactLinks } from "@/lib/contactLinks";
 
 interface InformationRow {
   Icon: LucideIcon;
@@ -11,37 +11,40 @@ interface InformationRow {
   ariaLabel?: string;
 }
 
-const informationRows: InformationRow[] = [
-  {
-    Icon: MapPin,
-    label: siteConfig.contact.address,
-    href: mapsHref,
-    external: true,
-    ariaLabel: "Voir l'adresse sur la carte",
-  },
-  {
-    Icon: Phone,
-    label: siteConfig.contact.phone,
-    href: phoneHref,
-    ariaLabel: "Appeler le restaurant",
-  },
-  {
-    Icon: Mail,
-    label: `Contact : ${siteConfig.contact.email}`,
-    href: emailHref,
-    ariaLabel: "Envoyer un email au restaurant",
-  },
-  {
-    Icon: Clock,
-    label: siteConfig.hours.summary,
-  },
-];
-
-export function MobileInformationPanel({
+export async function MobileInformationPanel({
   className = "",
 }: {
   className?: string;
 }) {
+  const siteConfig = await getSiteConfig();
+  const { phoneHref, emailHref, mapsHref } = buildContactLinks(siteConfig);
+
+  const informationRows: InformationRow[] = [
+    {
+      Icon: MapPin,
+      label: siteConfig.contact.address,
+      href: mapsHref,
+      external: true,
+      ariaLabel: "Voir l'adresse sur la carte",
+    },
+    {
+      Icon: Phone,
+      label: siteConfig.contact.phone,
+      href: phoneHref,
+      ariaLabel: "Appeler le restaurant",
+    },
+    {
+      Icon: Mail,
+      label: `Contact : ${siteConfig.contact.email}`,
+      href: emailHref,
+      ariaLabel: "Envoyer un email au restaurant",
+    },
+    {
+      Icon: Clock,
+      label: siteConfig.hours.summary,
+    },
+  ];
+
   return (
     <section
       aria-labelledby="mobile-footer-information-title"

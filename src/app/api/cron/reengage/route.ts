@@ -1,12 +1,14 @@
 import { NextResponse } from "next/server";
 import { runMarketingAutomations } from "@/lib/marketing-automation";
+import { timingSafeStrEqual } from "@/lib/crypto-utils";
 
 export const dynamic = "force-dynamic";
 
 /**
  * GET /api/cron/reengage — exécute toutes les relances marketing actives.
- * Protégé par `CRON_SECRET` (header Authorization: Bearer … ou ?secret=).
- * À planifier via Vercel Cron (voir vercel.json).
+ * Protégé par `CRON_SECRET` via le header `Authorization: Bearer …` uniquement
+ * (le secret n'est plus accepté en query-string : il fuirait dans les logs
+ * de proxy/CDN et le Referer). Vercel Cron envoie déjà ce header.
  */
 export async function GET(request: Request) {
   const secret = process.env.CRON_SECRET;
@@ -17,11 +19,11 @@ export async function GET(request: Request) {
       { status: 503 },
     );
   }
-  const url = new URL(request.url);
-  const provided =
-    request.headers.get("authorization")?.replace("Bearer ", "") ??
-    url.searchParams.get("secret");
-  if (provided !== secret) {
+  const provided = request.headers
+    .get("authorization")
+    ?.replace("Bearer ", "");
+  // Comparaison à temps constant (pas d'oracle de timing sur le secret).
+  if (!provided || !timingSafeStrEqual(provided, secret)) {
     return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
   }
 

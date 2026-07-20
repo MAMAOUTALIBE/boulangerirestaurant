@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 import { Logo } from "@/components/Logo";
 import { Reveal } from "@/components/ui/Reveal";
-import { siteConfig } from "@/lib/config";
+import { getSiteConfig } from "@/lib/site-settings";
 
 const benefits = [
   {
@@ -33,12 +33,6 @@ const benefits = [
   },
 ];
 
-const socials = [
-  { label: "Instagram", href: siteConfig.socials.instagram, Icon: CameraIcon },
-  { label: "WhatsApp", href: siteConfig.socials.whatsapp, Icon: MessageCircle },
-  { label: "Telegram", href: siteConfig.socials.telegram, Icon: Send },
-].filter((item) => Boolean(item.href));
-
 function CameraIcon() {
   return (
     <svg
@@ -54,6 +48,21 @@ function CameraIcon() {
 
 /** Section premium QR code : smartphone, QR, promo, avantages et contact. */
 export async function QRCodeSection() {
+  const siteConfig = await getSiteConfig();
+  const socials = [
+    {
+      label: "Instagram",
+      href: siteConfig.socials.instagram,
+      Icon: CameraIcon,
+    },
+    {
+      label: "WhatsApp",
+      href: siteConfig.socials.whatsapp,
+      Icon: MessageCircle,
+    },
+    { label: "Telegram", href: siteConfig.socials.telegram, Icon: Send },
+  ].filter((item) => Boolean(item.href));
+
   const target = `${siteConfig.url}/commander`;
   const qrSvg = await QRCode.toString(target, {
     type: "svg",
@@ -100,7 +109,9 @@ export async function QRCodeSection() {
                   <p className="mt-1 text-sm font-semibold">
                     {siteConfig.name}
                   </p>
-                  <p className="mt-1 text-xs text-cream/70">Juvisy-sur-Orge</p>
+                  <p className="mt-1 text-xs text-cream/70">
+                    {siteConfig.contact.city}
+                  </p>
                 </div>
               </div>
             </div>

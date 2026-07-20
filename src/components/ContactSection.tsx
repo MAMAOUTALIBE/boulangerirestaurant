@@ -1,23 +1,26 @@
 import Image from "next/image";
 import { MapPin, Phone, Mail, Clock } from "lucide-react";
 import { ContactForm } from "@/components/ContactForm";
-import { siteConfig } from "@/lib/config";
-import { emailHref, mapsHref, phoneHref } from "@/lib/contactLinks";
-
-const infos = [
-  {
-    Icon: MapPin,
-    label: siteConfig.contact.address,
-    href: mapsHref,
-    external: true,
-  },
-  { Icon: Phone, label: siteConfig.contact.phone, href: phoneHref },
-  { Icon: Mail, label: siteConfig.contact.email, href: emailHref },
-  { Icon: Clock, label: siteConfig.hours.summary, id: "horaires" },
-];
+import { getSiteConfig } from "@/lib/site-settings";
+import { buildContactLinks } from "@/lib/contactLinks";
 
 /** Section Contact : coordonnées + formulaire connecté. */
-export function ContactSection() {
+export async function ContactSection() {
+  const siteConfig = await getSiteConfig();
+  const { phoneHref, emailHref, mapsHref } = buildContactLinks(siteConfig);
+
+  const infos = [
+    {
+      Icon: MapPin,
+      label: siteConfig.contact.address,
+      href: mapsHref,
+      external: true,
+    },
+    { Icon: Phone, label: siteConfig.contact.phone, href: phoneHref },
+    { Icon: Mail, label: siteConfig.contact.email, href: emailHref },
+    { Icon: Clock, label: siteConfig.hours.summary, id: "horaires" },
+  ];
+
   return (
     <section
       id="contact"

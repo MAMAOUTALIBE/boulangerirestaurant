@@ -8,8 +8,10 @@ import { CartDrawer } from "@/components/CartDrawer";
 import { CookieConsent } from "@/components/CookieConsent";
 import { ServiceWorkerRegister } from "@/components/ServiceWorkerRegister";
 import { AiAssistant } from "@/components/AiAssistant";
-import { siteConfig } from "@/lib/config";
+import { getSiteConfig } from "@/lib/site-settings";
+import { SiteConfigProvider } from "@/context/SiteConfigContext";
 import { prisma } from "@/lib/prisma";
+import { serializeJsonLd } from "@/lib/utils";
 
 const sans = Inter({
   subsets: ["latin"],
@@ -26,64 +28,70 @@ const display = Playfair_Display({
 
 const heroImage = "/images/hero-plateau-turc-premium.png";
 
-export const metadata: Metadata = {
-  metadataBase: new URL(siteConfig.url),
-  title: {
-    default: `${siteConfig.name} | Restaurant turc & grillades`,
-    template: `%s | ${siteConfig.name}`,
-  },
-  description: `${siteConfig.name} : grillades au charbon, kebabs, pide, lahmacun, mezze et desserts turcs maison. Commandez en ligne, à emporter ou en livraison.`,
-  keywords: [
-    "restaurant turc",
-    "grillades turques",
-    "kebab",
-    "adana kebab",
-    "iskender",
-    "lahmacun",
-    "pide",
-    "baklava",
-    "livraison",
-  ],
-  alternates: { canonical: "/" },
-  openGraph: {
-    title: siteConfig.name,
-    description: "Grillades au charbon, kebabs et spécialités turques maison.",
-    type: "website",
-    locale: siteConfig.locale,
-    url: siteConfig.url,
-    siteName: siteConfig.name,
-    images: [
-      {
-        url: heroImage,
-        width: 1200,
-        height: 630,
-        alt: siteConfig.name,
-      },
+export async function generateMetadata(): Promise<Metadata> {
+  const siteConfig = await getSiteConfig();
+  return {
+    metadataBase: new URL(siteConfig.url),
+    title: {
+      default: `${siteConfig.name} | Restaurant turc & grillades`,
+      template: `%s | ${siteConfig.name}`,
+    },
+    description: siteConfig.description,
+    keywords: [
+      "restaurant turc",
+      "grillades turques",
+      "kebab",
+      "adana kebab",
+      "iskender",
+      "lahmacun",
+      "pide",
+      "baklava",
+      "livraison",
     ],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: siteConfig.name,
-    description: "Grillades au charbon, kebabs et spécialités turques maison.",
-    images: [heroImage],
-  },
-  robots: {
-    index: true,
-    follow: true,
-  },
-};
+    alternates: { canonical: "/" },
+    openGraph: {
+      title: siteConfig.name,
+      description: siteConfig.description,
+      type: "website",
+      locale: siteConfig.locale,
+      url: siteConfig.url,
+      siteName: siteConfig.name,
+      images: [
+        {
+          url: heroImage,
+          width: 1200,
+          height: 630,
+          alt: siteConfig.name,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: siteConfig.name,
+      description: siteConfig.description,
+      images: [heroImage],
+    },
+    robots: {
+      index: true,
+      follow: true,
+    },
+  };
+}
 
 export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const appearance = await prisma.orderingSetting
-    .findUnique({
-      where: { id: "default" },
-      select: { colorPalette: true },
-    })
-    .catch(() => null);
+  const [appearance, siteConfig] = await Promise.all([
+    prisma.orderingSetting
+      .findUnique({
+        where: { id: "default" },
+        select: { colorPalette: true },
+      })
+      .catch(() => null),
+    getSiteConfig(),
+  ]);
   const colorPalette =
     appearance?.colorPalette === "terracotta" ||
     appearance?.colorPalette === "emeraude"
@@ -120,17 +128,19 @@ export default async function RootLayout({
       <body className="bg-ink font-sans text-cream antialiased">
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+          dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }}
         />
-        <LangProvider>
-          <CartProvider>
-            <OrderProvider>
-              {children}
-              <CartDrawer />
-              <AiAssistant />
-            </OrderProvider>
-          </CartProvider>
-        </LangProvider>
+        <SiteConfigProvider value={siteConfig}>
+          <LangProvider>
+            <CartProvider>
+              <OrderProvider>
+                {children}
+                <CartDrawer />
+                <AiAssistant />
+              </OrderProvider>
+            </CartProvider>
+          </LangProvider>
+        </SiteConfigProvider>
         <CookieConsent />
         <ServiceWorkerRegister />
       </body>

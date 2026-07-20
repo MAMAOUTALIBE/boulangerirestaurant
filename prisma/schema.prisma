@@ -270,6 +270,31 @@ model OrderingSetting {
   stageMaxMin     Int    @default(5)
 }
 
+/// Identité du restaurant éditable depuis /admin/parametres (singleton « default »).
+/// Tous les champs sont optionnels : vide → on retombe sur `defaultSiteConfig`
+/// (src/lib/config.ts). Permet de rebrander le site sans toucher au code.
+model SiteSetting {
+  id                String   @id @default("default")
+  name              String?
+  shortName         String?
+  description       String?
+  phone             String?
+  email             String?
+  address           String?
+  /// Ville affichée (zone de livraison, retrait, SEO local). Ex. « Juvisy-sur-Orge ».
+  city              String?
+  facebook          String?
+  instagram         String?
+  tiktok            String?
+  /// Numéro WhatsApp des commandes (aussi utilisé pour le lien wa.me).
+  whatsappNumber    String?
+  /// Pseudo Telegram des commandes (aussi utilisé pour le lien t.me).
+  telegramUsername  String?
+  /// Résumé des horaires affiché (ex. « Lun – Dim : 11h30 – 23h00 »).
+  hoursSummary      String?
+  updatedAt         DateTime @updatedAt @default(now())
+}
+
 /// Zone de livraison : frais et minimum de commande par code postal.
 model DeliveryZone {
   id         String @id @default(cuid())
@@ -507,4 +532,12 @@ model VerificationToken {
   createdAt DateTime @default(now())
 
   @@index([email])
+}
+
+/// Déduplication des webhooks Stripe : l'`id` (= event.id Stripe) sert de clé
+/// d'idempotence pour garantir un traitement au plus une fois (anti-rejeu/race).
+model ProcessedStripeEvent {
+  id          String   @id
+  type        String
+  processedAt DateTime @default(now())
 }

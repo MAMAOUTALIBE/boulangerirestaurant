@@ -1,7 +1,9 @@
 import "server-only";
 import { prisma } from "@/lib/prisma";
 import { sendEmail } from "@/lib/email";
-import { siteConfig } from "@/lib/config";
+import { escapeHtml } from "@/lib/html";
+import { defaultSiteConfig } from "@/lib/config";
+import { getSiteConfig } from "@/lib/site-settings";
 import {
   birthdayMatches,
   classifyWeather,
@@ -22,7 +24,7 @@ export const DEFAULT_MARKETING_RULES = [
     id: "birthday",
     name: "Anniversaire client",
     type: "birthday",
-    subject: `Joyeux anniversaire de la part de ${siteConfig.shortName} 🎉`,
+    subject: `Joyeux anniversaire de la part de ${defaultSiteConfig.shortName} 🎉`,
     body: "Bonjour {prenom}, profitez de votre anniversaire avec le code {code}.",
     promoCode: "ANNIVERSAIRE",
   },
@@ -31,7 +33,7 @@ export const DEFAULT_MARKETING_RULES = [
     name: "Client absent depuis 30 jours",
     type: "inactive",
     delayDays: 30,
-    subject: `Vous nous manquez chez ${siteConfig.shortName}`,
+    subject: `Vous nous manquez chez ${defaultSiteConfig.shortName}`,
     body: "Bonjour {prenom}, revenez découvrir nos spécialités avec le code {code}.",
     promoCode: "RETOUR10",
   },
@@ -264,23 +266,16 @@ function interpolate(
   recipient: Recipient,
   promoCode: string | null,
   weather: WeatherKind | null,
+  restaurantName: string,
 ): string {
   return template
     .replaceAll("{prenom}", recipient.name?.trim() || "")
     .replaceAll("{code}", promoCode || "")
-    .replaceAll("{restaurant}", siteConfig.shortName)
+    .replaceAll("{restaurant}", restaurantName)
     .replaceAll("{plat}", recipient.dish || "votre plat préféré")
     .replaceAll("{meteo}", weather || "du jour");
 }
 
-function escapeHtml(value: string): string {
-  return value
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
-}
 
 export async function dispatchMarketingCampaign(input: {
   ruleId?: string;
@@ -301,6 +296,7 @@ export async function dispatchMarketingCampaign(input: {
       promoCode: input.promoCode,
     },
   });
+  const { shortName: restaurantName } = await getSiteConfig();
   let sent = 0;
   for (const recipient of input.recipients) {
     const dispatch = await prisma.marketingDispatch
@@ -321,6 +317,7 @@ export async function dispatchMarketingCampaign(input: {
         recipient,
         input.promoCode ?? null,
         input.weather ?? null,
+        restaurantName,
       ),
       html: `<div>${escapeHtml(
         interpolate(
@@ -328,6 +325,7 @@ export async function dispatchMarketingCampaign(input: {
           recipient,
           input.promoCode ?? null,
           input.weather ?? null,
+          restaurantName,
         ),
       ).replaceAll("\n", "<br>")}</div>`,
     });

@@ -18,8 +18,8 @@ import Link from "next/link";
 import { Logo } from "@/components/Logo";
 import { NewsletterForm } from "@/components/NewsletterForm";
 import { MobileInformationPanel } from "@/components/MobileInformationPanel";
-import { siteConfig } from "@/lib/config";
-import { emailHref, mapsHref, phoneHref } from "@/lib/contactLinks";
+import { getSiteConfig } from "@/lib/site-settings";
+import { buildContactLinks } from "@/lib/contactLinks";
 
 /* --- Icônes de marque (SVG inline, absentes de lucide) --- */
 function IconFacebook() {
@@ -83,20 +83,6 @@ function IconTelegram() {
   );
 }
 
-const socials = [
-  { label: "Facebook", Icon: IconFacebook, href: siteConfig.socials.facebook },
-  {
-    label: "Instagram",
-    Icon: IconInstagram,
-    href: siteConfig.socials.instagram,
-  },
-  { label: "TikTok", Icon: IconTikTok, href: siteConfig.socials.tiktok },
-  { label: "WhatsApp", Icon: IconWhatsApp, href: siteConfig.socials.whatsapp },
-  { label: "Telegram", Icon: IconTelegram, href: siteConfig.socials.telegram },
-].filter((item) => Boolean(item.href));
-
-const mobileSocials = socials.filter(({ label }) => label !== "Telegram");
-
 const mobileQuickLinks = [
   [
     { label: "Accueil", href: "/" },
@@ -114,18 +100,6 @@ const mobileQuickLinks = [
     { label: "Avis", href: "/#avis-clients" },
   ],
 ] as const;
-
-const contact = [
-  {
-    Icon: MapPin,
-    lines: [siteConfig.contact.address],
-    href: mapsHref,
-    external: true,
-  },
-  { Icon: Phone, lines: [siteConfig.contact.phone], href: phoneHref },
-  { Icon: Mail, lines: [siteConfig.contact.email], href: emailHref },
-  { Icon: Clock, lines: [siteConfig.hours.summary] },
-];
 
 const footerHighlights = [
   {
@@ -199,7 +173,46 @@ const footerLinkGroups: FooterLinkGroup[] = [
 const payments = ["VISA", "Mastercard", "PayPal", "Apple Pay"];
 
 /** Pied de page complet : logo, réseaux, liens, contact, newsletter, paiements. */
-export function Footer() {
+export async function Footer() {
+  const siteConfig = await getSiteConfig();
+  const { phoneHref, emailHref, mapsHref } = buildContactLinks(siteConfig);
+
+  const socials = [
+    {
+      label: "Facebook",
+      Icon: IconFacebook,
+      href: siteConfig.socials.facebook,
+    },
+    {
+      label: "Instagram",
+      Icon: IconInstagram,
+      href: siteConfig.socials.instagram,
+    },
+    { label: "TikTok", Icon: IconTikTok, href: siteConfig.socials.tiktok },
+    {
+      label: "WhatsApp",
+      Icon: IconWhatsApp,
+      href: siteConfig.socials.whatsapp,
+    },
+    {
+      label: "Telegram",
+      Icon: IconTelegram,
+      href: siteConfig.socials.telegram,
+    },
+  ].filter((item) => Boolean(item.href));
+
+  const contact = [
+    {
+      Icon: MapPin,
+      lines: [siteConfig.contact.address],
+      href: mapsHref,
+      external: true,
+    },
+    { Icon: Phone, lines: [siteConfig.contact.phone], href: phoneHref },
+    { Icon: Mail, lines: [siteConfig.contact.email], href: emailHref },
+    { Icon: Clock, lines: [siteConfig.hours.summary] },
+  ];
+
   return (
     <footer className="border-t border-gold/15 bg-[radial-gradient(circle_at_top,rgba(245,158,11,0.08),transparent_34%),linear-gradient(180deg,#111111,#070707)]">
       <MobileFooter />
@@ -343,7 +356,35 @@ export function Footer() {
   );
 }
 
-function MobileFooter() {
+async function MobileFooter() {
+  const siteConfig = await getSiteConfig();
+
+  const socials = [
+    {
+      label: "Facebook",
+      Icon: IconFacebook,
+      href: siteConfig.socials.facebook,
+    },
+    {
+      label: "Instagram",
+      Icon: IconInstagram,
+      href: siteConfig.socials.instagram,
+    },
+    { label: "TikTok", Icon: IconTikTok, href: siteConfig.socials.tiktok },
+    {
+      label: "WhatsApp",
+      Icon: IconWhatsApp,
+      href: siteConfig.socials.whatsapp,
+    },
+    {
+      label: "Telegram",
+      Icon: IconTelegram,
+      href: siteConfig.socials.telegram,
+    },
+  ].filter((item) => Boolean(item.href));
+
+  const mobileSocials = socials.filter(({ label }) => label !== "Telegram");
+
   return (
     <div className="sm:hidden">
       <div className="mx-auto max-w-[48rem] border-x border-white/[0.08] bg-[radial-gradient(circle_at_top,rgba(245,158,11,0.08),transparent_34%),linear-gradient(180deg,#080808,#050505)] px-4 pb-5 pt-7">

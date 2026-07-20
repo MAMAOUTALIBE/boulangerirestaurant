@@ -7,8 +7,8 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { getDishWithOptions } from "@/lib/dishes";
 import { DishOrderPanel } from "@/components/DishOrderPanel";
-import { formatPrice } from "@/lib/utils";
-import { siteConfig } from "@/lib/config";
+import { formatPrice, serializeJsonLd } from "@/lib/utils";
+import { getSiteConfig } from "@/lib/site-settings";
 
 export const dynamic = "force-dynamic";
 
@@ -18,11 +18,12 @@ export async function generateMetadata({
 }: {
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
+  const siteConfig = await getSiteConfig();
   const { slug } = await params;
   const dish = await getDishWithOptions(slug);
   if (!dish) return { title: "Plat introuvable" };
 
-  const description = `${dish.description} — ${formatPrice(dish.price)}. Commandez ${dish.name} chez ${siteConfig.name}, restaurant turc à Juvisy-sur-Orge.`;
+  const description = `${dish.description} — ${formatPrice(dish.price)}. Commandez ${dish.name} chez ${siteConfig.name}, restaurant turc à ${siteConfig.contact.city}.`;
   return {
     title: dish.name,
     description,
@@ -42,6 +43,7 @@ export default async function DishPage({
 }: {
   params: Promise<{ slug: string }>;
 }) {
+  const siteConfig = await getSiteConfig();
   const { slug } = await params;
   const dish = await getDishWithOptions(slug);
   if (!dish) notFound();
@@ -83,7 +85,7 @@ export default async function DishPage({
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }}
       />
       <Header />
       <main className="bg-ink pb-4 pt-24 sm:pb-12 sm:pt-28">

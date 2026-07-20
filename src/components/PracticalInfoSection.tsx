@@ -14,7 +14,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { Reveal } from "@/components/ui/Reveal";
-import { siteConfig } from "@/lib/config";
+import { getSiteConfig } from "@/lib/site-settings";
 
 const orderSteps = [
   {
@@ -34,36 +34,40 @@ const orderSteps = [
   },
 ];
 
-const practicalItems: {
+function buildPracticalItems(city: string): {
   title: string;
   text: string;
   Icon: LucideIcon;
-}[] = [
-  {
-    title: "Livraison locale",
-    text: "Juvisy-sur-Orge et alentours.",
-    Icon: Truck,
-  },
-  {
-    title: "Retrait rapide",
-    text: "Commande prête au créneau choisi.",
-    Icon: ShoppingBag,
-  },
-  {
-    title: "Paiement simple",
-    text: "Commande en ligne avec confirmation.",
-    Icon: CreditCard,
-  },
-  {
-    title: "Fabrication fraîche",
-    text: "Pétrissage, cuisson et finition chaque jour.",
-    Icon: ShieldCheck,
-  },
-];
+}[] {
+  return [
+    {
+      title: "Livraison locale",
+      text: `${city} et alentours.`,
+      Icon: Truck,
+    },
+    {
+      title: "Retrait rapide",
+      text: "Commande prête au créneau choisi.",
+      Icon: ShoppingBag,
+    },
+    {
+      title: "Paiement simple",
+      text: "Commande en ligne avec confirmation.",
+      Icon: CreditCard,
+    },
+    {
+      title: "Fabrication fraîche",
+      text: "Pétrissage, cuisson et finition chaque jour.",
+      Icon: ShieldCheck,
+    },
+  ];
+}
 
 /** Bandeau de réassurance placé avant la carte pour clarifier le parcours commande. */
-export function PracticalInfoSection() {
+export async function PracticalInfoSection() {
+  const siteConfig = await getSiteConfig();
   const phoneHref = `tel:${siteConfig.contact.phone.replace(/\s/g, "")}`;
+  const practicalItems = buildPracticalItems(siteConfig.contact.city);
 
   return (
     <section className="bg-[#F8F3EA] py-8 text-ink sm:py-10">
@@ -163,7 +167,7 @@ export function PracticalInfoSection() {
                 <span className="hidden h-8 w-px bg-ink/10 sm:block" />
                 <div className="flex items-center gap-2.5 sm:justify-end">
                   <Clock3 className="h-4 w-4 text-gold-600" />
-                  <span>11h30 - 23h00 · ven/sam jusqu&apos;à 00h00</span>
+                  <span>{siteConfig.hours.summary}</span>
                 </div>
               </div>
             </Reveal>

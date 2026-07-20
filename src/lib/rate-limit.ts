@@ -19,6 +19,16 @@ const redis =
       })
     : null;
 
+// En production multi-instances (ex. serverless), le fallback mémoire est par
+// instance → limite contournable. On avertit une fois. (Sur un VPS mono-instance
+// — la cible de prod — le fallback mémoire reste acceptable.)
+if (!redis && process.env.NODE_ENV === "production") {
+  console.warn(
+    "[rate-limit] UPSTASH_REDIS_REST_* absent : rate-limit en mémoire " +
+      "(par instance). À configurer si l'app tourne en multi-instances.",
+  );
+}
+
 const upstashLimiters = new Map<string, Ratelimit>();
 
 function limiterFor(limit: number, windowMs: number): Ratelimit | null {
@@ -37,11 +47,39 @@ function limiterFor(limit: number, windowMs: number): Ratelimit | null {
   return limiter;
 }
 
-/** Identifie l'appelant via l'IP (en-têtes proxy) ou un fallback. */
+/**
+ * Nombre de proxies de confiance en frontal (Nginx = 1 par défaut).
+ * Surchargeable via `TRUSTED_PROXY_COUNT` (ex. 2 si un CDN précède Nginx).
+ */
+function trustedProxyCount(): number {
+  const raw = Number(process.env.TRUSTED_PROXY_COUNT);
+  return Number.isFinite(raw) && raw >= 1 ? Math.floor(raw) : 1;
+}
+
+/**
+ * Identifie l'appelant par son IP réelle.
+ *
+ * `X-Forwarded-For` est une liste `client, proxy1, …` où seule l'entrée ajoutée
+ * par NOTRE proxy de confiance est fiable — les entrées de gauche sont fournies
+ * (donc falsifiables) par le client. On prend donc la n-ième entrée en partant
+ * de la DROITE (n = nombre de proxies de confiance), pas la première à gauche :
+ * sinon un attaquant fait varier l'en-tête et obtient un bucket neuf à chaque
+ * requête, contournant tout le rate-limiting (brute-force admin, spam…).
+ */
 export async function clientIp(): Promise<string> {
   const h = await headers();
   const fwd = h.get("x-forwarded-for");
-  if (fwd) return fwd.split(",")[0].trim();
+  if (fwd) {
+    const parts = fwd
+      .split(",")
+      .map((p) => p.trim())
+      .filter(Boolean);
+    if (parts.length > 0) {
+      const n = trustedProxyCount();
+      const idx = Math.min(Math.max(parts.length - n, 0), parts.length - 1);
+      return parts[idx];
+    }
+  }
   return h.get("x-real-ip") ?? "unknown";
 }
 

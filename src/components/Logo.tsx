@@ -1,7 +1,9 @@
+"use client";
+
 import Link from "next/link";
 import { Flame } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { siteConfig } from "@/lib/config";
+import { useSiteConfig } from "@/context/SiteConfigContext";
 
 interface LogoProps {
   className?: string;
@@ -11,6 +13,7 @@ interface LogoProps {
 
 /** Logo du restaurant. */
 export function Logo({ className, tone = "light" }: LogoProps) {
+  const siteConfig = useSiteConfig();
   return (
     <Link
       href="/"

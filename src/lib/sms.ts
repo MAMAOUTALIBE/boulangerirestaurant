@@ -1,4 +1,5 @@
 import "server-only";
+import { maskPhone } from "@/lib/redact";
 
 interface SmsInput {
   to: string;
@@ -20,9 +21,11 @@ export async function sendSms({ to, body, whatsapp }: SmsInput) {
     : process.env.TWILIO_SMS_FROM;
 
   if (!sid || !token || !from) {
-    console.info(
-      `[sms:simulation${whatsapp ? ":whatsapp" : ""}] → ${to} | ${body}`,
-    );
+    if (process.env.NODE_ENV !== "production") {
+      console.info(
+        `[sms:simulation${whatsapp ? ":whatsapp" : ""}] → ${maskPhone(to)} | ${body}`,
+      );
+    }
     return { simulated: true as const };
   }
 

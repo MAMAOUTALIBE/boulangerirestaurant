@@ -1,7 +1,7 @@
 import "server-only";
 
 import type { Order } from "@/types";
-import { siteConfig } from "@/lib/config";
+import { getSiteConfig } from "@/lib/site-settings";
 import { sendSms } from "@/lib/sms";
 import { formatPrice } from "@/lib/utils";
 
@@ -11,7 +11,7 @@ function normalizeE164(phone: string) {
   return `${prefix}${trimmed.replace(/\D/g, "")}`;
 }
 
-function channelMessage(order: Order) {
+function channelMessage(order: Order, siteUrl: string) {
   const lines = [
     `Nouvelle commande ${order.reference}`,
     `${order.customer.name} - ${order.customer.phone}`,
@@ -30,17 +30,21 @@ function channelMessage(order: Order) {
     "",
     `Total : ${formatPrice(order.total)}`,
     order.customer.notes ? `Notes : ${order.customer.notes}` : null,
-    `${siteConfig.url}/admin/commandes/${order.reference}`,
+    `${siteUrl}/admin/commandes/${order.reference}`,
   ].filter(Boolean);
 
   return lines.join("\n");
 }
 
-async function notifyWhatsApp(order: Order, text: string) {
+async function notifyWhatsApp(
+  order: Order,
+  text: string,
+  fallbackNumber: string,
+) {
   const to =
     process.env.WHATSAPP_ORDER_TO ??
     process.env.NEXT_PUBLIC_WHATSAPP_ORDER_NUMBER ??
-    siteConfig.messaging.whatsappOrderNumber;
+    fallbackNumber;
 
   return sendSms({
     to: normalizeE164(to),
@@ -80,9 +84,10 @@ async function notifyTelegram(text: string) {
 }
 
 export async function notifyOrderChannels(order: Order) {
-  const text = channelMessage(order);
+  const siteConfig = await getSiteConfig();
+  const text = channelMessage(order, siteConfig.url);
   const results = await Promise.allSettled([
-    notifyWhatsApp(order, text),
+    notifyWhatsApp(order, text, siteConfig.messaging.whatsappOrderNumber),
     notifyTelegram(text),
   ]);
 

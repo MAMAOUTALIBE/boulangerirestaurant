@@ -1,13 +1,14 @@
 import type { Metadata } from "next";
 import { LegalLayout } from "@/components/LegalLayout";
-import { siteConfig } from "@/lib/config";
+import { getSiteConfig } from "@/lib/site-settings";
 
 export const metadata: Metadata = {
   title: "Politique de confidentialité",
   robots: { index: false },
 };
 
-export default function ConfidentialitePage() {
+export default async function ConfidentialitePage() {
+  const siteConfig = await getSiteConfig();
   return (
     <LegalLayout
       title="Politique de confidentialité"

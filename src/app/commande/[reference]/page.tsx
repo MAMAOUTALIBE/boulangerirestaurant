@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, Check } from "lucide-react";
 import { getOrderByReference } from "@/lib/orders";
+import { getSessionEmail, isAdminSession } from "@/lib/session";
 import { payOrder } from "@/app/actions";
 import { formatPrice } from "@/lib/utils";
 import { AutoRefresh } from "@/components/admin/AutoRefresh";
@@ -38,6 +39,17 @@ export default async function OrderPage({ params, searchParams }: PageProps) {
   ]);
   const order = await getOrderByReference(reference);
   if (!order) notFound();
+
+  // Un utilisateur connecté ne peut consulter que sa propre commande (ou admin) ;
+  // un invité reste autorisé via la référence-capacité (80 bits) après checkout.
+  const sessionEmail = await getSessionEmail();
+  if (
+    sessionEmail &&
+    sessionEmail.toLowerCase() !== order.customer.email.toLowerCase() &&
+    !(await isAdminSession())
+  ) {
+    notFound();
+  }
 
   // Seul le statut confirmé par le webhook Stripe fait foi.
   const isPaid = order.status !== "en attente";

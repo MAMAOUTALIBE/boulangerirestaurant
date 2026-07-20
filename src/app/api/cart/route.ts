@@ -3,8 +3,12 @@ import { prisma } from "@/lib/prisma";
 import { getDefaultRestaurant } from "@/lib/restaurants";
 import { cartTrackingSchema } from "@/lib/validation";
 import { recordDemoLead } from "@/lib/demo-leads";
+import { clientIp, rateLimit } from "@/lib/rate-limit";
 
 export const dynamic = "force-dynamic";
+
+// Cap la taille du corps : chaque écriture crée/actualise une ligne DB + un lead.
+const MAX_BODY_BYTES = 32 * 1024;
 
 type CartWriteMode = "prisma" | "legacy-composite";
 let cartWriteMode: CartWriteMode | null = null;
@@ -74,9 +78,25 @@ async function upsertCartLegacyComposite(params: {
  * Appelé (fire-and-forget) par le panier client et au checkout.
  */
 export async function POST(request: Request) {
-  const parsed = cartTrackingSchema.safeParse(
-    await request.json().catch(() => null),
-  );
+  // Anti-abus : borne le débit (spam de paniers/leads, gonflement DB). Généreux
+  // car le panier se synchronise à chaque modification (debounced côté client).
+  if (!(await rateLimit(`cart:${await clientIp()}`, 30, 60_000))) {
+    return NextResponse.json({ error: "Trop de requêtes" }, { status: 429 });
+  }
+
+  // Cap de taille avant parsing.
+  const raw = await request.text();
+  if (raw.length > MAX_BODY_BYTES) {
+    return NextResponse.json({ error: "Corps trop volumineux" }, { status: 413 });
+  }
+  let payload: unknown = null;
+  try {
+    payload = JSON.parse(raw);
+  } catch {
+    payload = null;
+  }
+
+  const parsed = cartTrackingSchema.safeParse(payload);
   if (!parsed.success) {
     return NextResponse.json({ error: "Données invalides" }, { status: 400 });
   }

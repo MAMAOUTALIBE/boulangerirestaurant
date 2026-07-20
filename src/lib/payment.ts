@@ -1,6 +1,6 @@
 import "server-only";
 import type { Order } from "@/types";
-import { siteConfig } from "@/lib/config";
+import { getSiteConfig } from "@/lib/site-settings";
 import { getRestaurantConnectTransferData } from "@/lib/stripe-connect";
 import { amountInCents } from "@/lib/payment-integrity";
 
@@ -36,6 +36,7 @@ export async function startCheckout(order: Order): Promise<CheckoutResult> {
   const transferData = await getRestaurantConnectTransferData(
     order.restaurantId,
   );
+  const siteConfig = await getSiteConfig();
 
   // Import dynamique : Stripe n'est chargé que si une clé est présente.
   const { default: Stripe } = await import("stripe");

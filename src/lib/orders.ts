@@ -14,10 +14,11 @@ import { evaluatePromo } from "@/lib/promo";
 import { quoteDelivery } from "@/lib/delivery";
 import { awardPointsForOrder } from "@/lib/loyalty";
 import { formatPrice } from "@/lib/utils";
+import { rawHtml, safeHtml } from "@/lib/html";
 import { sendEmail } from "@/lib/email";
 import { sendSms } from "@/lib/sms";
 import { getDefaultRestaurant } from "@/lib/restaurants";
-import { siteConfig } from "@/lib/config";
+import { getSiteConfig } from "@/lib/site-settings";
 import { remainingStock, stockToday } from "@/lib/stock";
 import { recordDemoLead } from "@/lib/demo-leads";
 
@@ -363,12 +364,13 @@ export async function createOrder({
   await sendEmail({
     to: customer.email,
     subject: `Confirmation de votre commande ${ref}`,
-    html: `<h1>Merci ${customer.name} !</h1>
-      <p>Votre commande <strong>${ref}</strong> a bien été enregistrée.</p>
-      <p>Montant total : <strong>${formatPrice(total)}</strong></p>`,
+    html: safeHtml`<h1>Merci ${customer.name} !</h1>
+      <p>Votre commande <strong>${rawHtml(ref)}</strong> a bien été enregistrée.</p>
+      <p>Montant total : <strong>${rawHtml(formatPrice(total))}</strong></p>`,
   });
 
   // Automation : confirmation par SMS.
+  const siteConfig = await getSiteConfig();
   await sendSms({
     to: customer.phone,
     body: `${siteConfig.shortName} : votre commande ${ref} (${formatPrice(total)}) est bien reçue. Merci ${customer.name} !`,
@@ -427,6 +429,7 @@ export async function updateOrderStatus(
 
     // Automation : notifier le client aux étapes clés.
     if (status === "prête" || status === "livrée") {
+      const siteConfig = await getSiteConfig();
       const msg =
         status === "prête"
           ? `Votre commande ${reference} est prête !`
