@@ -1,8 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowLeft, LogOut, Package, ShieldCheck, Star } from "lucide-react";
-import { getSessionEmail } from "@/lib/session";
-import { isAdminEmail } from "@/lib/auth";
+import { getSessionEmail, isAdminSession } from "@/lib/session";
 import { getOrdersByEmail } from "@/lib/orders";
 import { prisma } from "@/lib/prisma";
 import { logout, redeemLoyalty } from "@/app/actions";
@@ -109,7 +108,9 @@ export default async function ComptePage({
     getOrdersByEmail(email),
     prisma.customer.findUnique({ where: { email } }),
   ]);
-  const admin = isAdminEmail(email);
+  // Le lien back-office ne s'affiche que pour une vraie session admin (mot de passe),
+  // pas pour un email allowlisté connecté par simple lien magique.
+  const admin = await isAdminSession();
   const points = customer?.loyaltyPoints ?? 0;
   const tier = tierForPoints(points);
   const canRedeem = points >= POINTS_PER_REDEMPTION;

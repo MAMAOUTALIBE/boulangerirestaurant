@@ -1,13 +1,14 @@
 import type { Metadata } from "next";
 import { LegalLayout } from "@/components/LegalLayout";
-import { siteConfig } from "@/lib/config";
+import { getSiteConfig } from "@/lib/site-settings";
 
 export const metadata: Metadata = {
   title: "Conditions générales de vente",
   robots: { index: false },
 };
 
-export default function CgvPage() {
+export default async function CgvPage() {
+  const siteConfig = await getSiteConfig();
   return (
     <LegalLayout title="Conditions générales de vente" updatedAt="31 mai 2026">
       <p className="rounded-xl border border-gold/30 bg-gold/5 p-4 text-sm text-gold">

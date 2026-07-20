@@ -6,9 +6,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Full-stack Turkish restaurant website (showcase + online ordering + admin CRM) built with **Next.js 16 (App Router)**, TypeScript (strict), PostgreSQL via **Prisma 6**, Zod, Tailwind 3, and Framer Motion. The codebase, UI, comments, commit messages, and order-status strings are all in **French** — match that language when editing.
 
-Important Git note: this local project was adapted from a restaurant base. No git
-remote is configured (a fresh, clean repository is to be created) — do not push
-until the new restaurant GitHub remote is explicitly set up.
+Important Git note: this local project was adapted from a restaurant base and is now
+the **Anatolia Grill** site (npm package name `restaurant-turc`). The GitHub remote
+`origin` (`MAMAOUTALIBE/boulangerirestaurant`) holds **source history only** — the live
+server is updated by rsync, not `git pull` (see Deployment). Commit/push only when asked.
 
 ## Commands
 
@@ -41,8 +42,8 @@ A running PostgreSQL instance and `DATABASE_URL` are **required** even for local
 ### Layers
 
 - **Server Actions** (`src/app/actions.ts`) are the primary mutation entry point — every form posts to one. They follow a fixed pattern: honeypot bot check (`isBot`) → `rateLimit(...)` → Zod `safeParse` → call a `src/lib/*` function → `revalidatePath`/`redirect`. Admin actions are prefixed `admin*` and re-check `isAdminEmail`.
-- **Domain logic** lives in `src/lib/*.ts`, each file marked `import "server-only"` (orders, payment, auth, customers, promo, delivery, loyalty, slots, reviews, segmentation, stripe-connect, email, sms, assistant, demo-leads, plus restaurant features: `stock`, `seasonal`, `antiwaste`, `service-alert`, `social-order`…). Keep business rules here, not in components or routes. A few helpers are deliberately **pure / framework-free** (no `server-only`, no DB) so they can be unit-tested in isolation — `stock.ts`, `service-alert.ts`, `social-order.ts`, `analytics.ts`, `segmentation.ts`, `validation.ts`, `utils.ts` (see their colocated `*.test.ts`; `analytics.ts` powers the revenue forecast + peak-hours heatmap on `/admin/rapports`).
-- **API routes** (`src/app/api/*`) serve JSON/CSV and webhooks. The Stripe webhook (`/api/webhooks/stripe`) is the **source of truth** for payment confirmation (reads the raw body to verify the signature) — the browser redirect is not trusted.
+- **Domain logic** lives in `src/lib/*.ts`, each file marked `import "server-only"` (orders, payment, auth, customers, promo, delivery, loyalty, slots, reviews, segmentation, stripe-connect, email, sms, assistant, demo-leads, marketing-automation, testers, plus restaurant features: `stock`, `seasonal`, `antiwaste`, `service-alert`, `social-order`…). Keep business rules here, not in components or routes. A few helpers are deliberately **pure / framework-free** (no `server-only`, no DB) so they can be unit-tested in isolation — `stock.ts`, `service-alert.ts`, `social-order.ts`, `analytics.ts`, `segmentation.ts`, `validation.ts`, `utils.ts`, `marketing-rules.ts`, `payment-integrity.ts`, `site-activity.ts` (see their colocated `*.test.ts`; `analytics.ts` powers the revenue forecast + peak-hours heatmap on `/admin/rapports`). A pure helper is typically the framework-free half of a `server-only` module that does the DB read (`marketing-rules`↔`marketing-automation`, `site-activity`↔`testers`).
+- **API routes** (`src/app/api/*`) serve JSON/CSV and webhooks. The Stripe webhook (`/api/webhooks/stripe`) is the **source of truth** for payment confirmation (reads the raw body to verify the signature) — the browser redirect is not trusted. Before marking an order `payée`, the pure `payment-integrity.ts` (`isExpectedStripePayment`, `amountInCents`) re-checks that Stripe's confirmed amount/currency/status match what was expected — Stripe's figures are verified, not trusted.
 - **Prisma client** is a `globalThis` singleton (`src/lib/prisma.ts`) to survive dev hot-reload.
 
 ### Data model notes (`prisma/schema.prisma`)
@@ -72,6 +73,12 @@ Four self-contained features, each with a `src/lib` module, a public route, an `
 ### Demo-lead capture (`demo-leads.ts`, `/admin/leads`, `DemoLead`)
 
 A cross-cutting **lead tracker** layered on top of the public forms for demo/prospecting: most Server Actions call `recordDemoLead({ source, … })` (newsletter, panier, commande, réservation, contact, traiteur, sur-mesure, saison, anti-gaspi) after their real work. It upserts a `DemoLead` (dedup + `visits` counter + `converted` flag) so `/admin/leads` shows who interacted and from where. Fire-and-forget — it must never block or fail the underlying action. When adding a new public form, mirror the pattern with the appropriate `DemoLeadSource`.
+
+**"Qui teste le site"** (`/admin/tests`) is a second, richer view of the same question: the pure `site-activity.ts` (`aggregateTesters` / `filterTesters`) groups every trace left on the site **by person** — `DemoLead`s, abandoned carts (`AbandonedCart`, captured via `/api/cart`), and `Order`s of **all** statuses (incl. `en attente`/`annulée`) — into a `contact → panier → commande` funnel. `testers.ts` is the `server-only` DB-reading half; it drops redundant `panier`/`commande` leads in favour of the real carts/orders. Read-only — it never mutates.
+
+### Marketing automation (`marketing-automation.ts` + pure `marketing-rules.ts`, `/admin/marketing`)
+
+Rule-based re-engagement emails, models `MarketingRule` / `MarketingCampaign` / `MarketingDispatch`. `ensureMarketingRules` seeds `DEFAULT_MARKETING_RULES` (birthday, inactivity, weather-based); the pure `marketing-rules.ts` holds the trigger predicates (`birthdayMatches`, `isInactiveForDays`, `classifyWeather`, `periodKey`). `runMarketingAutomations()` evaluates every active rule and sends via `sendEmail`, recording a `MarketingDispatch` per recipient so a rule fires **at most once per period** (`periodKey` dedup). It is invoked by the `/api/cron/reengage` cron (see Deployment), and `/admin/marketing` can also dispatch a one-off campaign (`dispatchMarketingCampaign`) and shows the `marketingDashboard`.
 
 ### Admin screens beyond CRUD
 
@@ -109,13 +116,13 @@ When a new order lands, `notifyOrderChannels` (`src/lib/order-notifications.ts`,
 - Path alias `@/*` → `src/*`.
 - Prettier: double quotes, semicolons, trailing commas, 80 cols, `prettier-plugin-tailwindcss` (keep Tailwind class order). Run `npm run format` before finishing.
 - Tests are Vitest + Testing Library (`jsdom`), colocated as `*.test.ts(x)`. The Vitest setup clears `localStorage` after each test.
-- Theme colors are centralized in `tailwind.config.ts` (`ink`, `cream`, `gold`, `forest`, `muted`) — use these tokens, not raw hex.
-- Site identity (name, description, contact phone/email/address, opening hours, SEO/QR/social defaults) is the single `siteConfig` in `src/lib/config.ts` — read it (or the derived `phoneHref`/`emailHref`/`mapsHref` in `src/lib/contactLinks.ts`), don't hard-code these anywhere.
+- Theme colors are centralized in `tailwind.config.ts` (`ink`, `cream`, `gold`, `forest`, `muted`) — use these tokens, not raw hex. Those tokens resolve to CSS variables whose accent (`gold`/`forest`) is swapped at runtime by the **CRM-chosen palette**: `OrderingSetting.colorPalette` (`ambre` | `terracotta` | `emeraude`, set from `/admin/parametres`) is read in `src/app/layout.tsx` and written as `data-color-palette` on `:root`, which `globals.css` maps to overrides. Don't hard-code accent hex — add a palette variant in `globals.css` instead.
+- Site identity (name, shortName, description, contact phone/email/address/city, hours summary, socials/WhatsApp/Telegram) is **DB-backed and admin-editable** from `/admin/parametres` (see below) — never hard-code these. `contact.city` is the standalone town shown for local delivery/pickup/SEO (Hero, PracticalInfo, commander, QRCode, menu SEO, address-form placeholders) — use it instead of hard-coding the town anywhere. `src/lib/config.ts` holds only the `defaultSiteConfig` fallback + the `SiteConfig` type + pure helpers (`buildContactLinks`, `whatsappUrl`, `telegramUrl`); it has no static `siteConfig` export anymore. Overrides persist as the **`SiteSetting`** singleton (id `"default"`, every column nullable → blank falls back to the default) via the `adminUpdateSiteIdentity` action, which `revalidatePath("/", "layout")` so changes show immediately. Read the effective identity via **`getSiteConfig()`** from `@/lib/site-settings` in server code (React-`cache`d per request; merges the row over `defaultSiteConfig`) or **`useSiteConfig()`** from `@/context/SiteConfigContext` in client components (the root `layout.tsx` reads it once and feeds the provider). Pure/client-safe modules that can't reach the DB (e.g. `social-order.ts`) take the values as parameters defaulting to `defaultSiteConfig`. Technical fields (`url`, `locale`, `currency`, `priceRange`) stay env/code-driven.
 - Money is rounded with the `roundCurrency` helper (cents precision); don't introduce float drift.
 
 ## Deployment
 
-Vercel (`vercel.json`: build runs `prisma migrate deploy`, region `cdg1`, weekly re-engagement cron at `/api/cron/reengage` protected by `CRON_SECRET`) or Docker/VPS (`Dockerfile`, `docker-compose.yml`). See `DEPLOYMENT.md` and `DEPLOIEMENT-VPS.md`. Security headers are set in `next.config.mjs` (CSP intentionally omitted to avoid breaking Stripe/JSON-LD).
+Vercel (`vercel.json`: build runs `prisma migrate deploy`, region `cdg1`, weekly re-engagement cron at `/api/cron/reengage` — runs `runMarketingAutomations`, protected by `CRON_SECRET`, which returns 503 until the secret is set) or Docker/VPS (`Dockerfile`, `docker-compose.yml`). See `DEPLOYMENT.md` and `DEPLOIEMENT-VPS.md`. Security headers are set in `next.config.mjs` (CSP intentionally omitted to avoid breaking Stripe/JSON-LD).
 
 Production target is a **VPS** at `root@213.130.144.215` for `https://lodene.cloud`: keep Anatolia Grill isolated under Compose project `restaurant-turc` (`docker compose -p restaurant-turc …`), dedicated `restaurant-turc_pgdata` volume, app published on `127.0.0.1:3201` only, and the `lodene.cloud` Nginx vhost. If the server hosts other sites, don't touch them (`lodene.org`/boulangerie is on `3101`, the older restaurant app is on `3100`, es-viry is on `8090`). Full first-deploy guide in `DEPLOIEMENT-VPS.md`; `deploy/nginx.conf` is the reverse-proxy config (proxies to 3201).
 

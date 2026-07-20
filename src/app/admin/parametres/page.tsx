@@ -1,6 +1,6 @@
-import { Palette, ShieldCheck } from "lucide-react";
+import { Palette, ShieldCheck, Store } from "lucide-react";
 import { adminEmails } from "@/lib/auth";
-import { siteConfig } from "@/lib/config";
+import { defaultSiteConfig } from "@/lib/config";
 import { prisma } from "@/lib/prisma";
 import {
   adminUpsertZone,
@@ -8,6 +8,7 @@ import {
   adminUpdateHours,
   adminUpdateOrderingSettings,
   adminUpdateColorPalette,
+  adminUpdateSiteIdentity,
   adminCreateRestaurant,
   adminCreateDriver,
   adminOpenRestaurantStripeOnboarding,
@@ -31,17 +32,61 @@ const DAYS = [
 const hhmm = (min: number) =>
   `${String(Math.floor(min / 60)).padStart(2, "0")}:${String(min % 60).padStart(2, "0")}`;
 
+/** Champ de formulaire pour l'identité du restaurant (placeholder = valeur par défaut). */
+function IdentityField({
+  name,
+  label,
+  defaultValue,
+  placeholder,
+  type = "text",
+  textarea = false,
+}: {
+  name: string;
+  label: string;
+  defaultValue: string;
+  placeholder?: string;
+  type?: string;
+  textarea?: boolean;
+}) {
+  const inputClass =
+    "mt-1 block w-full rounded-lg border border-white/10 bg-ink px-3 py-2 text-cream placeholder:text-muted/60 focus:border-gold/60 focus:outline-none";
+  return (
+    <label className="block text-sm">
+      <span className="text-cream/80">{label}</span>
+      {textarea ? (
+        <textarea
+          name={name}
+          defaultValue={defaultValue}
+          placeholder={placeholder}
+          rows={2}
+          className={inputClass}
+        />
+      ) : (
+        <input
+          name={name}
+          type={type}
+          defaultValue={defaultValue}
+          placeholder={placeholder}
+          className={inputClass}
+        />
+      )}
+    </label>
+  );
+}
+
 export default async function AdminParametresPage() {
   const admins = adminEmails();
-  const [zones, hours, setting, drivers, restaurants] = await Promise.all([
-    prisma.deliveryZone.findMany({ orderBy: { postalCode: "asc" } }),
-    prisma.openingHour.findMany({ orderBy: { dayOfWeek: "asc" } }),
-    prisma.orderingSetting.findUnique({ where: { id: "default" } }),
-    prisma.driver.findMany({ orderBy: { name: "asc" } }),
-    prisma.restaurant.findMany({
-      orderBy: [{ active: "desc" }, { name: "asc" }],
-    }),
-  ]);
+  const [zones, hours, setting, drivers, restaurants, identity] =
+    await Promise.all([
+      prisma.deliveryZone.findMany({ orderBy: { postalCode: "asc" } }),
+      prisma.openingHour.findMany({ orderBy: { dayOfWeek: "asc" } }),
+      prisma.orderingSetting.findUnique({ where: { id: "default" } }),
+      prisma.driver.findMany({ orderBy: { name: "asc" } }),
+      prisma.restaurant.findMany({
+        orderBy: [{ active: "desc" }, { name: "asc" }],
+      }),
+      prisma.siteSetting.findUnique({ where: { id: "default" } }),
+    ]);
   const stripeSecretConfigured = Boolean(process.env.STRIPE_SECRET_KEY);
   const stripeConnectedRestaurants = restaurants.filter(
     (r) => r.stripeOnboardingComplete,
@@ -67,6 +112,114 @@ export default async function AdminParametresPage() {
   return (
     <div className="space-y-8">
       <h1 className="font-display text-3xl font-bold text-cream">Paramètres</h1>
+
+      {/* Identité du restaurant */}
+      <section className="rounded-2xl border border-white/10 bg-ink-soft p-6">
+        <h2 className="flex items-center gap-2 font-display text-lg font-semibold text-cream">
+          <Store className="h-5 w-5 text-gold" />
+          Identité du restaurant
+        </h2>
+        <p className="mt-2 text-sm text-muted">
+          Personnalisez le site sans toucher au code. Un champ laissé vide
+          utilise la valeur par défaut (affichée en gris). Les changements sont
+          visibles immédiatement sur tout le site.
+        </p>
+        <form action={adminUpdateSiteIdentity} className="mt-5 space-y-5">
+          <div className="grid gap-4 sm:grid-cols-2">
+            <IdentityField
+              name="name"
+              label="Nom du restaurant"
+              defaultValue={identity?.name ?? ""}
+              placeholder={defaultSiteConfig.name}
+            />
+            <IdentityField
+              name="shortName"
+              label="Nom court (logo, notifications)"
+              defaultValue={identity?.shortName ?? ""}
+              placeholder={defaultSiteConfig.shortName}
+            />
+          </div>
+          <IdentityField
+            name="description"
+            label="Slogan / description (SEO)"
+            defaultValue={identity?.description ?? ""}
+            placeholder={defaultSiteConfig.description}
+            textarea
+          />
+          <div className="grid gap-4 sm:grid-cols-2">
+            <IdentityField
+              name="phone"
+              label="Téléphone"
+              defaultValue={identity?.phone ?? ""}
+              placeholder={defaultSiteConfig.contact.phone}
+            />
+            <IdentityField
+              name="email"
+              label="Email"
+              type="email"
+              defaultValue={identity?.email ?? ""}
+              placeholder={defaultSiteConfig.contact.email}
+            />
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <IdentityField
+              name="address"
+              label="Adresse (lien Google Maps auto)"
+              defaultValue={identity?.address ?? ""}
+              placeholder={defaultSiteConfig.contact.address}
+            />
+            <IdentityField
+              name="city"
+              label="Ville (livraison, retrait, SEO local)"
+              defaultValue={identity?.city ?? ""}
+              placeholder={defaultSiteConfig.contact.city}
+            />
+          </div>
+          <IdentityField
+            name="hoursSummary"
+            label="Horaires (résumé affiché)"
+            defaultValue={identity?.hoursSummary ?? ""}
+            placeholder={defaultSiteConfig.hours.summary}
+          />
+          <div className="grid gap-4 sm:grid-cols-2">
+            <IdentityField
+              name="whatsappNumber"
+              label="Numéro WhatsApp (commandes)"
+              defaultValue={identity?.whatsappNumber ?? ""}
+              placeholder={defaultSiteConfig.messaging.whatsappOrderNumber}
+            />
+            <IdentityField
+              name="telegramUsername"
+              label="Pseudo Telegram (commandes)"
+              defaultValue={identity?.telegramUsername ?? ""}
+              placeholder={defaultSiteConfig.messaging.telegramOrderUsername}
+            />
+          </div>
+          <div className="grid gap-4 sm:grid-cols-3">
+            <IdentityField
+              name="facebook"
+              label="Facebook (URL)"
+              defaultValue={identity?.facebook ?? ""}
+              placeholder={defaultSiteConfig.socials.facebook}
+            />
+            <IdentityField
+              name="instagram"
+              label="Instagram (URL)"
+              defaultValue={identity?.instagram ?? ""}
+              placeholder={defaultSiteConfig.socials.instagram}
+            />
+            <IdentityField
+              name="tiktok"
+              label="TikTok (URL)"
+              defaultValue={identity?.tiktok ?? ""}
+              placeholder={defaultSiteConfig.socials.tiktok}
+            />
+          </div>
+          <button className="rounded-lg bg-gold px-4 py-2 text-sm font-semibold text-ink transition hover:bg-gold-400">
+            Enregistrer l&apos;identité
+          </button>
+        </form>
+      </section>
 
       <section className="rounded-2xl border border-white/10 bg-ink-soft p-6">
         <h2 className="flex items-center gap-2 font-display text-lg font-semibold text-cream">
@@ -520,21 +673,6 @@ export default async function AdminParametresPage() {
             Ajouter / MAJ
           </button>
         </form>
-      </section>
-
-      {/* Coordonnées */}
-      <section className="rounded-2xl border border-white/10 bg-ink-soft p-6">
-        <h2 className="font-display text-lg font-semibold text-cream">
-          Coordonnées du restaurant
-        </h2>
-        <p className="mt-2 text-sm text-muted">
-          Modifiables dans <code className="text-gold">src/lib/config.ts</code>.
-        </p>
-        <ul className="mt-4 space-y-1 text-sm text-cream/85">
-          <li>{siteConfig.contact.address}</li>
-          <li>{siteConfig.contact.phone}</li>
-          <li>{siteConfig.contact.email}</li>
-        </ul>
       </section>
     </div>
   );

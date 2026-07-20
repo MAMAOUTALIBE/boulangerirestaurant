@@ -10,7 +10,7 @@ import {
   getTodayAntiWasteOffer,
   type AntiWasteOfferView,
 } from "@/lib/antiwaste";
-import { siteConfig } from "@/lib/config";
+import { getSiteConfig } from "@/lib/site-settings";
 import { formatPrice } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
@@ -175,7 +175,8 @@ function DesktopAntiWasteOffer({ offer }: { offer: AntiWasteOfferView }) {
   );
 }
 
-function DesktopNoOfferCard() {
+async function DesktopNoOfferCard() {
+  const siteConfig = await getSiteConfig();
   return (
     <div className="mt-5 overflow-hidden rounded-[24px] border border-white/10 bg-[radial-gradient(circle_at_top_left,rgba(34,197,94,0.12),transparent_36%),#111111] shadow-[0_28px_85px_-62px_rgba(0,0,0,0.95)] lg:grid lg:h-[calc(100svh-17rem)] lg:max-h-[31rem] lg:min-h-[27rem] lg:grid-cols-[0.92fr_1.08fr]">
       <div className="relative min-h-[20rem] lg:min-h-0">

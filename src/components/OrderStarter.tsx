@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Bike, Store, Utensils, Check, MapPin } from "lucide-react";
 import type { Fulfillment } from "@/types";
 import { useOrderChoice, type OrderChoice } from "@/context/OrderContext";
+import { useSiteConfig } from "@/context/SiteConfigContext";
 import { checkDelivery } from "@/app/actions";
 
 const MODES: { value: Fulfillment; label: string; Icon: typeof Bike }[] = [
@@ -42,6 +43,7 @@ export function OrderStarter({
   onConfirmed?: () => void;
 }) {
   const { choice, setChoice } = useOrderChoice();
+  const siteConfig = useSiteConfig();
   const [mode, setMode] = useState<Fulfillment>(
     choice?.fulfillment ?? "emporter",
   );
@@ -179,7 +181,7 @@ export function OrderStarter({
               <input
                 value={street}
                 onChange={(e) => setStreet(e.target.value)}
-                placeholder="5 rue Jules Vallès"
+                placeholder="N° et nom de rue"
                 autoComplete="street-address"
                 className="w-full rounded-xl border border-white/10 bg-ink px-4 py-3 text-sm text-cream placeholder:text-muted focus:border-gold/60 focus:outline-none"
               />
@@ -197,7 +199,7 @@ export function OrderStarter({
                     setPostal(e.target.value);
                     setDeliveryMsg(null);
                   }}
-                  placeholder="91260"
+                  placeholder="Code postal"
                   inputMode="numeric"
                   autoComplete="postal-code"
                   className="w-full rounded-xl border border-white/10 bg-ink px-3 py-3 text-sm text-cream placeholder:text-muted focus:border-gold/60 focus:outline-none"
@@ -210,7 +212,7 @@ export function OrderStarter({
                 <input
                   value={city}
                   onChange={(e) => setCity(e.target.value)}
-                  placeholder="Juvisy-sur-Orge"
+                  placeholder={siteConfig.contact.city}
                   autoComplete="address-level2"
                   className="w-full rounded-xl border border-white/10 bg-ink px-3 py-3 text-sm text-cream placeholder:text-muted focus:border-gold/60 focus:outline-none"
                 />

@@ -6,8 +6,7 @@ import {
   OrderCreationError,
 } from "@/lib/orders";
 import { clientIp, rateLimit } from "@/lib/rate-limit";
-import { getSessionEmail } from "@/lib/session";
-import { isAdminEmail } from "@/lib/auth";
+import { getSessionEmail, isAdminSession } from "@/lib/session";
 
 const MAX_BODY_BYTES = 64 * 1024;
 
@@ -84,7 +83,7 @@ export async function GET(request: Request) {
   }
   const email = await getSessionEmail();
   const ownsOrder = email?.toLowerCase() === order.customer.email.toLowerCase();
-  if (!ownsOrder && !isAdminEmail(email)) {
+  if (!ownsOrder && !(await isAdminSession())) {
     return NextResponse.json({ error: "Accès refusé" }, { status: 403 });
   }
   return NextResponse.json({ order });

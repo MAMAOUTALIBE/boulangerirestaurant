@@ -22,7 +22,7 @@ import { navLinks } from "@/data/services";
 import { cn } from "@/lib/utils";
 import { useCart } from "@/context/CartContext";
 import { useLang } from "@/context/LangContext";
-import { siteConfig } from "@/lib/config";
+import { useSiteConfig } from "@/context/SiteConfigContext";
 
 const desktopLinks = [
   {
@@ -77,7 +77,6 @@ const offerLinks = [
     Icon: Images,
   },
 ];
-const phoneHref = `tel:${siteConfig.contact.phone.replace(/\s/g, "")}`;
 
 /** En-tête sticky avec navigation desktop, panier et menu mobile. */
 export function Header() {
@@ -85,6 +84,8 @@ export function Header() {
   const [open, setOpen] = useState(false);
   const { totalCount: cartCount, setOpen: setCartOpen } = useCart();
   const { t } = useLang();
+  const siteConfig = useSiteConfig();
+  const phoneHref = `tel:${siteConfig.contact.phone.replace(/\s/g, "")}`;
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);

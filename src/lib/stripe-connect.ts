@@ -1,7 +1,7 @@
 import "server-only";
 import type Stripe from "stripe";
 import { prisma } from "@/lib/prisma";
-import { siteConfig } from "@/lib/config";
+import { getSiteConfig } from "@/lib/site-settings";
 
 function getStripeSecret() {
   return process.env.STRIPE_SECRET_KEY?.trim() ?? "";
@@ -64,6 +64,7 @@ export async function ensureRestaurantStripeAccount(restaurantId: string) {
     return { accountId: restaurant.stripeAccountId, created: false };
   }
 
+  const siteConfig = await getSiteConfig();
   const account = await stripe.accounts.create({
     type: "express",
     country: connectCountry(),
@@ -124,6 +125,7 @@ export async function syncRestaurantStripeStatus(restaurantId: string) {
 export async function createRestaurantOnboardingLink(restaurantId: string) {
   const stripe = await getStripeClient();
   const { accountId } = await ensureRestaurantStripeAccount(restaurantId);
+  const siteConfig = await getSiteConfig();
   const url = siteConfig.url.replace(/\/$/, "");
 
   const link = await stripe.accountLinks.create({

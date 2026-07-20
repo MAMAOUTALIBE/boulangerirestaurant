@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import { updateOrderStatus, getOrderByReference } from "@/lib/orders";
 import { isExpectedStripePayment } from "@/lib/payment-integrity";
-import { siteConfig } from "@/lib/config";
+import { getSiteConfig } from "@/lib/site-settings";
+import { prisma } from "@/lib/prisma";
 
 // Le webhook a besoin du corps brut (raw body) pour vérifier la signature.
 export const dynamic = "force-dynamic";
@@ -12,6 +13,7 @@ export const dynamic = "force-dynamic";
  * redirection navigateur. Active uniquement si Stripe est configuré.
  */
 export async function POST(request: Request) {
+  const siteConfig = await getSiteConfig();
   const secret = process.env.STRIPE_SECRET_KEY;
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
@@ -41,6 +43,18 @@ export async function POST(request: Request) {
   } catch (err) {
     console.error("[stripe:webhook] signature invalide", err);
     return NextResponse.json({ error: "Signature invalide." }, { status: 400 });
+  }
+
+  // Idempotence forte : on enregistre l'event.id AVANT tout traitement. La clé
+  // primaire garantit un traitement au plus une fois même en cas de rejeu ou de
+  // double livraison concurrente (course que le seul garde de statut ne couvre pas).
+  try {
+    await prisma.processedStripeEvent.create({
+      data: { id: event.id, type: event.type },
+    });
+  } catch {
+    // Déjà traité (violation de clé primaire) → on accuse réception sans rejouer.
+    return NextResponse.json({ received: true, deduped: true });
   }
 
   switch (event.type) {

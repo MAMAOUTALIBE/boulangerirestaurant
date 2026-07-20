@@ -1,20 +1,13 @@
 import { NextResponse } from "next/server";
-import { getSessionEmail } from "@/lib/session";
-import { isAdminEmail } from "@/lib/auth";
+import { isAdminSession } from "@/lib/session";
 import { getAllOrders } from "@/lib/orders";
+import { csvRow } from "@/lib/csv";
 
 export const dynamic = "force-dynamic";
 
-/** Échappe une valeur pour le format CSV. */
-function csv(value: string | number): string {
-  const s = String(value);
-  return /[",\n;]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
-}
-
 /** GET /api/admin/orders.csv — export des commandes (admin uniquement). */
 export async function GET() {
-  const email = await getSessionEmail();
-  if (!isAdminEmail(email)) {
+  if (!(await isAdminSession())) {
     return NextResponse.json({ error: "Accès refusé" }, { status: 403 });
   }
 
@@ -30,7 +23,7 @@ export async function GET() {
     "articles",
   ];
   const rows = orders.map((o) =>
-    [
+    csvRow([
       o.reference,
       o.createdAt,
       o.status,
@@ -39,9 +32,7 @@ export async function GET() {
       o.customer.phone,
       o.total.toFixed(2),
       o.items.map((i) => `${i.quantity}x ${i.name}`).join(" | "),
-    ]
-      .map(csv)
-      .join(";"),
+    ]),
   );
   const body = [header.join(";"), ...rows].join("\n");
 

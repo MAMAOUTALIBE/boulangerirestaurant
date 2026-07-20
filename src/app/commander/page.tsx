@@ -25,7 +25,7 @@ import { useCart } from "@/context/CartContext";
 import { useOrderChoice } from "@/context/OrderContext";
 import { placeOrder, checkPromo, checkDelivery } from "@/app/actions";
 import { OrderStarter } from "@/components/OrderStarter";
-import { siteConfig } from "@/lib/config";
+import { useSiteConfig } from "@/context/SiteConfigContext";
 import { formatPrice } from "@/lib/utils";
 import {
   buildTelegramOrderUrl,
@@ -55,29 +55,32 @@ const starterLinks = [
     image: "/images/baklava.png",
   },
 ];
-const checkoutHighlights: {
+function buildCheckoutHighlights(city: string): {
   title: string;
   text: string;
   Icon: LucideIcon;
-}[] = [
-  {
-    title: "Créneau au choix",
-    text: "Dès que possible ou horaire programmé.",
-    Icon: Clock3,
-  },
-  {
-    title: "Livraison ou retrait",
-    text: "Juvisy-sur-Orge et alentours.",
-    Icon: Truck,
-  },
-  {
-    title: "Paiement sécurisé",
-    text: "Validation claire avant paiement.",
-    Icon: CreditCard,
-  },
-];
+}[] {
+  return [
+    {
+      title: "Créneau au choix",
+      text: "Dès que possible ou horaire programmé.",
+      Icon: Clock3,
+    },
+    {
+      title: "Livraison ou retrait",
+      text: `${city} et alentours.`,
+      Icon: Truck,
+    },
+    {
+      title: "Paiement sécurisé",
+      text: "Validation claire avant paiement.",
+      Icon: CreditCard,
+    },
+  ];
+}
 
 export default function CommanderPage() {
+  const siteConfig = useSiteConfig();
   const { items, totalPrice, clear, cartId } = useCart();
   const { choice, clearChoice } = useOrderChoice();
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -121,13 +124,21 @@ export default function CommanderPage() {
         tip,
         total,
         promoCode: promo.trim() || undefined,
+        restaurantName: siteConfig.name,
       })
     : "";
   const whatsappOrderUrl = socialOrderMessage
-    ? buildWhatsAppOrderUrl(socialOrderMessage)
+    ? buildWhatsAppOrderUrl(
+        socialOrderMessage,
+        siteConfig.messaging.whatsappOrderNumber,
+      )
     : "#";
   const telegramOrderUrl = socialOrderMessage
-    ? buildTelegramOrderUrl(socialOrderMessage)
+    ? buildTelegramOrderUrl(
+        socialOrderMessage,
+        siteConfig.messaging.telegramOrderUsername,
+        siteConfig.url,
+      )
     : "#";
 
   function trackCheckoutLead(field: "name" | "phone" | "email", value: string) {
@@ -406,6 +417,15 @@ export default function CommanderPage() {
                   Vos coordonnées
                 </h2>
                 <form action={action} className="mt-4 space-y-4">
+                  {/* Honeypot anti-bot : masqué aux humains, rempli par les bots. */}
+                  <input
+                    type="text"
+                    name="company"
+                    tabIndex={-1}
+                    autoComplete="off"
+                    aria-hidden="true"
+                    className="hidden"
+                  />
                   <Field
                     id="name"
                     label="Nom"
@@ -465,6 +485,7 @@ export default function CommanderPage() {
 }
 
 function EmptyCartState() {
+  const siteConfig = useSiteConfig();
   return (
     <div className="mt-6 grid gap-6 sm:mt-10 lg:grid-cols-[minmax(0,1.1fr)_0.9fr] 3xl:grid-cols-[minmax(0,1.25fr)_0.85fr] 3xl:gap-8">
       <section className="overflow-hidden rounded-2xl border border-white/10 bg-ink-soft">
@@ -545,6 +566,7 @@ function EmptyCartState() {
 }
 
 function MobileQuickHelp() {
+  const siteConfig = useSiteConfig();
   const phoneHref = `tel:${siteConfig.contact.phone.replace(/\s/g, "")}`;
 
   return (
@@ -573,7 +595,9 @@ function MobileQuickHelp() {
 }
 
 function CheckoutHelpPanel({ subtotal }: { subtotal?: number }) {
+  const siteConfig = useSiteConfig();
   const phoneHref = `tel:${siteConfig.contact.phone.replace(/\s/g, "")}`;
+  const checkoutHighlights = buildCheckoutHighlights(siteConfig.contact.city);
 
   return (
     <aside className="rounded-2xl border border-gold/25 bg-gold/[0.06] p-5 shadow-[0_18px_50px_-42px_rgba(245,158,11,0.65)] lg:sticky lg:top-32">

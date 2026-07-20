@@ -1,7 +1,9 @@
-import { siteConfig } from "@/lib/config";
-
-export const phoneHref = `tel:${siteConfig.contact.phone.replace(/\s/g, "")}`;
-export const emailHref = `mailto:${siteConfig.contact.email}`;
-export const mapsHref = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-  siteConfig.contact.address,
-)}`;
+/**
+ * Liens de contact dérivés (tel:, mailto:, Google Maps).
+ *
+ * Ils dépendent désormais de l'identité *dynamique* du site : appeler
+ * `buildContactLinks(config)` avec la config obtenue via `getSiteConfig()`
+ * (serveur) ou `useSiteConfig()` (client) — il n'existe plus de constantes
+ * figées, car les coordonnées sont éditables depuis `/admin/parametres`.
+ */
+export { buildContactLinks } from "@/lib/config";

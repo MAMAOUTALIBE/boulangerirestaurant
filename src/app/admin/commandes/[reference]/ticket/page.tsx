@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { getOrderByReference } from "@/lib/orders";
 import { PrintTrigger } from "@/components/admin/PrintTrigger";
-import { siteConfig } from "@/lib/config";
+import { getSiteConfig } from "@/lib/site-settings";
 
 export const dynamic = "force-dynamic";
 
@@ -11,6 +11,7 @@ export default async function TicketPage({
 }: {
   params: Promise<{ reference: string }>;
 }) {
+  const siteConfig = await getSiteConfig();
   const { reference } = await params;
   const order = await getOrderByReference(reference);
   if (!order) notFound();

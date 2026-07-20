@@ -1,8 +1,9 @@
 import "server-only";
 import crypto from "crypto";
 import { prisma } from "@/lib/prisma";
-import { siteConfig } from "@/lib/config";
+import { getSiteConfig } from "@/lib/site-settings";
 import { sendEmail } from "@/lib/email";
+import { timingSafeStrEqual } from "@/lib/crypto-utils";
 
 const TOKEN_TTL_MIN = 15;
 
@@ -19,14 +20,36 @@ export function isAdminEmail(email: string | null): boolean {
   return adminEmails().includes(email.toLowerCase());
 }
 
+/**
+ * Vérifie le mot de passe admin.
+ * - Préféré : `ADMIN_PASSWORD_HASH` au format `scrypt$<selHex>$<hashHex>`
+ *   (le mot de passe en clair ne vit alors pas dans l'environnement).
+ *   Générer avec : `node -e "const c=require('crypto');const s=c.randomBytes(16);
+ *   process.stdout.write('scrypt$'+s.toString('hex')+'$'+c.scryptSync(process.argv[1],s,32).toString('hex'))" "MON_MOT_DE_PASSE"`
+ * - Sinon : repli sur `ADMIN_PASSWORD` en clair, comparé à temps constant et
+ *   sans fuite de longueur.
+ */
 export function isValidAdminPassword(password: string): boolean {
+  const hash = process.env.ADMIN_PASSWORD_HASH;
+  if (hash) return verifyScryptHash(password, hash);
+
   const expected = process.env.ADMIN_PASSWORD;
   if (!expected) return false;
+  return timingSafeStrEqual(password, expected);
+}
 
-  const passwordBuffer = Buffer.from(password);
-  const expectedBuffer = Buffer.from(expected);
-  if (passwordBuffer.length !== expectedBuffer.length) return false;
-  return crypto.timingSafeEqual(passwordBuffer, expectedBuffer);
+function verifyScryptHash(password: string, stored: string): boolean {
+  const parts = stored.split("$");
+  if (parts.length !== 3 || parts[0] !== "scrypt") return false;
+  try {
+    const salt = Buffer.from(parts[1], "hex");
+    const expected = Buffer.from(parts[2], "hex");
+    if (salt.length === 0 || expected.length === 0) return false;
+    const derived = crypto.scryptSync(password, salt, expected.length);
+    return crypto.timingSafeEqual(derived, expected);
+  } catch {
+    return false;
+  }
 }
 
 /**
@@ -44,6 +67,7 @@ export async function createMagicLink(email: string): Promise<string> {
     data: { token, email: normalized, expiresAt },
   });
 
+  const siteConfig = await getSiteConfig();
   const url = `${siteConfig.url}/compte/verify?token=${token}`;
 
   const result = await sendEmail({
@@ -55,8 +79,9 @@ export async function createMagicLink(email: string): Promise<string> {
       <p>Si vous n'êtes pas à l'origine de cette demande, ignorez cet email.</p>`,
   });
 
-  if (result.simulated) {
-    // En l'absence de Resend, on logge le lien pour pouvoir tester en local.
+  if (result.simulated && process.env.NODE_ENV !== "production") {
+    // Hors prod uniquement : sans Resend, on logge le lien pour tester en local.
+    // En prod on ne logge JAMAIS le token (sinon fuite de connexion via les logs).
     console.info(`[auth:magic-link] ${normalized} → ${url}`);
   }
 

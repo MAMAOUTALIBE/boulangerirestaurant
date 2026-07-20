@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Bell } from "lucide-react";
-import { siteConfig } from "@/lib/config";
+import { useSiteConfig } from "@/context/SiteConfigContext";
 
 const LABEL: Record<string, string> = {
   payée: "Commande confirmée",
@@ -22,6 +22,7 @@ export function OrderStatusNotifier({
 }) {
   const last = useRef(initialStatus);
   const [enabled, setEnabled] = useState(false);
+  const { shortName } = useSiteConfig();
 
   async function enable() {
     if (!("Notification" in window)) return;
@@ -41,7 +42,7 @@ export function OrderStatusNotifier({
         if (status && status !== last.current) {
           last.current = status;
           if (LABEL[status] && Notification.permission === "granted") {
-            new Notification(siteConfig.shortName, { body: LABEL[status] });
+            new Notification(shortName, { body: LABEL[status] });
           }
         }
       } catch {
@@ -49,7 +50,7 @@ export function OrderStatusNotifier({
       }
     }, 20000);
     return () => clearInterval(id);
-  }, [enabled, reference]);
+  }, [enabled, reference, shortName]);
 
   if (enabled) return null;
   return (

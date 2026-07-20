@@ -1,13 +1,14 @@
 import type { Metadata } from "next";
 import { LegalLayout } from "@/components/LegalLayout";
-import { siteConfig } from "@/lib/config";
+import { getSiteConfig } from "@/lib/site-settings";
 
 export const metadata: Metadata = {
   title: "Mentions légales",
   robots: { index: false },
 };
 
-export default function MentionsLegalesPage() {
+export default async function MentionsLegalesPage() {
+  const siteConfig = await getSiteConfig();
   return (
     <LegalLayout title="Mentions légales" updatedAt="31 mai 2026">
       <p className="rounded-xl border border-gold/30 bg-gold/5 p-4 text-sm text-gold">

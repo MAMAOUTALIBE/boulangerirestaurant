@@ -2,10 +2,12 @@ import { Star } from "lucide-react";
 import { Reveal } from "@/components/ui/Reveal";
 import { ReviewForm } from "@/components/ReviewForm";
 import { getApprovedReviews } from "@/lib/reviews";
-import { siteConfig } from "@/lib/config";
+import { getSiteConfig } from "@/lib/site-settings";
+import { serializeJsonLd } from "@/lib/utils";
 
 /** Section avis : note moyenne, avis approuvés et formulaire de dépôt. */
 export async function ReviewsSection() {
+  const siteConfig = await getSiteConfig();
   const { reviews, count, average } = await getApprovedReviews();
 
   return (
@@ -15,7 +17,7 @@ export async function ReviewsSection() {
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
+            __html: serializeJsonLd({
               "@context": "https://schema.org",
               "@type": "Restaurant",
               name: siteConfig.name,

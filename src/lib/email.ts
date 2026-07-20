@@ -1,4 +1,5 @@
-import { siteConfig } from "@/lib/config";
+import { getSiteConfig } from "@/lib/site-settings";
+import { maskEmail } from "@/lib/redact";
 
 interface SendEmailInput {
   to: string;
@@ -13,12 +14,15 @@ interface SendEmailInput {
  */
 export async function sendEmail({ to, subject, html }: SendEmailInput) {
   const apiKey = process.env.RESEND_API_KEY;
+  const siteConfig = await getSiteConfig();
   const from =
     process.env.EMAIL_FROM ??
     `${siteConfig.shortName} <${siteConfig.contact.email}>`;
 
   if (!apiKey) {
-    console.info(`[email:simulation] → ${to} | ${subject}`);
+    if (process.env.NODE_ENV !== "production") {
+      console.info(`[email:simulation] → ${maskEmail(to)} | ${subject}`);
+    }
     return { simulated: true as const };
   }
 

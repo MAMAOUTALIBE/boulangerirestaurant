@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
-import { getSessionEmail } from "@/lib/session";
-import { isAdminEmail } from "@/lib/auth";
+import { isAdminSession } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
@@ -14,7 +13,7 @@ interface Result {
 
 /** GET /api/admin/search?q= — recherche globale (commandes, clients, plats). */
 export async function GET(request: Request) {
-  if (!isAdminEmail(await getSessionEmail())) {
+  if (!(await isAdminSession())) {
     return NextResponse.json({ error: "Accès refusé" }, { status: 403 });
   }
   const q = (new URL(request.url).searchParams.get("q") ?? "").trim();

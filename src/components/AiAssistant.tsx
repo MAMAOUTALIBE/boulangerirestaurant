@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { BotMessageSquare, Plus, Send, Sparkles, X } from "lucide-react";
-import { siteConfig } from "@/lib/config";
+import { useSiteConfig } from "@/context/SiteConfigContext";
 import { useCart } from "@/context/CartContext";
 
 type AssistantAction =
@@ -43,6 +43,7 @@ export function AiAssistant() {
   const [hasOpened, setHasOpened] = useState(false);
   const [added, setAdded] = useState<Record<string, boolean>>({});
   const scrollRef = useRef<HTMLDivElement>(null);
+  const siteConfig = useSiteConfig();
   const hidden = pathname?.startsWith("/admin");
 
   if (hidden) return null;

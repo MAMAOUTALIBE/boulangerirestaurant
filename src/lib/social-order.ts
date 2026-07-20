@@ -1,5 +1,5 @@
 import type { CartItem, Fulfillment } from "@/types";
-import { siteConfig } from "@/lib/config";
+import { defaultSiteConfig } from "@/lib/config";
 import { formatPrice } from "@/lib/utils";
 
 interface SocialOrderChoice {
@@ -18,6 +18,8 @@ interface SocialOrderInput {
   tip?: number;
   total: number;
   promoCode?: string;
+  /** Nom du restaurant (défaut = template). Passer la valeur dynamique côté client. */
+  restaurantName?: string;
 }
 
 function cleanPhone(phone: string) {
@@ -41,9 +43,10 @@ export function formatSocialOrderMessage({
   tip = 0,
   total,
   promoCode,
+  restaurantName = defaultSiteConfig.name,
 }: SocialOrderInput) {
   const lines = [
-    `Bonjour ${siteConfig.name}, je souhaite commander :`,
+    `Bonjour ${restaurantName}, je souhaite commander :`,
     "",
     ...items.flatMap((item) => {
       const details = [
@@ -79,17 +82,21 @@ export function formatSocialOrderMessage({
   return lines.join("\n");
 }
 
-export function buildWhatsAppOrderUrl(message: string) {
-  const phone = cleanPhone(siteConfig.messaging.whatsappOrderNumber).replace(
-    /^\+/,
-    "",
-  );
+export function buildWhatsAppOrderUrl(
+  message: string,
+  whatsappNumber: string = defaultSiteConfig.messaging.whatsappOrderNumber,
+) {
+  const phone = cleanPhone(whatsappNumber).replace(/^\+/, "");
   return `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
 }
 
-export function buildTelegramOrderUrl(message: string) {
-  const username = siteConfig.messaging.telegramOrderUsername.replace(/^@/, "");
-  const url = `${siteConfig.url}/commander`;
+export function buildTelegramOrderUrl(
+  message: string,
+  telegramUsername: string = defaultSiteConfig.messaging.telegramOrderUsername,
+  siteUrl: string = defaultSiteConfig.url,
+) {
+  const username = telegramUsername.replace(/^@/, "");
+  const url = `${siteUrl}/commander`;
   const text = username ? `${message}\n\nÀ envoyer à @${username}.` : message;
   return `https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`;
 }
