@@ -48,6 +48,17 @@ export const seedDishes: SeedDish[] = [
     sortOrder: 3,
   },
   {
+    slug: "hamburger-maison",
+    name: "Hamburger maison",
+    description:
+      "Steak de bœuf grillé, cheddar fondant, salade, tomate, oignon rouge et sauce maison",
+    price: 12.9,
+    image: "/images/galerie/hamburger-maison.webp",
+    category: "grillades",
+    tag: "Nouveau",
+    sortOrder: 5,
+  },
+  {
     slug: "lahmacun",
     name: "Lahmacun",
     description:
