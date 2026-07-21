@@ -1,0 +1,14 @@
+# Overlay d'assets de « Anatolia Grill ».
+#
+# Dépose ici les fichiers propres au restaurant, en respectant l'arborescence
+# du dépôt. Ils sont rsync'és PAR-DESSUS l'arbre distant AVANT le build Docker,
+# donc ils remplacent les assets du template. Exemples :
+#
+#   deploy/clients/anatolia-grill/overlay/public/images/hero-plateau-turc-premium.png
+#   deploy/clients/anatolia-grill/overlay/src/app/favicon.ico
+#   deploy/clients/anatolia-grill/overlay/src/app/icon.svg
+#
+# Le contenu réel (médias) est ignoré par git (voir .gitignore) : il reste local
+# et n'entre pas dans le dépôt public. Ce .gitkeep préserve juste le dossier.
+#
+# Laisser vide = le site garde les assets par défaut du template.

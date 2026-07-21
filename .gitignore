@@ -42,3 +42,8 @@ next-env.d.ts
 
 # Prisma / DB
 .env
+
+# Overlays d'assets par restaurant (médias propres au client, hors dépôt public).
+# On garde la structure (.gitkeep) mais pas les fichiers déposés.
+deploy/clients/*/overlay/*
+!deploy/clients/*/overlay/.gitkeep

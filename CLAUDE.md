@@ -29,7 +29,8 @@ npx vitest run -t "applies a percent promo"
 
 # Database (Prisma):
 npm run db:migrate   # prisma migrate dev (apply + create migration in dev)
-npm run db:seed      # tsx prisma/seed.ts (categories, products, options, hours, establishment…)
+npm run db:seed      # tsx prisma/seed.ts — applies a SEED PROFILE (default anatolia-grill)
+SEED_PROFILE=blank npm run db:seed   # skeleton profile for a new restaurant (see below)
 npm run db:studio    # prisma studio
 ```
 
@@ -126,6 +127,10 @@ Vercel (`vercel.json`: build runs `prisma migrate deploy`, region `cdg1`, weekly
 
 Production target is a **VPS** at `root@213.130.144.215` for `https://lodene.cloud`: keep Anatolia Grill isolated under Compose project `restaurant-turc` (`docker compose -p restaurant-turc …`), dedicated `restaurant-turc_pgdata` volume, app published on `127.0.0.1:3201` only, and the `lodene.cloud` Nginx vhost. If the server hosts other sites, don't touch them (`lodene.org`/boulangerie is on `3101`, the older restaurant app is on `3100`, es-viry is on `8090`). Full first-deploy guide in `DEPLOIEMENT-VPS.md`; `deploy/nginx.conf` is the reverse-proxy config (proxies to 3201).
 
-Updates run from the Mac. The turnkey entry point is **`./deploy/redeploy.sh`** — a thin wrapper that pre-fills the production params (`/root/restaurant-turc`, `https://lodene.cloud`, Compose project `restaurant-turc`) and `exec`s `deploy/update-production.sh`, the env-var-driven script (`DEPLOY_VPS`, `DEPLOY_REMOTE_DIR`, `DEPLOY_SITE_URL`, `DEPLOY_KEY`, `DEPLOY_COMPOSE_PROJECT=restaurant-turc`) that does local checks (typecheck + lint + build) → rsync (excluding `.env*`, so the remote secrets file is never overwritten) → Docker rebuild → Prisma `migrate deploy` → `/api/health` check (see `deploy/MISE-A-JOUR.md`). Deploy is over **rsync, not git pull**; GitHub is for source history, not the live server checkout.
+Updates run from the Mac. The generic entry point is **`./deploy/deploy-client.sh <slug>`** — it sources the target params from `deploy/clients/<slug>.env` (VPS, remote dir, site URL, Compose project, host port), applies the client's optional asset overlay (`deploy/clients/<slug>/overlay/`), and `exec`s `deploy/update-production.sh`, the env-var-driven script (`DEPLOY_VPS`, `DEPLOY_REMOTE_DIR`, `DEPLOY_SITE_URL`, `DEPLOY_KEY`, `DEPLOY_COMPOSE_PROJECT`, `DEPLOY_OVERLAY_DIR`) that does local checks (typecheck + lint + build) → rsync (excluding `.env*`, so the remote secrets file is never overwritten) → overlay rsync → Docker rebuild → Prisma `migrate deploy` → `/api/health` check (see `deploy/MISE-A-JOUR.md`). `./deploy/redeploy.sh` is a backwards-compatible alias for `./deploy/deploy-client.sh anatolia-grill`. Deploy is over **rsync, not git pull**; GitHub is for source history, not the live server checkout.
+
+### Multi-restaurant (same code, N deployments)
+
+The same codebase serves multiple restaurants via **multi-instance** isolation (one Compose project + DB volume + port + Nginx vhost per restaurant). Full guide: **`MULTI-RESTAURANT.md`**. Key pieces: per-target config in `deploy/clients/<slug>.env` (+ `PORTS.md` registry, `EXEMPLE.env` template), remote secrets template `.env.client.example`, per-restaurant asset overlays `deploy/clients/<slug>/overlay/` (gitignored media, rsync'd over the tree before build), Nginx template `deploy/nginx.template.conf`. Initial content comes from a **seed profile**: `prisma/seed.ts` is a generic runner picking `prisma/seeds/<slug>.ts` via `SEED_PROFILE` (registry `PROFILES`, default `anatolia-grill`). Profiles carry `resetStrategy`: `"demo"` (anatolia only — destructive, deactivates other restaurants/dishes/promos) vs `"additive"` (upsert-only, safe for provisioning a real client). Provision a new client's remote DB once with `docker compose -p <slug> --env-file .env run --rm -e SEED_PROFILE=<slug> migrate node_modules/.bin/tsx prisma/seed.ts` — never run the `anatolia-grill`/demo profile or `prisma migrate reset` in prod.
 
 Sibling instructions file: `AGENTS.md` (for non-Claude agents) restates the deploy command and the production constraints in French — never run `npm run db:seed` or `prisma migrate reset` in prod; if the server hosts other sites, never touch their containers or ports.
