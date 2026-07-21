@@ -20,6 +20,42 @@ type GalleryItem =
 const items: GalleryItem[] = [
   {
     type: "image",
+    src: "/images/galerie/lahmacun-maison.webp",
+    alt: "Lahmacun maison tout juste sortis du four",
+    tag: "Lahmacun",
+  },
+  {
+    type: "image",
+    src: "/images/galerie/boeuf-mijote-boulgour.webp",
+    alt: "Boeuf mijoté accompagné de boulgour et de salade fraîche",
+    tag: "Plats du jour",
+  },
+  {
+    type: "image",
+    src: "/images/galerie/assiette-doner.webp",
+    alt: "Assiette de döner avec riz, frites, salade et sauce maison",
+    tag: "Döner",
+  },
+  {
+    type: "image",
+    src: "/images/galerie/soupe-lentilles.webp",
+    alt: "Soupe turque aux lentilles servie avec un quartier de citron",
+    tag: "Soupes",
+  },
+  {
+    type: "image",
+    src: "/images/galerie/buffet-chaud.webp",
+    alt: "Buffet chaud avec soupe, viandes cuisinées, riz et boulgour",
+    tag: "Cuisine",
+  },
+  {
+    type: "image",
+    src: "/images/galerie/assiette-mixte.webp",
+    alt: "Assiette mixte de döner et boeuf grillé avec riz, frites et salade",
+    tag: "Assiettes",
+  },
+  {
+    type: "image",
     src: "/images/galerie/plateau-bbq-signature.webp",
     alt: "Plateau barbecue signature avec steaks grillés, pommes de terre, maïs et sauces",
     tag: "Plateaux",

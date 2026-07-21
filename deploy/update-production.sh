@@ -77,6 +77,21 @@ rsync -az --delete \
   --exclude '.data' --exclude '.vercel' \
   ./ "$VPS:$REMOTE_DIR/"
 
+# Overlay d'assets propre au restaurant (logo, favicon, photos…), appliqué
+# APRÈS le rsync du code — donc APRÈS le --delete — pour remplacer les assets du
+# template et conserver les fichiers présents uniquement dans l'overlay.
+# Le contenu de l'overlay reproduit l'arborescence du dépôt (public/…, src/app/…).
+if [[ -n "${DEPLOY_OVERLAY_DIR:-}" && -d "$DEPLOY_OVERLAY_DIR" ]] \
+  && [[ -n "$(find "$DEPLOY_OVERLAY_DIR" -type f ! -name '.gitkeep' -print -quit)" ]]; then
+  echo "==> 2b/5  Overlay d'assets du restaurant ($DEPLOY_OVERLAY_DIR)"
+  rsync -az \
+    -e "ssh ${SSH_OPTS[*]}" \
+    --exclude '.gitkeep' \
+    "$DEPLOY_OVERLAY_DIR"/ "$VPS:$REMOTE_DIR/"
+else
+  echo "==> 2b/5  Pas d'overlay d'assets (assets du template conservés)"
+fi
+
 echo "==> 3/5  Vérification du .env distant"
 if ! ssh "${SSH_OPTS[@]}" "$VPS" "test -f $remote_dir_q/.env"; then
   echo "Fichier distant manquant : $REMOTE_DIR/.env"
