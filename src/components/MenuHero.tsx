@@ -6,20 +6,20 @@ import { Reveal } from "@/components/ui/Reveal";
 
 const slides = [
   {
-    src: "/images/hero-plateau-turc-premium.png",
-    alt: "Plateau généreux de grillades et spécialités turques",
+    src: "/images/galerie/assiette-mixte.webp",
+    alt: "Assiette mixte de döner et de viande grillée",
   },
   {
-    src: "/images/hero-slide-grillades-turques.png",
-    alt: "Grillades turques préparées au charbon",
+    src: "/images/galerie/assiette-doner.webp",
+    alt: "Assiette de döner avec riz, frites et salade",
   },
   {
-    src: "/images/hero-slide-pide-lahmacun.png",
-    alt: "Pide et lahmacun fraîchement préparés",
+    src: "/images/galerie/lahmacun-maison.webp",
+    alt: "Lahmacun fraîchement préparés",
   },
   {
-    src: "/images/hero-slide-desserts-turcs.png",
-    alt: "Assortiment de desserts turcs",
+    src: "/images/galerie/buffet-chaud.webp",
+    alt: "Buffet chaud de spécialités turques",
   },
 ] as const;
 

@@ -6,13 +6,13 @@ import { remainingStock, isSoldOut } from "@/lib/stock";
 
 const dishImageOverrides: Record<string, string> = {
   "adana-kebab": "/images/hero-slide-adana-kebab.png",
-  "iskender-kebab": "/images/hero-premium-kebab.png",
-  "kebab-grille": "/images/hero-slide-grillades-turques.png",
-  kofte: "/images/hero-plateau-turc-premium.png",
-  lahmacun: "/images/hero-slide-pide-lahmacun.png",
+  "iskender-kebab": "/images/galerie/assiette-doner.webp",
+  "kebab-grille": "/images/galerie/assiette-mixte.webp",
+  kofte: "/images/galerie/boeuf-mijote-boulgour.webp",
+  lahmacun: "/images/galerie/lahmacun-maison.webp",
   "pide-sucuk": "/images/hero-slide-pide-lahmacun.png",
   manti: "/images/about-3.jpg",
-  "mercimek-corbasi": "/images/about-3.jpg",
+  "mercimek-corbasi": "/images/galerie/soupe-lentilles.webp",
   houmous: "/images/about-3.jpg",
   "borek-fromage": "/images/hero-slide-pide-lahmacun.png",
   baklava: "/images/baklava.png",

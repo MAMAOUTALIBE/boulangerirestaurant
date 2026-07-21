@@ -32,7 +32,7 @@ export const seedDishes: SeedDish[] = [
     description:
       "Émincé de viande grillée sur pide, sauce tomate, beurre noisette et yaourt",
     price: 16.9,
-    image: "/images/hero-premium-kebab.png",
+    image: "/images/galerie/assiette-doner.webp",
     category: "grillades",
     tag: "Populaire",
     sortOrder: 2,
@@ -43,7 +43,7 @@ export const seedDishes: SeedDish[] = [
     description:
       "Viande marinée grillée au charbon, riz pilaf et légumes grillés",
     price: 13.9,
-    image: "/images/hero-slide-grillades-turques.png",
+    image: "/images/galerie/assiette-mixte.webp",
     category: "grillades",
     sortOrder: 3,
   },
@@ -53,7 +53,7 @@ export const seedDishes: SeedDish[] = [
     description:
       "Pâte fine croustillante garnie de viande hachée, tomate, poivron et persil",
     price: 6.9,
-    image: "/images/hero-slide-pide-lahmacun.png",
+    image: "/images/galerie/lahmacun-maison.webp",
     category: "pide",
     tag: "Maison",
     sortOrder: 4,
