@@ -26,7 +26,7 @@ const display = Playfair_Display({
   weight: ["500", "600", "700", "800"],
 });
 
-const heroImage = "/images/africain/thiep-poisson.webp";
+const heroImage = "/images/hero-plateau-turc-premium.png";
 
 export async function generateMetadata(): Promise<Metadata> {
   const siteConfig = await getSiteConfig();

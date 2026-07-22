@@ -5,23 +5,21 @@ import type { Dish } from "@/types";
 import { remainingStock, isSoldOut } from "@/lib/stock";
 
 const dishImageOverrides: Record<string, string> = {
-  "adana-kebab": "/images/africain/yassa-poulet.webp",
-  "iskender-kebab": "/images/africain/thiep-poisson.webp",
-  "kebab-grille": "/images/africain/thiep-poulet.webp",
-  kofte: "/images/africain/mafe-boeuf.webp",
-  lahmacun: "/images/africain/attieke-poisson-alloco.webp",
-  "pide-sucuk": "/images/africain/pastels-alloco.webp",
-  manti: "/images/africain/mafe-boeuf.webp",
-  "mercimek-corbasi": "/images/africain/yassa-poulet.webp",
-  houmous: "/images/africain/pastels-alloco.webp",
-  "borek-fromage": "/images/africain/pastels-alloco.webp",
-  baklava: "/images/africain/desserts-africains.webp",
-  sutlac: "/images/africain/desserts-africains.webp",
-  ayran: "/images/africain/boissons-bissap-gingembre-bouye.webp",
-  "the-turc": "/images/africain/boissons-bissap-gingembre-bouye.webp",
-  "sodas-frais": "/images/africain/boissons-bissap-gingembre-bouye.webp",
-  "hamburger-maison": "/images/africain/thiep-poulet.webp",
-  "tacos-maison": "/images/africain/attieke-poisson-alloco.webp",
+  "adana-kebab": "/images/hero-slide-adana-kebab.png",
+  "iskender-kebab": "/images/galerie/assiette-doner.webp",
+  "kebab-grille": "/images/galerie/assiette-mixte.webp",
+  kofte: "/images/galerie/boeuf-mijote-boulgour.webp",
+  lahmacun: "/images/galerie/lahmacun-maison.webp",
+  "pide-sucuk": "/images/hero-slide-pide-lahmacun.png",
+  manti: "/images/about-3.jpg",
+  "mercimek-corbasi": "/images/galerie/soupe-lentilles.webp",
+  houmous: "/images/about-3.jpg",
+  "borek-fromage": "/images/hero-slide-pide-lahmacun.png",
+  baklava: "/images/baklava.png",
+  sutlac: "/images/hero-slide-desserts-turcs.png",
+  ayran: "/images/ayran.png",
+  "the-turc": "/images/hero-slide-boissons-turques.png",
+  "sodas-frais": "/images/boisson-sodas.png",
 };
 
 // La visibilité publique d'un produit/catégorie est désormais pilotée par le

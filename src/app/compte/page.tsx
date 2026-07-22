@@ -72,7 +72,7 @@ export default async function ComptePage({
 
               <aside className="relative min-h-[28rem] border-l border-white/10">
                 <Image
-                  src="/images/africain/thiep-poisson.webp"
+                  src="/images/hero-plateau-turc-premium.png"
                   alt="Plateau de grillades turques de notre restaurant"
                   fill
                   sizes="42vw"

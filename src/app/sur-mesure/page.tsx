@@ -71,7 +71,7 @@ export default function SurMesurePage() {
                 <figure className="overflow-hidden rounded-[28px] border border-gold/25 bg-white/[0.03] shadow-[0_28px_90px_-60px_rgba(245,158,11,0.75)]">
                   <div className="relative aspect-[16/9]">
                     <Image
-                      src="/images/africain/thiep-poisson.webp"
+                      src="/images/hero-plateau-turc-premium.png"
                       alt="Grand plateau de grillades turques à partager : kebabs, brochettes et accompagnements"
                       fill
                       priority

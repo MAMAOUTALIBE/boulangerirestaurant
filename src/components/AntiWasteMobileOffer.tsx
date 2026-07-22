@@ -48,7 +48,7 @@ export function AntiWasteMobileOffer({
         <div className="grid grid-cols-[7.5rem_1fr] gap-3 p-2.5">
           <div className="relative min-h-[8.25rem] overflow-hidden rounded-xl">
             <Image
-              src="/images/africain/thiep-poulet.webp"
+              src="/images/hero-slide-grillades-turques.png"
               alt="Plateau de grillades et spécialités du jour"
               fill
               sizes="120px"

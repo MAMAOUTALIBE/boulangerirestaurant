@@ -28,14 +28,14 @@ const saisonSuggestions = [
   {
     name: "Plateau de baklava",
     description: "Baklava pistache et noix, assortiment de fête à partager.",
-    image: "/images/africain/desserts-africains.webp",
+    image: "/images/hero-slide-desserts-turcs.png",
     badge: "Fête",
     price: "À partir de 24,90 €",
   },
   {
     name: "Plateau mezze",
     description: "Houmous, börek et assortiment d'entrées à partager.",
-    image: "/images/africain/pastels-alloco.webp",
+    image: "/images/about-3.jpg",
     badge: "À partager",
     price: "À partir de 19,90 €",
   },
@@ -43,14 +43,14 @@ const saisonSuggestions = [
     name: "Plateau de grillades",
     description:
       "Brochettes, kebabs et accompagnements pour les grandes tablées.",
-    image: "/images/africain/thiep-poulet.webp",
+    image: "/images/hero-slide-grillades-turques.png",
     badge: "Famille",
     price: "Sur commande",
   },
   {
     name: "Buffet événement",
     description: "Grillades, mezze et desserts turcs pour vos réceptions.",
-    image: "/images/africain/thiep-poisson.webp",
+    image: "/images/hero-plateau-turc-premium.png",
     badge: "Traiteur",
     price: "Sur devis",
   },
@@ -223,7 +223,7 @@ function DesktopSeasonalEmpty() {
       <div className="grid gap-5 p-5 lg:grid-cols-[0.9fr_1.1fr] lg:p-6">
         <div className="relative min-h-[24rem] overflow-hidden rounded-3xl border border-white/10">
           <Image
-            src="/images/africain/desserts-africains.webp"
+            src="/images/hero-slide-desserts-turcs.png"
             alt="Spécialités turques de saison : baklava et douceurs"
             fill
             sizes="40vw"

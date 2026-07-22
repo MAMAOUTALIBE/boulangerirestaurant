@@ -114,24 +114,24 @@ function imageForCategory(slug: string) {
     slug.includes("kebab") ||
     slug.includes("kofte")
   ) {
-    return "/images/africain/thiep-poulet.webp";
+    return "/images/hero-slide-grillades-turques.png";
   }
   if (slug.includes("pide") || slug.includes("lahmacun")) {
-    return "/images/africain/attieke-poisson-alloco.webp";
+    return "/images/hero-slide-pide-lahmacun.png";
   }
   if (
     slug.includes("dessert") ||
     slug.includes("baklava") ||
     slug.includes("sutlac")
   ) {
-    return "/images/africain/desserts-africains.webp";
+    return "/images/hero-slide-desserts-turcs.png";
   }
   if (
     slug.includes("boisson") ||
     slug.includes("ayran") ||
     slug.includes("the-turc")
   ) {
-    return "/images/africain/boissons-bissap-gingembre-bouye.webp";
+    return "/images/hero-slide-boissons-turques.png";
   }
   if (
     slug.includes("entree") ||
@@ -141,9 +141,9 @@ function imageForCategory(slug: string) {
     slug.includes("manti") ||
     slug.includes("specialite")
   ) {
-    return "/images/africain/pastels-alloco.webp";
+    return "/images/about-3.jpg";
   }
-  return "/images/africain/thiep-poisson.webp";
+  return "/images/hero-plateau-turc-premium.png";
 }
 
 function groupMobileCategories(

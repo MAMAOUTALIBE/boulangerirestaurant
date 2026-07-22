@@ -40,19 +40,19 @@ const starterLinks = [
     href: "/menu/adana-kebab",
     name: "Adana kebab",
     text: "Signature",
-    image: "/images/africain/yassa-poulet.webp",
+    image: "/images/hero-slide-adana-kebab.png",
   },
   {
     href: "/menu/iskender-kebab",
     name: "İskender kebab",
     text: "Populaire",
-    image: "/images/africain/mafe-boeuf.webp",
+    image: "/images/hero-premium-kebab.png",
   },
   {
     href: "/menu/baklava",
     name: "Baklava",
     text: "Dessert",
-    image: "/images/africain/desserts-africains.webp",
+    image: "/images/baklava.png",
   },
 ];
 function buildCheckoutHighlights(city: string): {
