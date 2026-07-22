@@ -21,7 +21,7 @@ export const seedDishes: SeedDish[] = [
     description:
       "Brochette de viande hachée d'agneau épicée, grillée au charbon, bulgur et salade",
     price: 14.9,
-    image: "/images/hero-slide-adana-kebab.png",
+    image: "/images/africain/yassa-poulet.webp",
     category: "grillades",
     tag: "Signature",
     sortOrder: 1,
@@ -32,7 +32,7 @@ export const seedDishes: SeedDish[] = [
     description:
       "Émincé de viande grillée sur pide, sauce tomate, beurre noisette et yaourt",
     price: 16.9,
-    image: "/images/galerie/assiette-doner.webp",
+    image: "/images/africain/thiep-poisson.webp",
     category: "grillades",
     tag: "Populaire",
     sortOrder: 2,
@@ -43,7 +43,7 @@ export const seedDishes: SeedDish[] = [
     description:
       "Viande marinée grillée au charbon, riz pilaf et légumes grillés",
     price: 13.9,
-    image: "/images/galerie/assiette-mixte.webp",
+    image: "/images/africain/thiep-poulet.webp",
     category: "grillades",
     sortOrder: 3,
   },
@@ -53,10 +53,21 @@ export const seedDishes: SeedDish[] = [
     description:
       "Steak de bœuf grillé, cheddar fondant, salade, tomate, oignon rouge et sauce maison",
     price: 12.9,
-    image: "/images/galerie/hamburger-maison.webp",
+    image: "/images/africain/thiep-poulet.webp",
     category: "grillades",
     tag: "Nouveau",
     sortOrder: 5,
+  },
+  {
+    slug: "tacos-maison",
+    name: "Tacos maison",
+    description:
+      "Viande grillée, frites, cheddar fondant et sauce fromagère dans une tortilla toastée",
+    price: 11.9,
+    image: "/images/africain/attieke-poisson-alloco.webp",
+    category: "grillades",
+    tag: "Nouveau",
+    sortOrder: 6,
   },
   {
     slug: "lahmacun",
@@ -64,7 +75,7 @@ export const seedDishes: SeedDish[] = [
     description:
       "Pâte fine croustillante garnie de viande hachée, tomate, poivron et persil",
     price: 6.9,
-    image: "/images/galerie/lahmacun-maison.webp",
+    image: "/images/africain/attieke-poisson-alloco.webp",
     category: "pide",
     tag: "Maison",
     sortOrder: 4,
@@ -75,7 +86,7 @@ export const seedDishes: SeedDish[] = [
     description:
       "Barque de pâte dorée garnie de sucuk épicé, fromage fondant et œuf",
     price: 9.9,
-    image: "/images/hero-slide-pide-lahmacun.png",
+    image: "/images/africain/pastels-alloco.webp",
     category: "pide",
     sortOrder: 5,
   },
@@ -85,7 +96,7 @@ export const seedDishes: SeedDish[] = [
     description:
       "Raviolis turcs farcis à la viande, yaourt à l'ail et beurre au paprika",
     price: 12.9,
-    image: "/images/about-3.jpg",
+    image: "/images/africain/mafe-boeuf.webp",
     category: "specialites",
     tag: "Spécialité",
     sortOrder: 6,
@@ -95,7 +106,7 @@ export const seedDishes: SeedDish[] = [
     name: "Baklava",
     description: "Feuilles de pâte filo, pistaches concassées et sirop de miel",
     price: 5.9,
-    image: "/images/baklava.png",
+    image: "/images/africain/desserts-africains.webp",
     category: "desserts",
     tag: "Incontournable",
     sortOrder: 7,
@@ -106,7 +117,7 @@ export const seedDishes: SeedDish[] = [
     description:
       "Boisson traditionnelle au yaourt battu, fraîche et légèrement salée",
     price: 2.5,
-    image: "/images/ayran.png",
+    image: "/images/africain/boissons-bissap-gingembre-bouye.webp",
     category: "boissons",
     sortOrder: 8,
   },

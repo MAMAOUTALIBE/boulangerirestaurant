@@ -67,7 +67,7 @@ export default function TraiteurPage() {
             <div className="mt-5 overflow-hidden rounded-[24px] border border-white/10 bg-[radial-gradient(circle_at_top_left,rgba(216,154,28,0.12),transparent_38%),#111111] shadow-[0_28px_85px_-62px_rgba(0,0,0,0.95)] lg:grid lg:h-[calc(100svh-17rem)] lg:max-h-[31rem] lg:min-h-[28rem] lg:grid-cols-[0.92fr_1.08fr]">
               <div className="relative min-h-[20rem] lg:min-h-0">
                 <Image
-                  src="/images/hero-slide-grillades-turques.png"
+                  src="/images/africain/thiep-poulet.webp"
                   alt="Plateaux traiteur de grillades, mezze et spécialités turques"
                   fill
                   sizes="(max-width: 1024px) 100vw, 44vw"

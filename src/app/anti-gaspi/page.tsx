@@ -27,25 +27,25 @@ const paniersExemples = [
   {
     name: "Grillades du soir",
     description: "Brochettes, kebabs et viandes grillées du jour.",
-    image: "/images/hero-slide-grillades-turques.png",
+    image: "/images/africain/thiep-poulet.webp",
     badge: "Maison",
   },
   {
     name: "Pide & lahmacun",
     description: "Pide et lahmacun préparés dans la journée.",
-    image: "/images/hero-slide-pide-lahmacun.png",
+    image: "/images/africain/pastels-alloco.webp",
     badge: "Du four",
   },
   {
     name: "Mezze & entrées",
     description: "Houmous, börek et assortiment de mezze.",
-    image: "/images/about-3.jpg",
+    image: "/images/africain/mafe-boeuf.webp",
     badge: "À partager",
   },
   {
     name: "Desserts",
     description: "Baklava et douceurs turques selon la vitrine.",
-    image: "/images/baklava.png",
+    image: "/images/africain/desserts-africains.webp",
     badge: "Sucré",
   },
 ];
@@ -181,7 +181,7 @@ async function DesktopNoOfferCard() {
     <div className="mt-5 overflow-hidden rounded-[24px] border border-white/10 bg-[radial-gradient(circle_at_top_left,rgba(34,197,94,0.12),transparent_36%),#111111] shadow-[0_28px_85px_-62px_rgba(0,0,0,0.95)] lg:grid lg:h-[calc(100svh-17rem)] lg:max-h-[31rem] lg:min-h-[27rem] lg:grid-cols-[0.92fr_1.08fr]">
       <div className="relative min-h-[20rem] lg:min-h-0">
         <Image
-          src="/images/hero-slide-grillades-turques.png"
+          src="/images/africain/thiep-poulet.webp"
           alt="Grillades et spécialités du jour pour les plateaux anti-gaspi"
           fill
           sizes="(max-width: 1024px) 100vw, 44vw"

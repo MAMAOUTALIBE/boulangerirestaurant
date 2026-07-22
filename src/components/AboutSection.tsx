@@ -5,11 +5,11 @@ import { aboutPoints } from "@/data/services";
 
 const gallery = [
   {
-    src: "/images/hero-slide-grillades-turques.png",
+    src: "/images/africain/thiep-poisson.webp",
     alt: "Plateau de grillades turques",
   },
-  { src: "/images/about-1.jpg", alt: "Notre salle de restaurant" },
-  { src: "/images/about-3.jpg", alt: "Assortiment de spécialités turques" },
+  { src: "/images/africain/yassa-poulet.webp", alt: "Poulet yassa" },
+  { src: "/images/africain/pastels-alloco.webp", alt: "Pastels et alloco" },
 ];
 
 /** Bloc « À propos de nous » (colonne centrale de la bande). */

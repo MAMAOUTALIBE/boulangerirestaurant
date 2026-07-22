@@ -6,19 +6,19 @@ import { Reveal } from "@/components/ui/Reveal";
 
 const slides = [
   {
-    src: "/images/galerie/assiette-mixte.webp",
+    src: "/images/africain/thiep-poisson.webp",
     alt: "Assiette mixte de döner et de viande grillée",
   },
   {
-    src: "/images/galerie/assiette-doner.webp",
+    src: "/images/africain/thiep-poulet.webp",
     alt: "Assiette de döner avec riz, frites et salade",
   },
   {
-    src: "/images/galerie/lahmacun-maison.webp",
+    src: "/images/africain/yassa-poulet.webp",
     alt: "Lahmacun fraîchement préparés",
   },
   {
-    src: "/images/galerie/buffet-chaud.webp",
+    src: "/images/africain/attieke-poisson-alloco.webp",
     alt: "Buffet chaud de spécialités turques",
   },
 ] as const;
