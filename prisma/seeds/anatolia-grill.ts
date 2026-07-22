@@ -14,10 +14,11 @@ import type { SeedDish, SeedProfile } from "./types";
 const categories = [
   { slug: "entrees", name: "Entrées & Mezze", sortOrder: 1 },
   { slug: "grillades", name: "Grillades & Kebabs", sortOrder: 2 },
-  { slug: "pide", name: "Pide & Lahmacun", sortOrder: 3 },
-  { slug: "specialites", name: "Spécialités", sortOrder: 4 },
-  { slug: "desserts", name: "Desserts", sortOrder: 5 },
-  { slug: "boissons", name: "Boissons", sortOrder: 6 },
+  { slug: "sandwichs", name: "Sandwichs & Burgers", sortOrder: 3 },
+  { slug: "pide", name: "Pide & Lahmacun", sortOrder: 4 },
+  { slug: "specialites", name: "Spécialités", sortOrder: 5 },
+  { slug: "desserts", name: "Desserts", sortOrder: 6 },
+  { slug: "boissons", name: "Boissons", sortOrder: 7 },
 ];
 
 const extraDishes: SeedDish[] = [
@@ -26,7 +27,7 @@ const extraDishes: SeedDish[] = [
     name: "Mercimek çorbası",
     description: "Soupe crémeuse de lentilles corail, cumin et filet de citron",
     price: 5.5,
-    image: "/images/galerie/soupe-lentilles.webp",
+    image: "/images/chez-mine/soupe-lentilles.jpg",
     category: "entrees",
     sortOrder: 1,
   },
@@ -90,7 +91,7 @@ const extraDishes: SeedDish[] = [
 ];
 
 const anatoliaGrill: SeedProfile = {
-  restaurant: { slug: "anatolia-grill", name: "Restaurant" },
+  restaurant: { slug: "anatolia-grill", name: "Chez Miné" },
   resetStrategy: "demo",
   // Identité laissée vide : retombe sur `defaultSiteConfig` (src/lib/config.ts),
   // surchargeable ensuite depuis /admin/parametres.

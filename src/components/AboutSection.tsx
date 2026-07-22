@@ -5,11 +5,17 @@ import { aboutPoints } from "@/data/services";
 
 const gallery = [
   {
-    src: "/images/hero-slide-grillades-turques.png",
-    alt: "Plateau de grillades turques",
+    src: "/images/chez-mine/assiette-mixte.jpg",
+    alt: "Assiette mixte de grillades Chez Miné",
   },
-  { src: "/images/about-1.jpg", alt: "Notre salle de restaurant" },
-  { src: "/images/about-3.jpg", alt: "Assortiment de spécialités turques" },
+  {
+    src: "/images/chez-mine/salle.jpg",
+    alt: "Salle du restaurant Chez Miné",
+  },
+  {
+    src: "/images/chez-mine/facade.jpg",
+    alt: "Façade de Grill Chez Miné",
+  },
 ];
 
 /** Bloc « À propos de nous » (colonne centrale de la bande). */

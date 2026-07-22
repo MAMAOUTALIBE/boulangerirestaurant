@@ -65,10 +65,10 @@ export function telegramUrl(username: string): string {
 
 /** Valeurs par défaut du template (fallback quand la base est vide). */
 export const defaultSiteConfig: SiteConfig = {
-  name: "Restaurant",
-  shortName: "Restaurant",
+  name: "Chez Miné",
+  shortName: "Chez Miné",
   description:
-    "Restaurant turc : grillades au charbon, kebabs, pide, lahmacun, mezze et desserts maison. Sur place, à emporter ou en livraison.",
+    "Chez Miné, restaurant turc : kebabs, grillades, sandwichs, assiettes généreuses et desserts maison. Sur place, à emporter ou en livraison.",
   url: process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000",
   locale: "fr_FR",
   contact: {

@@ -66,8 +66,8 @@ export async function ContactSection() {
 
             <div className="relative hidden min-h-0 flex-1 overflow-hidden rounded-[22px] border border-white/10 lg:block">
               <Image
-                src="/images/about-1.jpg"
-                alt="Salle de notre restaurant turc"
+                src="/images/chez-mine/salle-vitrine.jpg"
+                alt="Salle du restaurant Chez Miné près de la vitrine"
                 fill
                 sizes="36vw"
                 className="object-cover"

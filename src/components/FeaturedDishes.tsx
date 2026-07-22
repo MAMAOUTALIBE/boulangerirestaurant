@@ -4,7 +4,11 @@ import { ArrowRight } from "lucide-react";
 import { DishCard } from "@/components/DishCard";
 import { getMenuForBrowser } from "@/lib/dishes";
 
-const specialtySlugs = ["adana-kebab", "iskender-kebab", "baklava"];
+const specialtySlugs = [
+  "assiette-brochettes-poulet",
+  "sandwich-doner-poulet",
+  "baklava",
+];
 
 /** Grille des spécialités mises en avant sur l'accueil. */
 export async function FeaturedDishes() {
@@ -86,8 +90,8 @@ export async function FeaturedDishes() {
           </div>
           <div className="max-w-4xl">
             <p className="hidden text-sm leading-7 text-ink/70 sm:block sm:text-base 3xl:text-lg 3xl:leading-8">
-              Adana kebab, İskender kebab et baklava : trois signatures à
-              commander rapidement.
+              Brochettes grillées, sandwich döner poulet et baklava maison :
+              trois signatures de Chez Miné à commander rapidement.
             </p>
           </div>
         </div>
@@ -118,6 +122,13 @@ function imageForCategory(slug: string) {
   }
   if (slug.includes("pide") || slug.includes("lahmacun")) {
     return "/images/hero-slide-pide-lahmacun.png";
+  }
+  if (
+    slug.includes("sandwich") ||
+    slug.includes("burger") ||
+    slug.includes("tacos")
+  ) {
+    return "/images/chez-mine/sandwich-doner-poulet.jpg";
   }
   if (
     slug.includes("dessert") ||

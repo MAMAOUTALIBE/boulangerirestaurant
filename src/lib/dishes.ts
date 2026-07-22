@@ -5,21 +5,35 @@ import type { Dish } from "@/types";
 import { remainingStock, isSoldOut } from "@/lib/stock";
 
 const dishImageOverrides: Record<string, string> = {
-  "adana-kebab": "/images/hero-slide-adana-kebab.png",
-  "iskender-kebab": "/images/galerie/assiette-doner.webp",
-  "kebab-grille": "/images/galerie/assiette-mixte.webp",
-  kofte: "/images/galerie/boeuf-mijote-boulgour.webp",
+  "adana-kebab": "/images/chez-mine/assiette-brochettes-kofta.jpg",
+  "iskender-kebab": "/images/chez-mine/assiette-doner.jpg",
+  "kebab-grille": "/images/chez-mine/assiette-mixte.jpg",
+  kofte: "/images/chez-mine/sandwich-kofte.jpg",
   lahmacun: "/images/galerie/lahmacun-maison.webp",
   "pide-sucuk": "/images/hero-slide-pide-lahmacun.png",
   manti: "/images/about-3.jpg",
-  "mercimek-corbasi": "/images/galerie/soupe-lentilles.webp",
+  "mercimek-corbasi": "/images/chez-mine/soupe-lentilles.jpg",
   houmous: "/images/about-3.jpg",
   "borek-fromage": "/images/hero-slide-pide-lahmacun.png",
-  baklava: "/images/baklava.png",
+  baklava: "/images/chez-mine/baklava-maison.jpg",
   sutlac: "/images/hero-slide-desserts-turcs.png",
   ayran: "/images/ayran.png",
   "the-turc": "/images/hero-slide-boissons-turques.png",
   "sodas-frais": "/images/boisson-sodas.png",
+  "hamburger-maison": "/images/chez-mine/cheeseburger.jpg",
+  "double-cheeseburger": "/images/chez-mine/double-cheeseburger.jpg",
+  "sandwich-doner-poulet": "/images/chez-mine/sandwich-doner-poulet.jpg",
+  "sandwich-kofte": "/images/chez-mine/sandwich-kofte.jpg",
+  "sandwich-steak": "/images/chez-mine/sandwich-steak.jpg",
+  "sandwich-poulet-marine": "/images/chez-mine/sandwich-poulet-marine.jpg",
+  "tacos-maison": "/images/chez-mine/sandwich-poulet-epice.jpg",
+  "assiette-brochettes-poulet":
+    "/images/chez-mine/assiette-brochettes-poulet.jpg",
+  "assiette-cotelettes-agneau":
+    "/images/chez-mine/assiette-cotelettes-agneau.jpg",
+  "assiette-doner-poulet": "/images/chez-mine/assiette-doner-poulet.jpg",
+  "saute-veau": "/images/chez-mine/saute-veau.jpg",
+  revani: "/images/chez-mine/revani.jpg",
 };
 
 // La visibilité publique d'un produit/catégorie est désormais pilotée par le
