@@ -107,7 +107,7 @@ export function DishCard({
       </div>
 
       <div className="flex min-w-0 flex-1 flex-col justify-start px-3 pb-2.5 pt-3 sm:px-5 sm:pb-4 sm:pt-3.5 3xl:px-6 3xl:pb-5 3xl:pt-4">
-        <h3 className="line-clamp-2 font-display text-[1.12rem] font-semibold leading-[1.08] text-cream min-[390px]:text-[1.18rem] sm:text-2xl sm:text-ink 3xl:text-3xl">
+        <h3 className="line-clamp-1 font-display text-[1.12rem] font-semibold leading-[1.08] text-cream min-[390px]:text-[1.18rem] sm:line-clamp-2 sm:text-2xl sm:text-ink 3xl:text-3xl">
           {dish.name}
         </h3>
         <TitleUnderline />
