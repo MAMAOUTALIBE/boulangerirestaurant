@@ -104,23 +104,16 @@ export function DishCard({
             Plus que {lowStock}
           </span>
         )}
-        <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-ink/85 to-transparent" />
-        <span className="absolute bottom-2 left-2 rounded-md bg-black/45 px-2.5 py-1 font-display text-lg font-bold text-cream backdrop-blur-[2px] sm:bottom-3 sm:left-3 sm:text-2xl 3xl:bottom-4 3xl:left-4 3xl:text-3xl">
-          {formatPrice(dish.price)}
-        </span>
       </div>
 
-      <div className="flex min-w-0 flex-1 flex-col justify-start px-3 pb-2.5 pt-3 sm:block sm:px-5 sm:pb-4 sm:pt-3.5 3xl:px-6 3xl:pb-5 3xl:pt-4">
+      <div className="flex min-w-0 flex-1 flex-col justify-start px-3 pb-2.5 pt-3 sm:px-5 sm:pb-4 sm:pt-3.5 3xl:px-6 3xl:pb-5 3xl:pt-4">
         <h3 className="line-clamp-2 font-display text-[1.12rem] font-semibold leading-[1.08] text-cream min-[390px]:text-[1.18rem] sm:text-2xl sm:text-ink 3xl:text-3xl">
           {dish.name}
         </h3>
         <TitleUnderline />
-        <div className="mt-1 flex items-center justify-between gap-2 sm:mt-1.5 sm:items-start sm:gap-3">
-          <p className="line-clamp-2 text-[0.72rem] leading-[1.25] text-cream/70 min-[390px]:text-[0.76rem] sm:text-base sm:leading-relaxed sm:text-ink/70 3xl:text-lg 3xl:leading-8">
-            {dish.description}
-          </p>
-          {actionButton}
-        </div>
+        <p className="mt-1 line-clamp-1 text-[0.72rem] leading-[1.25] text-cream/70 min-[390px]:line-clamp-2 min-[390px]:text-[0.76rem] sm:mt-1.5 sm:text-base sm:leading-relaxed sm:text-ink/70 3xl:text-lg 3xl:leading-8">
+          {dish.description}
+        </p>
         {details.length > 0 && (
           <div className="mt-2 hidden flex-wrap gap-1.5 sm:mt-3 sm:flex">
             {details.slice(0, 4).map((detail) => (
@@ -133,6 +126,12 @@ export function DishCard({
             ))}
           </div>
         )}
+        <div className="mt-auto flex items-end justify-between gap-3 pt-1.5 sm:pt-3">
+          <span className="font-display text-[1.15rem] font-bold leading-none text-gold min-[390px]:text-xl sm:text-2xl sm:text-forest 3xl:text-3xl">
+            {formatPrice(dish.price)}
+          </span>
+          {actionButton}
+        </div>
       </div>
     </motion.article>
   );
