@@ -10,6 +10,13 @@ const specialtySlugs = [
   "attieke-poisson-alloco",
 ];
 
+const mobileCategoryCardStyles = [
+  "border-amber-400/55 shadow-[0_14px_34px_-18px_rgba(245,158,11,0.72)] hover:border-amber-300/90 hover:shadow-[0_18px_42px_-16px_rgba(245,158,11,0.9)]",
+  "border-orange-400/55 shadow-[0_14px_34px_-18px_rgba(251,146,60,0.68)] hover:border-orange-300/90 hover:shadow-[0_18px_42px_-16px_rgba(251,146,60,0.86)]",
+  "border-rose-400/50 shadow-[0_14px_34px_-18px_rgba(251,113,133,0.62)] hover:border-rose-300/90 hover:shadow-[0_18px_42px_-16px_rgba(251,113,133,0.82)]",
+  "border-emerald-400/50 shadow-[0_14px_34px_-18px_rgba(52,211,153,0.58)] hover:border-emerald-300/90 hover:shadow-[0_18px_42px_-16px_rgba(52,211,153,0.78)]",
+] as const;
+
 /** Grille des spécialités mises en avant sur l'accueil. */
 export async function FeaturedDishes() {
   const { categories, dishes } = await getMenuForBrowser();
@@ -43,20 +50,21 @@ export async function FeaturedDishes() {
               </Link>
             </div>
             <div className="grid grid-cols-2 gap-2">
-              {mobileCategories.map((category) => (
+              {mobileCategories.map((category, index) => (
                 <Link
                   key={category.id}
                   href={category.href}
-                  className="group relative min-h-[7rem] overflow-hidden rounded-2xl border border-white/10 bg-white/[0.035]"
+                  className={`group relative min-h-[7rem] overflow-hidden rounded-2xl border bg-[#101010] transition duration-300 active:scale-[0.98] ${mobileCategoryCardStyles[index]}`}
                 >
                   <Image
                     src={imageForCategory(category.imageSlug)}
                     alt=""
                     fill
                     sizes="50vw"
-                    className="object-cover opacity-80 transition duration-500 group-hover:scale-105"
+                    className="object-cover opacity-85 transition duration-500 group-hover:scale-110 group-hover:opacity-95"
                   />
-                  <div className="from-black/88 absolute inset-0 bg-gradient-to-t via-black/30 to-transparent" />
+                  <div className="from-black/92 absolute inset-0 bg-gradient-to-t via-black/35 to-transparent" />
+                  <div className="pointer-events-none absolute inset-[1px] rounded-[0.9rem] ring-1 ring-inset ring-white/10" />
                   <div className="absolute inset-x-0 bottom-0 p-3">
                     <p className="line-clamp-2 font-display text-lg font-bold leading-tight text-cream">
                       {category.name}
@@ -147,10 +155,38 @@ function imageForCategory(slug: string) {
 function groupMobileCategories(
   categories: Array<{ id: string; slug: string; name: string }>,
 ) {
-  // Restaurant : chaque catégorie pointe vers sa propre ancre de menu.
-  return categories.map((category) => ({
+  const availableSlugs = new Set(categories.map((category) => category.slug));
+  const mobileCategories = [
+    {
+      id: "mobile-plats",
+      name: "Plats",
+      slug: "plats-africains",
+      imageSlug: "plats-africains",
+    },
+    {
+      id: "mobile-entrees",
+      name: "Entrées",
+      slug: "entrees",
+      imageSlug: "entrees",
+    },
+    {
+      id: "mobile-desserts",
+      name: "Desserts",
+      slug: "desserts",
+      imageSlug: "desserts",
+    },
+    {
+      id: "mobile-boissons",
+      name: "Boissons",
+      slug: "boissons",
+      imageSlug: "boissons",
+    },
+  ];
+
+  return mobileCategories.map((category) => ({
     ...category,
-    href: `/menu#${category.slug}`,
-    imageSlug: category.slug,
+    href: availableSlugs.has(category.slug)
+      ? `/menu#${category.slug}`
+      : "/menu",
   }));
 }

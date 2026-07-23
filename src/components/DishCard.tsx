@@ -71,7 +71,7 @@ export function DishCard({
     <motion.article
       whileHover={{ y: unavailable ? 0 : -6 }}
       transition={{ type: "spring", stiffness: 260, damping: 20 }}
-      className="group grid h-[8.7rem] grid-cols-[9.25rem_minmax(0,1fr)] overflow-hidden rounded-2xl border border-gold/15 bg-[#101010] shadow-[0_18px_42px_-34px_rgba(245,158,11,0.78)] transition-shadow duration-300 hover:shadow-[0_22px_52px_-34px_rgba(8,8,8,0.72)] min-[390px]:h-[9rem] min-[390px]:grid-cols-[9.9rem_minmax(0,1fr)] sm:flex sm:h-full sm:flex-col sm:border-ink/10 sm:bg-white sm:shadow-[0_16px_40px_-30px_rgba(8,8,8,0.62)]"
+      className="group grid h-[8.7rem] grid-cols-[9.25rem_minmax(0,1fr)] overflow-hidden rounded-2xl border border-gold/40 bg-[radial-gradient(circle_at_top_right,rgba(245,158,11,0.12),transparent_46%),#101010] shadow-[0_16px_38px_-20px_rgba(245,158,11,0.72),0_8px_24px_-18px_rgba(0,0,0,0.95)] ring-1 ring-inset ring-white/[0.06] transition duration-300 hover:border-gold/75 hover:shadow-[0_20px_48px_-18px_rgba(245,158,11,0.88),0_10px_28px_-18px_rgba(0,0,0,0.98)] min-[390px]:h-[9rem] min-[390px]:grid-cols-[9.9rem_minmax(0,1fr)] sm:flex sm:h-full sm:flex-col sm:border-ink/10 sm:bg-white sm:shadow-[0_16px_40px_-30px_rgba(8,8,8,0.62)] sm:ring-0 sm:hover:border-gold/55 sm:hover:shadow-[0_20px_46px_-28px_rgba(216,154,28,0.72)]"
     >
       <div className="relative h-full min-h-0 w-full overflow-hidden bg-ink sm:aspect-[5/3] sm:min-h-0 3xl:aspect-[16/10]">
         <Image
