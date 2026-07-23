@@ -49,7 +49,7 @@ export interface SiteConfig {
 const whatsappOrderNumber =
   process.env.NEXT_PUBLIC_WHATSAPP_ORDER_NUMBER ?? "+33775787825";
 const telegramOrderUsername =
-  process.env.NEXT_PUBLIC_TELEGRAM_ORDER_USERNAME ?? "anatoliagrill";
+  process.env.NEXT_PUBLIC_TELEGRAM_ORDER_USERNAME ?? "lauualesimbo";
 
 /** Construit un lien wa.me à partir d'un numéro (garde seulement les chiffres). */
 export function whatsappUrl(number: string): string {
@@ -65,10 +65,10 @@ export function telegramUrl(username: string): string {
 
 /** Valeurs par défaut du template (fallback quand la base est vide). */
 export const defaultSiteConfig: SiteConfig = {
-  name: "Chez Miné",
-  shortName: "Chez Miné",
+  name: "Lauuale Simbo",
+  shortName: "Lauuale Simbo",
   description:
-    "Chez Miné, restaurant turc : kebabs, grillades, sandwichs, assiettes généreuses et desserts maison. Sur place, à emporter ou en livraison.",
+    "Lauuale Simbo, restaurant de spécialités africaines : thiéboudiène, yassa, mafé, attiéké, alloco et boissons maison. Sur place, à emporter ou en livraison.",
   url: process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000",
   locale: "fr_FR",
   contact: {

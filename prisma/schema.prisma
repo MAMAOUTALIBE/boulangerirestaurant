@@ -1,4 +1,4 @@
-// Schéma Prisma — base PostgreSQL pour restaurant turc.
+// Schéma Prisma — base PostgreSQL pour restaurant de spécialités africaines.
 generator client {
   provider = "prisma-client-js"
 }

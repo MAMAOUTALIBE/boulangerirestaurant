@@ -7,7 +7,7 @@ export const testimonials: Testimonial[] = [
     avatar: "/images/avatar-marie.jpg",
     rating: 5,
     comment:
-      "Les grillades sont savoureuses et parfaitement cuites au charbon. Un vrai régal !",
+      "Le thiéboudiène est savoureux, généreux et parfaitement assaisonné. Un vrai régal !",
     city: "Paris",
   },
   {
@@ -16,7 +16,7 @@ export const testimonials: Testimonial[] = [
     avatar: "/images/avatar-benoit.jpg",
     rating: 5,
     comment:
-      "Commande en ligne très pratique, adana kebab généreux et accueil toujours rapide.",
+      "Commande en ligne très pratique, poulet yassa généreux et accueil toujours chaleureux.",
     city: "Lyon",
   },
   {
@@ -25,7 +25,7 @@ export const testimonials: Testimonial[] = [
     avatar: "/images/avatar-aissata.jpg",
     rating: 5,
     comment:
-      "Une vraie adresse de quartier : lahmacun maison, baklava délicieux et équipe chaleureuse.",
+      "Une vraie adresse de quartier : mafé maison, bissap délicieux et équipe chaleureuse.",
     city: "Marseille",
   },
 ];

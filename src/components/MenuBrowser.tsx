@@ -34,28 +34,25 @@ interface DisplayCategory extends BrowserCategory {
 }
 
 const popularDishIds = new Set([
-  "adana-kebab",
-  "iskender-kebab",
-  "lahmacun",
-  "baklava",
+  "thieb-poisson",
+  "yassa-poulet",
+  "mafe-boeuf",
+  "attieke-poisson-alloco",
 ]);
 
 const dishDetails: Record<string, string[]> = {
-  "adana-kebab": ["Agneau", "Grillé au charbon", "Épicé"],
-  "iskender-kebab": ["Sur pain pide", "Sauce tomate", "Yaourt"],
-  "kebab-grille": ["Mariné", "Grillé au charbon", "Accompagnement"],
-  kofte: ["Boulettes", "Grillé", "Épices"],
-  lahmacun: ["Viande hachée", "Croustillant", "À rouler"],
-  "pide-sucuk": ["Sucuk", "Fromage", "Au four"],
-  manti: ["Raviolis", "Yaourt à l'ail", "Beurre paprika"],
-  "mercimek-corbasi": ["Lentilles corail", "Cumin", "Chaud"],
-  houmous: ["Pois chiches", "Tahini", "Végétarien"],
-  "borek-fromage": ["Yufka", "Fromage", "Croustillant"],
-  baklava: ["Pistaches", "Pâte filo", "Miel"],
-  sutlac: ["Riz au lait", "Vanille", "Gratiné"],
-  ayran: ["Yaourt", "Frais", "Sans alcool"],
-  "the-turc": ["Thé noir", "Verre tulipe", "Sans alcool"],
-  "sodas-frais": ["33 cl", "Frais", "Sans alcool"],
+  "pastels-maison": ["Croustillants", "Sauce maison", "À partager"],
+  alloco: ["Banane plantain", "Doré", "Végétarien"],
+  "thieb-poisson": ["Poisson", "Riz parfumé", "Légumes"],
+  "thieb-poulet": ["Poulet", "Riz parfumé", "Légumes"],
+  "yassa-poulet": ["Poulet", "Oignons confits", "Citron"],
+  "mafe-boeuf": ["Bœuf", "Sauce arachide", "Riz"],
+  "attieke-poisson-alloco": ["Poisson grillé", "Attiéké", "Alloco"],
+  "poulet-braise-alloco": ["Poulet braisé", "Alloco", "Sauce maison"],
+  "douceur-africaine": ["Maison", "Gourmand", "Sucré"],
+  "bissap-maison": ["Hibiscus", "Frais", "Sans alcool"],
+  "jus-gingembre": ["Gingembre", "Tonique", "Sans alcool"],
+  "jus-bouye": ["Fruit du baobab", "Onctueux", "Sans alcool"],
 };
 
 /** Menu interactif : recherche plein-texte + filtres catégorie. */
@@ -273,9 +270,9 @@ function matchesQuickFilter(categorySlug: string | undefined, filter: string) {
 }
 
 function iconForCategory(slug: string): LucideIcon {
-  if (slug.includes("grillade") || slug.includes("kebab")) return Flame;
-  if (slug.includes("pide") || slug.includes("lahmacun")) return Pizza;
-  if (slug.includes("entree") || slug.includes("mezze")) return Soup;
+  if (slug.includes("grillade")) return Flame;
+  if (slug.includes("plat") || slug.includes("attieke")) return Pizza;
+  if (slug.includes("entree")) return Soup;
   if (slug.includes("dessert")) return IceCreamBowl;
   if (slug.includes("boisson")) return CupSoda;
   return UtensilsCrossed;

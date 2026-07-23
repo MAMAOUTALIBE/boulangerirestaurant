@@ -20,7 +20,7 @@ const orderSteps = [
   {
     step: "01",
     title: "Choisissez",
-    text: "Grillades, kebabs, pide, lahmacun, mezze et desserts.",
+    text: "Thiéboudiène, yassa, mafé, attiéké, grillades et desserts.",
   },
   {
     step: "02",
@@ -57,7 +57,7 @@ function buildPracticalItems(city: string): {
     },
     {
       title: "Fabrication fraîche",
-      text: "Pétrissage, cuisson et finition chaque jour.",
+      text: "Préparation, cuisson et finition chaque jour.",
       Icon: ShieldCheck,
     },
   ];

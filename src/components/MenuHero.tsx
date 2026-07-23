@@ -6,20 +6,20 @@ import { Reveal } from "@/components/ui/Reveal";
 
 const slides = [
   {
-    src: "/images/galerie/assiette-mixte.webp",
-    alt: "Assiette mixte de döner et de viande grillée",
+    src: "/images/africain/thiep-poisson.webp",
+    alt: "Thiéboudiène au poisson et légumes mijotés",
   },
   {
-    src: "/images/galerie/assiette-doner.webp",
-    alt: "Assiette de döner avec riz, frites et salade",
+    src: "/images/africain/yassa-poulet.webp",
+    alt: "Poulet yassa aux oignons confits",
   },
   {
-    src: "/images/galerie/lahmacun-maison.webp",
-    alt: "Lahmacun fraîchement préparés",
+    src: "/images/africain/mafe-boeuf.webp",
+    alt: "Mafé de bœuf à la sauce arachide",
   },
   {
-    src: "/images/galerie/buffet-chaud.webp",
-    alt: "Buffet chaud de spécialités turques",
+    src: "/images/africain/attieke-poisson-alloco.webp",
+    alt: "Attiéké, poisson grillé et alloco",
   },
 ] as const;
 
@@ -69,8 +69,8 @@ export function MenuHero() {
             Le Menu
           </h1>
           <p className="mt-3 hidden max-w-xl text-base leading-relaxed text-white/80 drop-shadow sm:block">
-            Grillades au charbon, kebabs, pide, lahmacun, mezze et desserts
-            turcs, préparés chaque jour avec des produits frais.
+            Thiéboudiène, yassa, mafé, attiéké, grillades, desserts et boissons
+            maison, préparés chaque jour avec des produits frais.
           </p>
         </Reveal>
 

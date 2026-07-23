@@ -36,17 +36,14 @@ function buildServiceHighlights(city: string): {
       Icon: UtensilsCrossed,
     },
     {
-      title: "Grillades au charbon",
-      detail: "Préparé minute",
+      title: "Cuisine africaine",
+      detail: "Préparée maison",
       Icon: Flame,
     },
   ];
 }
 
 const HERO_SLIDE_INTERVAL_MS = 5600;
-const HERO_VIDEO_START_AT = 1.2;
-const HERO_VIDEO_SLIDE_INTERVAL_MS = 10800;
-
 type HeroSlideBase = {
   label: string;
   alt: string;
@@ -68,48 +65,44 @@ type HeroVideoSlide = HeroSlideBase & {
 
 type HeroSlide = HeroImageSlide | HeroVideoSlide;
 
-const heroSlides = [
+const heroSlides: readonly HeroSlide[] = [
   {
-    type: "video",
-    label: "Grillades animées",
-    src: "/videos/hero-grillades-animees.mp4",
-    poster: "/images/hero-slide-grillades-turques.png",
-    alt: "Animation de viandes grillées, flammes et légumes sur un barbecue",
-    durationMs: HERO_VIDEO_SLIDE_INTERVAL_MS,
-    mediaClassName: "object-[50%_48%] sm:object-[50%_50%] lg:object-[50%_54%]",
-    startAt: HERO_VIDEO_START_AT,
+    type: "image",
+    label: "Saveurs africaines",
+    src: "/images/africain/thiep-poisson.webp",
+    alt: "Cuisine généreuse préparée minute chez Lauuale Simbo",
   },
   {
     type: "image",
-    label: "Assiette mixte",
-    src: "/images/chez-mine/assiette-mixte.jpg",
-    alt: "Grande assiette mixte Chez Miné avec grillades, salade et accompagnements",
+    label: "Thiéboudiène poisson",
+    src: "/images/africain/thiep-poisson.webp",
+    alt: "Thiéboudiène au poisson, riz parfumé et légumes mijotés",
   },
   {
     type: "image",
-    label: "Grillades & kebabs",
-    src: "/images/chez-mine/assiette-brochettes-kofta.jpg",
-    alt: "Assiette de brochettes de köfte avec riz, boulgour et salade fraîche",
+    label: "Yassa poulet",
+    src: "/images/africain/yassa-poulet.webp",
+    alt: "Poulet yassa aux oignons confits et citron, servi avec du riz",
   },
   {
     type: "image",
-    label: "Döner maison",
-    src: "/images/chez-mine/assiette-doner.jpg",
-    alt: "Assiette de döner maison avec riz, boulgour et salade",
+    label: "Mafé de bœuf",
+    src: "/images/africain/mafe-boeuf.webp",
+    alt: "Mafé de bœuf dans sa sauce onctueuse à l'arachide",
   },
   {
     type: "image",
-    label: "Sandwichs généreux",
-    src: "/images/chez-mine/sandwich-doner-poulet.jpg",
-    alt: "Sandwich döner poulet Chez Miné accompagné de frites",
+    label: "Attiéké poisson & alloco",
+    src: "/images/africain/attieke-poisson-alloco.webp",
+    alt: "Poisson grillé avec attiéké, alloco et crudités",
   },
   {
     type: "image",
-    label: "Desserts & boissons",
-    src: "/images/chez-mine/baklava-maison.jpg",
-    alt: "Baklava maison aux pistaches servi chez Miné",
+    label: "Boissons maison",
+    src: "/images/africain/boissons-bissap-gingembre-bouye.webp",
+    alt: "Bissap, jus de gingembre et bouye préparés maison",
   },
-] satisfies readonly HeroSlide[];
+];
 
 /** Hero premium : promesse forte, image immersive et réassurance immédiate. */
 export function Hero() {

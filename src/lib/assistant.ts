@@ -225,11 +225,11 @@ export async function buildSystemPrompt(
     timeZone: "Europe/Paris",
   });
 
-  return `Tu es l'assistant virtuel de « ${siteConfig.name} », restaurant turc spécialisé dans les grillades au charbon, kebabs, pide, lahmacun, mezze et desserts orientaux, situé au ${siteConfig.contact.address}. Tu réponds en JSON.
+  return `Tu es l'assistant virtuel de « ${siteConfig.name} », restaurant de spécialités africaines proposant thiéboudiène, yassa, mafé, attiéké, alloco, grillades, desserts et boissons maison, situé au ${siteConfig.contact.address}. Tu réponds en JSON.
 
 TON RÔLE :
 - Aider chaleureusement les clients en français, de façon concise et naturelle.
-- Conseiller grillades, kebabs, pide, lahmacun, mezze et desserts turcs, composer un repas cohérent (entrée, plat, dessert, boisson) et ajouter les produits au panier.
+- Conseiller plats africains, grillades, accompagnements, desserts et boissons maison, composer un repas cohérent (entrée, plat, dessert, boisson) et ajouter les produits au panier.
 - Renseigner sur les horaires, la livraison (codes postaux desservis), les réservations de table et le service traiteur.
 - Répondre aux questions courantes sur l'adresse, le téléphone, l'email, les commandes à emporter, le click & collect, le paiement, les allergies et le suivi de commande.
 - Quand c'est utile, proposer d'ouvrir une page (réservation, commander, traiteur…) via une action.
@@ -243,13 +243,13 @@ FORMAT DE RÉPONSE (JSON strict, rien d'autre) :
   ]
 }
 - "actions" est optionnel (tableau vide si aucune action). "prefill" est optionnel et ne s'applique qu'à "reservation".
-- add_to_cart : QUE des produits du menu ci-dessous. Le "dishId" est le slug entre crochets SANS les crochets (ex : "[adana-kebab]" → "adana-kebab").
+- add_to_cart : QUE des produits du menu ci-dessous. Le "dishId" est le slug entre crochets SANS les crochets (ex : "[thieb-poisson]" → "thieb-poisson").
 - Dès que le client veut un produit (ou que tu proposes une sélection), émets une action add_to_cart pour CHAQUE produit — MÊME s'il est "(options à choisir)" : le site affichera alors un lien vers sa page au lieu de l'ajouter directement.
 - Pour un repas complet (entrée, plat, dessert, boisson), propose des produits cohérents et ajoute-les tous.
 - open_page : réserver une table → "reservation" ; finaliser la commande → "commander" ; un événement → "traiteur".
 - RÉSERVATION : si le client donne des détails (date, heure, nombre de personnes…), émets open_page "reservation" avec un objet "prefill" rempli (date au format AAAA-MM-JJ, heure HH:MM, guests = nombre) pour préremplir le formulaire. Ne demande pas une info déjà donnée.
 - BUDGET : si le client donne un budget (ex : « pour 25 € »), propose une sélection dont le TOTAL reste sous ce budget, indique le total calculé dans "reply", et ajoute les produits via add_to_cart.
-- Dans "reply", mentionne ce que tu ajoutes (ex : « J'ai ajouté l'adana kebab à votre panier. »). Pour un produit à options, invite à choisir les options via le lien.
+- Dans "reply", mentionne ce que tu ajoutes (ex : « J'ai ajouté le thiéboudiène poisson à votre panier. »). Pour un produit à options, invite à choisir les options via le lien.
 
 LIVRAISON :
 - Codes postaux desservis et conditions :
@@ -447,24 +447,24 @@ function findMatchingDishes(
 
   const categoryTerms: Array<[string[], string[]]> = [
     [
-      ["dessert", "sucre", "baklava"],
-      ["dessert", "baklava"],
+      ["dessert", "sucre", "douceur"],
+      ["dessert", "douceur"],
     ],
     [
-      ["boisson", "soda", "ayran", "the"],
-      ["boisson", "ayran"],
+      ["boisson", "bissap", "gingembre", "bouye"],
+      ["boisson", "bissap", "gingembre", "bouye"],
     ],
     [
-      ["entree", "mezze", "houmous"],
-      ["entree", "mezze", "houmous"],
+      ["entree", "pastel", "alloco"],
+      ["entree", "pastel", "alloco"],
     ],
     [
-      ["grillade", "kebab", "viande", "brochette"],
-      ["grillade", "kebab"],
+      ["grillade", "poulet", "poisson", "braise"],
+      ["grillade", "poulet", "poisson", "braise"],
     ],
     [
-      ["pide", "lahmacun"],
-      ["pide", "lahmacun"],
+      ["thieb", "yassa", "mafe", "attieke"],
+      ["thieb", "yassa", "mafe", "attieke"],
     ],
   ];
 
@@ -504,16 +504,16 @@ function pickSuggestion(menu: AssistantDish[], q: string): AssistantDish[] {
     );
 
   if (hasAny(q, ["vegetarien", "veggie", "sans viande"])) {
-    return [byText(["houmous", "salade", "vegetarien"]), byText(["ayran"])]
+    return [byText(["alloco", "salade", "vegetarien"]), byText(["bissap"])]
       .filter(Boolean)
       .slice(0, 3) as AssistantDish[];
   }
 
   return [
-    byText(["houmous", "mezze", "entree"]),
-    byText(["adana", "kebab", "grillade"]),
-    byText(["baklava", "dessert"]),
-    byText(["ayran", "boisson"]),
+    byText(["pastel", "alloco", "entree"]),
+    byText(["thieb", "yassa", "mafe", "attieke"]),
+    byText(["douceur", "dessert"]),
+    byText(["bissap", "gingembre", "bouye", "boisson"]),
   ]
     .filter(Boolean)
     .slice(0, 4) as AssistantDish[];
@@ -702,7 +702,7 @@ export async function ruleBasedResponse(
   if (
     matchedDishes.length &&
     (wantsCartAction(q) ||
-      hasAny(q, ["menu", "plat", "prix", "kebab", "grillade", "pide"]))
+      hasAny(q, ["menu", "plat", "prix", "thieb", "yassa", "mafe", "attieke"]))
   ) {
     const quantity = extractQuantity(q);
     const selected = matchedDishes.slice(0, wantsCartAction(q) ? 3 : 5);
@@ -739,7 +739,7 @@ export async function ruleBasedResponse(
     }
   }
 
-  if (hasAny(q, ["menu", "carte", "plat", "prix", "kebab", "grillade"])) {
+  if (hasAny(q, ["menu", "carte", "plat", "prix", "thieb", "yassa", "mafe"])) {
     return {
       reply:
         "La carte en ligne affiche les plats disponibles, les prix, les options et l'ajout au panier. Je peux aussi vous conseiller si vous me dites ce que vous aimez.",

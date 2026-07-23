@@ -3,8 +3,8 @@ import type { Service, NavLink } from "@/types";
 
 /** Badges de réassurance affichés sous le hero. */
 export const services: Service[] = [
-  { id: "frais", label: "Viandes fraîches marinées maison", icon: Leaf },
-  { id: "prepare", label: "Grillé au charbon, à la commande", icon: ChefHat },
+  { id: "frais", label: "Produits frais et recettes maison", icon: Leaf },
+  { id: "prepare", label: "Cuisine généreuse, préparée sur place", icon: ChefHat },
   { id: "livraison", label: "Livraison rapide à domicile", icon: Truck },
   { id: "paiement", label: "Paiement sécurisé en ligne", icon: ShieldCheck },
 ];
@@ -40,8 +40,8 @@ export const qrFeatures: string[] = [
 
 /** Points forts listés dans la section À propos. */
 export const aboutPoints: string[] = [
-  "Viandes marinées et grillées au charbon",
-  "Pide, lahmacun et börek faits maison",
-  "Mezze, baklava et desserts maison",
+  "Thiéboudiène, yassa et mafé faits maison",
+  "Poissons et viandes marinés avec soin",
+  "Alloco, pastels et desserts maison",
   "Équipe passionnée et accueillante",
 ];

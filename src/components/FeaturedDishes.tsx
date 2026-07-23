@@ -5,9 +5,9 @@ import { DishCard } from "@/components/DishCard";
 import { getMenuForBrowser } from "@/lib/dishes";
 
 const specialtySlugs = [
-  "assiette-brochettes-poulet",
-  "sandwich-doner-poulet",
-  "baklava",
+  "thieb-poisson",
+  "yassa-poulet",
+  "attieke-poisson-alloco",
 ];
 
 /** Grille des spécialités mises en avant sur l'accueil. */
@@ -75,7 +75,7 @@ export async function FeaturedDishes() {
           <div className="flex flex-col gap-3 xl:flex-row xl:items-start xl:justify-between xl:gap-6">
             <div className="min-w-0 flex-1">
               <h2 className="font-display text-xl font-bold leading-tight text-cream sm:text-3xl sm:text-ink lg:text-4xl 3xl:text-5xl">
-                Nos spécialités turques.
+                Nos spécialités africaines.
               </h2>
             </div>
             <div className="hidden sm:block xl:shrink-0">
@@ -90,8 +90,9 @@ export async function FeaturedDishes() {
           </div>
           <div className="max-w-4xl">
             <p className="hidden text-sm leading-7 text-ink/70 sm:block sm:text-base 3xl:text-lg 3xl:leading-8">
-              Brochettes grillées, sandwich döner poulet et baklava maison :
-              trois signatures de Chez Miné à commander rapidement.
+              Thiéboudiène, poulet yassa et attiéké poisson-alloco : trois
+              signatures généreuses de Lauuale Simbo à savourer sur place ou à
+              emporter.
             </p>
           </div>
         </div>
@@ -115,46 +116,32 @@ export async function FeaturedDishes() {
 function imageForCategory(slug: string) {
   if (
     slug.includes("grillade") ||
-    slug.includes("kebab") ||
-    slug.includes("kofte")
+    slug.includes("attieke")
   ) {
-    return "/images/hero-slide-grillades-turques.png";
-  }
-  if (slug.includes("pide") || slug.includes("lahmacun")) {
-    return "/images/hero-slide-pide-lahmacun.png";
+    return "/images/africain/attieke-poisson-alloco.webp";
   }
   if (
-    slug.includes("sandwich") ||
-    slug.includes("burger") ||
-    slug.includes("tacos")
+    slug.includes("plat") ||
+    slug.includes("thieb") ||
+    slug.includes("yassa") ||
+    slug.includes("mafe")
   ) {
-    return "/images/chez-mine/sandwich-doner-poulet.jpg";
+    return "/images/africain/thiep-poisson.webp";
   }
-  if (
-    slug.includes("dessert") ||
-    slug.includes("baklava") ||
-    slug.includes("sutlac")
-  ) {
-    return "/images/hero-slide-desserts-turcs.png";
+  if (slug.includes("dessert")) {
+    return "/images/africain/desserts-africains.webp";
   }
-  if (
-    slug.includes("boisson") ||
-    slug.includes("ayran") ||
-    slug.includes("the-turc")
-  ) {
-    return "/images/hero-slide-boissons-turques.png";
+  if (slug.includes("boisson")) {
+    return "/images/africain/boissons-bissap-gingembre-bouye.webp";
   }
   if (
     slug.includes("entree") ||
-    slug.includes("mezze") ||
-    slug.includes("houmous") ||
-    slug.includes("borek") ||
-    slug.includes("manti") ||
-    slug.includes("specialite")
+    slug.includes("pastel") ||
+    slug.includes("alloco")
   ) {
-    return "/images/about-3.jpg";
+    return "/images/africain/pastels-alloco.webp";
   }
-  return "/images/hero-plateau-turc-premium.png";
+  return "/images/africain/thiep-poulet.webp";
 }
 
 function groupMobileCategories(

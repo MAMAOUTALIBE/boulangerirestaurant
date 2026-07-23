@@ -6,7 +6,7 @@ import { GallerySection } from "@/components/GallerySection";
 export const metadata: Metadata = {
   title: "Galerie",
   description:
-    "Galerie photos et vidéos de notre restaurant turc : grillades au charbon, kebabs, pide, lahmacun et desserts préparés chaque jour.",
+    "Galerie de nos spécialités africaines : thiéboudiène, yassa, mafé, attiéké, grillades et desserts préparés chaque jour.",
 };
 
 export default function GaleriePage() {

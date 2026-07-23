@@ -5,7 +5,7 @@ import { Footer } from "@/components/Footer";
 export const metadata: Metadata = {
   title: "Finaliser ma commande",
   description:
-    "Validez votre commande dans notre restaurant turc : à emporter, en livraison ou sur place. Paiement sécurisé.",
+    "Validez votre commande chez Lauuale Simbo : à emporter, en livraison ou sur place. Paiement sécurisé.",
 };
 
 export default function CommanderLayout({

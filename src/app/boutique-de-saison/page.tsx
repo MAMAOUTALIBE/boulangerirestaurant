@@ -15,7 +15,7 @@ export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "Boutique de saison",
   description:
-    "Précommandez nos spécialités turques de saison : plateaux de baklava, grillades et pièces de fête. Quantités limitées, retrait au restaurant.",
+    "Précommandez nos spécialités africaines de saison : plateaux à partager, grillades et menus de fête. Quantités limitées, retrait au restaurant.",
 };
 
 const atoutsMobile = [
@@ -26,31 +26,31 @@ const atoutsMobile = [
 
 const saisonSuggestions = [
   {
-    name: "Plateau de baklava",
-    description: "Baklava pistache et noix, assortiment de fête à partager.",
-    image: "/images/hero-slide-desserts-turcs.png",
+    name: "Plateau de douceurs africaines",
+    description: "Assortiment gourmand de fête à partager.",
+    image: "/images/africain/desserts-africains.webp",
     badge: "Fête",
     price: "À partir de 24,90 €",
   },
   {
-    name: "Plateau mezze",
-    description: "Houmous, börek et assortiment d'entrées à partager.",
-    image: "/images/about-3.jpg",
+    name: "Plateau pastels & alloco",
+    description: "Pastels croustillants, alloco et sauces maison à partager.",
+    image: "/images/africain/pastels-alloco.webp",
     badge: "À partager",
     price: "À partir de 19,90 €",
   },
   {
     name: "Plateau de grillades",
     description:
-      "Brochettes, kebabs et accompagnements pour les grandes tablées.",
-    image: "/images/hero-slide-grillades-turques.png",
+      "Poulet braisé, poisson et accompagnements pour les grandes tablées.",
+    image: "/images/africain/attieke-poisson-alloco.webp",
     badge: "Famille",
     price: "Sur commande",
   },
   {
     name: "Buffet événement",
-    description: "Grillades, mezze et desserts turcs pour vos réceptions.",
-    image: "/images/hero-plateau-turc-premium.png",
+    description: "Plats africains, grillades et douceurs pour vos réceptions.",
+    image: "/images/africain/thiep-poulet.webp",
     badge: "Traiteur",
     price: "Sur devis",
   },
@@ -146,7 +146,7 @@ export default async function BoutiqueDeSaisonPage() {
               Boutique de saison
             </h1>
             <p className="mt-3 max-w-2xl text-muted">
-              Nos spécialités turques de saison en précommande, en quantités
+              Nos spécialités africaines de saison en précommande, en quantités
               limitées. Réservez la vôtre, payez au retrait au restaurant.
             </p>
 
@@ -223,8 +223,8 @@ function DesktopSeasonalEmpty() {
       <div className="grid gap-5 p-5 lg:grid-cols-[0.9fr_1.1fr] lg:p-6">
         <div className="relative min-h-[24rem] overflow-hidden rounded-3xl border border-white/10">
           <Image
-            src="/images/hero-slide-desserts-turcs.png"
-            alt="Spécialités turques de saison : baklava et douceurs"
+            src="/images/africain/desserts-africains.webp"
+            alt="Spécialités africaines de saison et douceurs"
             fill
             sizes="40vw"
             className="object-cover"

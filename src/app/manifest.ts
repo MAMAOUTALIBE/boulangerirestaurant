@@ -7,7 +7,7 @@ export default async function manifest(): Promise<MetadataRoute.Manifest> {
     name: siteConfig.name,
     short_name: siteConfig.shortName,
     description:
-      "Commandez nos grillades, kebabs et spécialités turques en ligne.",
+      "Commandez nos plats, grillades et spécialités africaines en ligne.",
     start_url: "/",
     display: "standalone",
     background_color: "#080808",

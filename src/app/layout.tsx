@@ -26,26 +26,26 @@ const display = Playfair_Display({
   weight: ["500", "600", "700", "800"],
 });
 
-const heroImage = "/images/hero-plateau-turc-premium.png";
+const heroImage = "/images/africain/thiep-poisson.webp";
 
 export async function generateMetadata(): Promise<Metadata> {
   const siteConfig = await getSiteConfig();
   return {
     metadataBase: new URL(siteConfig.url),
     title: {
-      default: `${siteConfig.name} | Restaurant turc & grillades`,
+      default: `${siteConfig.name} | Spécialités africaines`,
       template: `%s | ${siteConfig.name}`,
     },
     description: siteConfig.description,
     keywords: [
-      "restaurant turc",
-      "grillades turques",
-      "kebab",
-      "adana kebab",
-      "iskender",
-      "lahmacun",
-      "pide",
-      "baklava",
+      "restaurant africain",
+      "spécialités africaines",
+      "thiéboudiène",
+      "yassa poulet",
+      "mafé",
+      "attiéké",
+      "alloco",
+      "bissap",
       "livraison",
     ],
     alternates: { canonical: "/" },
@@ -104,7 +104,7 @@ export default async function RootLayout({
     name: siteConfig.name,
     description: siteConfig.description,
     url: siteConfig.url,
-    servesCuisine: "Turque, grillades, kebab",
+    servesCuisine: "Africaine, ouest-africaine, sénégalaise",
     priceRange: siteConfig.priceRange,
     telephone: siteConfig.contact.phone,
     email: siteConfig.contact.email,

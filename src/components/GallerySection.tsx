@@ -14,150 +14,57 @@ type GalleryItem =
 // Pour AJOUTER UNE VIDÉO : dépose ton fichier dans `public/videos/`
 // (ex. `public/videos/grillades.mp4`) puis ajoute une entrée :
 //   { type: "video", src: "/videos/grillades.mp4",
-//     poster: "/images/hero-slide-grillades-turques.png", alt: "Le mangal en action",
+//     poster: "/images/africain/thiep-poisson.webp", alt: "La cuisine en action",
 //     tag: "Coulisses" },
 // Le poster est l'image affichée avant lecture.
 const items: GalleryItem[] = [
   {
     type: "image",
-    src: "/images/chez-mine/assiette-mixte.jpg",
-    alt: "Assiette mixte de grillades Chez Miné",
-    tag: "Grillades",
+    src: "/images/africain/thiep-poisson.webp",
+    alt: "Thiéboudiène au poisson et légumes mijotés",
+    tag: "Thiéboudiène",
   },
   {
     type: "image",
-    src: "/images/chez-mine/assiette-brochettes-kofta.jpg",
-    alt: "Assiette de brochettes de köfte avec riz, boulgour et salade",
-    tag: "Köfte",
+    src: "/images/africain/thiep-poulet.webp",
+    alt: "Thiéboudiène au poulet mariné",
+    tag: "Thiéboudiène",
   },
   {
     type: "image",
-    src: "/images/chez-mine/assiette-doner.jpg",
-    alt: "Assiette de döner maison avec accompagnements",
-    tag: "Döner",
+    src: "/images/africain/yassa-poulet.webp",
+    alt: "Yassa poulet aux oignons confits et citron",
+    tag: "Yassa",
   },
   {
     type: "image",
-    src: "/images/chez-mine/soupe-lentilles.jpg",
-    alt: "Soupe turque aux lentilles servie avec un quartier de citron",
-    tag: "Soupes",
+    src: "/images/africain/mafe-boeuf.webp",
+    alt: "Mafé de bœuf à la sauce arachide",
+    tag: "Mafé",
   },
   {
     type: "image",
-    src: "/images/chez-mine/assiette-cotelettes-agneau.jpg",
-    alt: "Assiette de côtelettes d'agneau grillées",
-    tag: "Agneau",
+    src: "/images/africain/attieke-poisson-alloco.webp",
+    alt: "Attiéké avec poisson grillé et alloco",
+    tag: "Attiéké",
   },
   {
     type: "image",
-    src: "/images/chez-mine/assiette-brochettes-poulet.jpg",
-    alt: "Assiette de brochettes de poulet grillé",
-    tag: "Poulet",
+    src: "/images/africain/pastels-alloco.webp",
+    alt: "Pastels maison et bananes plantain alloco",
+    tag: "Entrées",
   },
   {
     type: "image",
-    src: "/images/chez-mine/assiette-doner-poulet.jpg",
-    alt: "Assiette de döner poulet avec riz, boulgour et salade",
-    tag: "Döner poulet",
-  },
-  {
-    type: "image",
-    src: "/images/chez-mine/assiette-poulet-poivrons.jpg",
-    alt: "Assiette de poulet mariné aux poivrons",
-    tag: "Poulet",
-  },
-  {
-    type: "image",
-    src: "/images/chez-mine/saute-veau.jpg",
-    alt: "Sauté de veau servi avec boulgour et salade",
-    tag: "Plat du jour",
-  },
-  {
-    type: "image",
-    src: "/images/chez-mine/sandwich-doner-poulet.jpg",
-    alt: "Sandwich döner poulet et frites",
-    tag: "Sandwichs",
-  },
-  {
-    type: "image",
-    src: "/images/chez-mine/sandwich-kofte.jpg",
-    alt: "Sandwich köfte grillée et frites",
-    tag: "Sandwichs",
-  },
-  {
-    type: "image",
-    src: "/images/chez-mine/sandwich-steak.jpg",
-    alt: "Sandwich steak cheddar et frites",
-    tag: "Sandwichs",
-  },
-  {
-    type: "image",
-    src: "/images/chez-mine/sandwich-poulet-marine.jpg",
-    alt: "Sandwich poulet mariné et frites",
-    tag: "Sandwichs",
-  },
-  {
-    type: "image",
-    src: "/images/chez-mine/cheeseburger.jpg",
-    alt: "Cheeseburger maison servi avec des frites",
-    tag: "Burgers",
-  },
-  {
-    type: "image",
-    src: "/images/chez-mine/double-cheeseburger.jpg",
-    alt: "Double cheeseburger maison et frites",
-    tag: "Burgers",
-  },
-  {
-    type: "image",
-    src: "/images/chez-mine/baklava-maison.jpg",
-    alt: "Baklava maison généreusement garni de pistaches",
+    src: "/images/africain/desserts-africains.webp",
+    alt: "Assortiment de douceurs africaines maison",
     tag: "Desserts",
   },
   {
     type: "image",
-    src: "/images/chez-mine/revani.jpg",
-    alt: "Revani, gâteau turc à la semoule et noix de coco",
-    tag: "Desserts",
-  },
-  {
-    type: "image",
-    src: "/images/chez-mine/facade.jpg",
-    alt: "Façade du restaurant Grill Chez Miné",
-    tag: "Restaurant",
-  },
-  {
-    type: "image",
-    src: "/images/chez-mine/salle.jpg",
-    alt: "Salle conviviale du restaurant Chez Miné",
-    tag: "Restaurant",
-  },
-  {
-    type: "image",
-    src: "/images/chez-mine/salle-vitrine.jpg",
-    alt: "Tables près de la vitrine du restaurant Chez Miné",
-    tag: "Restaurant",
-  },
-  {
-    type: "video",
-    src: "/videos/chez-mine/burger-signature.mp4",
-    poster: "/images/chez-mine/double-cheeseburger.jpg",
-    alt: "Présentation du burger signature Chez Miné",
-    tag: "Burgers",
-  },
-  {
-    type: "video",
-    src: "/videos/chez-mine/tacos-poulet.mp4",
-    poster: "/images/chez-mine/sandwich-poulet-epice.jpg",
-    alt: "Présentation du tacos poulet Chez Miné",
-    tag: "Tacos",
-  },
-  {
-    type: "video",
-    src: "/videos/chez-mine/burger-bacon.mp4",
-    poster: "/images/chez-mine/cheeseburger.jpg",
-    alt: "Présentation d'un burger gourmand Chez Miné",
-    tag: "Burgers",
+    src: "/images/africain/boissons-bissap-gingembre-bouye.webp",
+    alt: "Bissap, jus de gingembre et bouye maison",
+    tag: "Boissons",
   },
 ];
 
@@ -166,7 +73,6 @@ type Filter = "all" | "image" | "video";
 const filters: { id: Filter; label: string }[] = [
   { id: "all", label: "Tout" },
   { id: "image", label: "Photos" },
-  { id: "video", label: "Vidéos" },
 ];
 
 export function GallerySection() {
@@ -241,8 +147,8 @@ export function GallerySection() {
           Nos plats en images
         </h1>
         <p className="mt-3 text-sm leading-relaxed text-cream/65 sm:text-base">
-          Grillades au charbon, kebabs, pide et desserts turcs : un aperçu de ce
-          que l&apos;on prépare chaque jour en cuisine.
+          Thiéboudiène, yassa, mafé, attiéké, grillades et douceurs : un aperçu
+          de ce que l&apos;on prépare chaque jour en cuisine.
         </p>
       </div>
 

@@ -178,8 +178,8 @@ export function Header() {
           <input
             name="q"
             type="search"
-            aria-label="Rechercher un kebab, une grillade ou un dessert"
-            placeholder="Rechercher kebab, pide, dessert..."
+            aria-label="Rechercher un plat africain, une grillade ou un dessert"
+            placeholder="Rechercher thieb, yassa, mafé..."
             className="placeholder:text-cream/46 min-w-0 flex-1 bg-transparent text-sm font-medium text-cream focus:outline-none 2xl:text-base 3xl:text-lg"
           />
           <button

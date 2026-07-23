@@ -23,7 +23,7 @@ export async function generateMetadata({
   const dish = await getDishWithOptions(slug);
   if (!dish) return { title: "Plat introuvable" };
 
-  const description = `${dish.description} — ${formatPrice(dish.price)}. Commandez ${dish.name} chez ${siteConfig.name}, restaurant turc à ${siteConfig.contact.city}.`;
+  const description = `${dish.description} — ${formatPrice(dish.price)}. Commandez ${dish.name} chez ${siteConfig.name}, restaurant de spécialités africaines à ${siteConfig.contact.city}.`;
   return {
     title: dish.name,
     description,

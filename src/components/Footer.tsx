@@ -104,7 +104,7 @@ const mobileQuickLinks = [
 const footerHighlights = [
   {
     label: "Commander en ligne",
-    description: "Grillades, kebabs et mezze à retirer ou en livraison.",
+    description: "Plats africains et grillades à retirer ou en livraison.",
     href: "/commander",
     Icon: ShoppingBag,
   },
@@ -117,7 +117,7 @@ const footerHighlights = [
   },
   {
     label: "Service traiteur",
-    description: "Buffets et plateaux turcs pour tous vos événements.",
+    description: "Buffets et plateaux africains pour tous vos événements.",
     href: "/traiteur",
     Icon: ChefHat,
   },
@@ -247,7 +247,7 @@ export async function Footer() {
           <div className="pr-4">
             <Logo />
             <p className="mt-4 max-w-xs text-sm leading-relaxed text-muted">
-              Grillades au charbon, kebabs et spécialités turques maison.
+              Thiéboudiène, yassa, mafé et spécialités africaines maison.
             </p>
             <p className="mt-6 text-xs font-semibold uppercase tracking-[0.22em] text-gold">
               Suivez-nous
@@ -391,7 +391,7 @@ async function MobileFooter() {
         <Logo className="mx-auto w-fit justify-center" />
 
         <p className="mx-auto mt-3 max-w-xs text-center text-sm leading-5 text-cream/70">
-          Grillades au charbon, kebabs et spécialités turques maison.
+          Thiéboudiène, yassa, mafé et spécialités africaines maison.
         </p>
 
         <p className="mt-5 text-center text-xs font-bold uppercase tracking-[0.32em] text-gold">

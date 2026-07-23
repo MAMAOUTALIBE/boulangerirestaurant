@@ -5,35 +5,21 @@ import type { Dish } from "@/types";
 import { remainingStock, isSoldOut } from "@/lib/stock";
 
 const dishImageOverrides: Record<string, string> = {
-  "adana-kebab": "/images/chez-mine/assiette-brochettes-kofta.jpg",
-  "iskender-kebab": "/images/chez-mine/assiette-doner.jpg",
-  "kebab-grille": "/images/chez-mine/assiette-mixte.jpg",
-  kofte: "/images/chez-mine/sandwich-kofte.jpg",
-  lahmacun: "/images/galerie/lahmacun-maison.webp",
-  "pide-sucuk": "/images/hero-slide-pide-lahmacun.png",
-  manti: "/images/about-3.jpg",
-  "mercimek-corbasi": "/images/chez-mine/soupe-lentilles.jpg",
-  houmous: "/images/about-3.jpg",
-  "borek-fromage": "/images/hero-slide-pide-lahmacun.png",
-  baklava: "/images/chez-mine/baklava-maison.jpg",
-  sutlac: "/images/hero-slide-desserts-turcs.png",
-  ayran: "/images/ayran.png",
-  "the-turc": "/images/hero-slide-boissons-turques.png",
-  "sodas-frais": "/images/boisson-sodas.png",
-  "hamburger-maison": "/images/chez-mine/cheeseburger.jpg",
-  "double-cheeseburger": "/images/chez-mine/double-cheeseburger.jpg",
-  "sandwich-doner-poulet": "/images/chez-mine/sandwich-doner-poulet.jpg",
-  "sandwich-kofte": "/images/chez-mine/sandwich-kofte.jpg",
-  "sandwich-steak": "/images/chez-mine/sandwich-steak.jpg",
-  "sandwich-poulet-marine": "/images/chez-mine/sandwich-poulet-marine.jpg",
-  "tacos-maison": "/images/chez-mine/sandwich-poulet-epice.jpg",
-  "assiette-brochettes-poulet":
-    "/images/chez-mine/assiette-brochettes-poulet.jpg",
-  "assiette-cotelettes-agneau":
-    "/images/chez-mine/assiette-cotelettes-agneau.jpg",
-  "assiette-doner-poulet": "/images/chez-mine/assiette-doner-poulet.jpg",
-  "saute-veau": "/images/chez-mine/saute-veau.jpg",
-  revani: "/images/chez-mine/revani.jpg",
+  "pastels-maison": "/images/africain/pastels-alloco.webp",
+  alloco: "/images/africain/pastels-alloco.webp",
+  "thieb-poisson": "/images/africain/thiep-poisson.webp",
+  "thieb-poulet": "/images/africain/thiep-poulet.webp",
+  "yassa-poulet": "/images/africain/yassa-poulet.webp",
+  "mafe-boeuf": "/images/africain/mafe-boeuf.webp",
+  "attieke-poisson-alloco":
+    "/images/africain/attieke-poisson-alloco.webp",
+  "poulet-braise-alloco": "/images/africain/thiep-poulet.webp",
+  "douceur-africaine": "/images/africain/desserts-africains.webp",
+  "bissap-maison":
+    "/images/africain/boissons-bissap-gingembre-bouye.webp",
+  "jus-gingembre":
+    "/images/africain/boissons-bissap-gingembre-bouye.webp",
+  "jus-bouye": "/images/africain/boissons-bissap-gingembre-bouye.webp",
 };
 
 // La visibilité publique d'un produit/catégorie est désormais pilotée par le

@@ -29,7 +29,7 @@ export function Logo({ className, tone = "light" }: LogoProps) {
         )}
       >
         <Image
-          src="/images/chez-mine/logo.jpg"
+          src="/images/logo-lauuale-simbo.webp"
           alt=""
           fill
           sizes="56px"

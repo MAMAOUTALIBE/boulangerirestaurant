@@ -1,128 +1,46 @@
 /**
- * Profil de seed « anatolia-grill » — restaurant turc de DÉMONSTRATION.
+ * Profil de démonstration de Lauuale Simbo.
  *
- * C'est le profil par défaut (dev). Il conserve le comportement historique du
- * seed : contenu turc complet + fixtures de démo + `resetStrategy: "demo"`
- * (désactive les autres restaurants / plats / promos).
- *
- * Pour provisionner un VRAI restaurant, créer un nouveau profil (copier
- * `blank.ts`) avec `resetStrategy: "additive"` plutôt que de partir de celui-ci.
+ * Ce profil conserve le slug technique historique `anatolia-grill` pour ne pas
+ * casser le déploiement existant. Il reste destructif et réservé au développement.
  */
 import { seedDishes } from "../../src/data/dishes";
-import type { SeedDish, SeedProfile } from "./types";
+import type { SeedProfile } from "./types";
 
-const categories = [
-  { slug: "entrees", name: "Entrées & Mezze", sortOrder: 1 },
-  { slug: "grillades", name: "Grillades & Kebabs", sortOrder: 2 },
-  { slug: "sandwichs", name: "Sandwichs & Burgers", sortOrder: 3 },
-  { slug: "pide", name: "Pide & Lahmacun", sortOrder: 4 },
-  { slug: "specialites", name: "Spécialités", sortOrder: 5 },
-  { slug: "desserts", name: "Desserts", sortOrder: 6 },
-  { slug: "boissons", name: "Boissons", sortOrder: 7 },
-];
-
-const extraDishes: SeedDish[] = [
-  {
-    slug: "mercimek-corbasi",
-    name: "Mercimek çorbası",
-    description: "Soupe crémeuse de lentilles corail, cumin et filet de citron",
-    price: 5.5,
-    image: "/images/chez-mine/soupe-lentilles.jpg",
-    category: "entrees",
-    sortOrder: 1,
-  },
-  {
-    slug: "houmous",
-    name: "Houmous maison",
-    description:
-      "Purée de pois chiches au tahini, citron et huile d'olive, servie avec du pide chaud",
-    price: 6.5,
-    image: "/images/about-3.jpg",
-    category: "entrees",
-    sortOrder: 2,
-  },
-  {
-    slug: "borek-fromage",
-    name: "Börek au fromage",
-    description:
-      "Feuilles de yufka croustillantes garnies de fromage et de persil",
-    price: 6.9,
-    image: "/images/hero-slide-pide-lahmacun.png",
-    category: "entrees",
-    sortOrder: 3,
-  },
-  {
-    slug: "kofte",
-    name: "Köfte",
-    description: "Boulettes de viande grillées aux épices, riz pilaf et salade",
-    price: 13.5,
-    image: "/images/galerie/boeuf-mijote-boulgour.webp",
-    category: "grillades",
-    sortOrder: 4,
-  },
-  {
-    slug: "sutlac",
-    name: "Sütlaç",
-    description:
-      "Riz au lait turc parfumé à la vanille, légèrement gratiné au four",
-    price: 4.9,
-    image: "/images/hero-slide-desserts-turcs.png",
-    category: "desserts",
-    sortOrder: 5,
-  },
-  {
-    slug: "the-turc",
-    name: "Thé turc (çay)",
-    description: "Thé noir infusé, servi dans le verre tulipe traditionnel",
-    price: 2.0,
-    image: "/images/hero-slide-boissons-turques.png",
-    category: "boissons",
-    sortOrder: 6,
-  },
-  {
-    slug: "sodas-frais",
-    name: "Sodas",
-    description: "Canettes 33 cl au choix, bien fraîches",
-    price: 2.5,
-    image: "/images/boisson-sodas.png",
-    category: "boissons",
-    sortOrder: 7,
-  },
-];
-
-const anatoliaGrill: SeedProfile = {
-  restaurant: { slug: "anatolia-grill", name: "Chez Miné" },
+const lauualeSimbo: SeedProfile = {
+  restaurant: { slug: "anatolia-grill", name: "Lauuale Simbo" },
   resetStrategy: "demo",
-  // Identité laissée vide : retombe sur `defaultSiteConfig` (src/lib/config.ts),
-  // surchargeable ensuite depuis /admin/parametres.
-  ordering: { slotIntervalMin: 15, leadTimeMin: 20, capacityPerSlot: 8 },
-  categories,
-  dishes: [...seedDishes, ...extraDishes],
+  ordering: { slotIntervalMin: 15, leadTimeMin: 25, capacityPerSlot: 8 },
+  categories: [
+    { slug: "entrees", name: "Entrées & accompagnements", sortOrder: 1 },
+    { slug: "plats-africains", name: "Plats africains", sortOrder: 2 },
+    { slug: "grillades", name: "Grillades", sortOrder: 3 },
+    { slug: "desserts", name: "Desserts", sortOrder: 4 },
+    { slug: "boissons", name: "Boissons maison", sortOrder: 5 },
+  ],
+  dishes: seedDishes,
   optionGroups: [
     {
-      dishSlug: "kebab-grille",
-      name: "Accompagnement",
+      dishSlug: "attieke-poisson-alloco",
+      name: "Accompagnement supplémentaire",
       type: "single",
-      required: true,
+      required: false,
       sortOrder: 1,
       options: [
-        { name: "Riz pilaf", priceDelta: 0, sortOrder: 1 },
-        { name: "Bulgur", priceDelta: 0, sortOrder: 2 },
-        { name: "Frites maison", priceDelta: 1, sortOrder: 3 },
-        { name: "Salade", priceDelta: 0, sortOrder: 4 },
+        { name: "Alloco", priceDelta: 3, sortOrder: 1 },
+        { name: "Attiéké", priceDelta: 3, sortOrder: 2 },
+        { name: "Riz", priceDelta: 2.5, sortOrder: 3 },
       ],
     },
     {
-      dishSlug: "kebab-grille",
-      name: "Sauces & suppléments",
-      type: "multi",
+      dishSlug: "poulet-braise-alloco",
+      name: "Sauce",
+      type: "single",
       required: false,
-      sortOrder: 2,
+      sortOrder: 1,
       options: [
-        { name: "Sauce blanche", priceDelta: 0.5, sortOrder: 1 },
-        { name: "Sauce piquante", priceDelta: 0.5, sortOrder: 2 },
-        { name: "Fromage", priceDelta: 1.5, sortOrder: 3 },
-        { name: "Boisson 33 cl", priceDelta: 2, sortOrder: 4 },
+        { name: "Sauce oignons", priceDelta: 0, sortOrder: 1 },
+        { name: "Sauce piquante", priceDelta: 0, sortOrder: 2 },
       ],
     },
   ],
@@ -141,28 +59,28 @@ const anatoliaGrill: SeedProfile = {
   ],
   demo: {
     stock: {
-      "adana-kebab": 20,
-      "iskender-kebab": 15,
-      lahmacun: 30,
-      baklava: 24,
+      "thieb-poisson": 20,
+      "yassa-poulet": 20,
+      "attieke-poisson-alloco": 15,
+      "pastels-maison": 30,
     },
     seasonal: {
-      slug: "plateau-baklava",
-      name: "Plateau de baklava assorti",
+      slug: "plateau-saveurs-africaines",
+      name: "Plateau de saveurs africaines",
       description:
-        "Assortiment de baklava pistache et noix, fait maison. En précommande, quantités limitées.",
-      image: "/images/hero-slide-desserts-turcs.png",
-      price: 24.9,
-      quota: 50,
+        "Pastels, alloco, poulet braisé et accompagnements maison à partager.",
+      image: "/images/africain/pastels-alloco.webp",
+      price: 29.9,
+      quota: 40,
       salesStartOffsetDays: -5,
       salesEndOffsetDays: 30,
       pickupStartOffsetDays: 2,
       pickupEndOffsetDays: 30,
     },
     antiwaste: {
-      title: "Plateau surprise du soir",
+      title: "Panier surprise africain",
       description:
-        "Assortiment de spécialités du jour : grillades, pide, mezze et accompagnements.",
+        "Assortiment des spécialités du jour : riz, grillades, alloco et accompagnements.",
       price: 8,
       originalValue: 22,
       quantity: 8,
@@ -172,4 +90,4 @@ const anatoliaGrill: SeedProfile = {
   },
 };
 
-export default anatoliaGrill;
+export default lauualeSimbo;

@@ -37,22 +37,22 @@ const fieldClass =
   "w-full rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-sm text-cream placeholder:text-muted focus:border-gold/60 focus:outline-none focus:ring-1 focus:ring-gold/40";
 const starterLinks = [
   {
-    href: "/menu/adana-kebab",
-    name: "Adana kebab",
+    href: "/menu/thieb-poisson",
+    name: "Thiéboudiène poisson",
     text: "Signature",
-    image: "/images/hero-slide-adana-kebab.png",
+    image: "/images/africain/thiep-poisson.webp",
   },
   {
-    href: "/menu/iskender-kebab",
-    name: "İskender kebab",
+    href: "/menu/yassa-poulet",
+    name: "Poulet yassa",
     text: "Populaire",
-    image: "/images/hero-premium-kebab.png",
+    image: "/images/africain/yassa-poulet.webp",
   },
   {
-    href: "/menu/baklava",
-    name: "Baklava",
+    href: "/menu/douceur-africaine",
+    name: "Douceur africaine",
     text: "Dessert",
-    image: "/images/baklava.png",
+    image: "/images/africain/desserts-africains.webp",
   },
 ];
 function buildCheckoutHighlights(city: string): {

@@ -118,7 +118,7 @@ export async function PremiumEngagementSection() {
 
                 <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
                   <a
-                    href="https://www.google.com/search?q=restaurant+turc+avis"
+                    href="https://www.google.com/search?q=Lauuale+Simbo+avis"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex min-h-11 items-center justify-center gap-2 rounded-2xl border border-gold/70 px-4 text-sm font-bold text-gold transition hover:bg-gold hover:text-ink"

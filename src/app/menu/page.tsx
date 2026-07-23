@@ -10,7 +10,7 @@ export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "Le Menu",
   description:
-    "Découvrez toute la carte de notre restaurant turc : entrées et mezze, grillades et kebabs, pide, lahmacun, desserts et boissons.",
+    "Découvrez toute notre carte africaine : entrées, thiéboudiène, yassa, mafé, attiéké, grillades, desserts et boissons maison.",
 };
 
 export default async function MenuPage() {

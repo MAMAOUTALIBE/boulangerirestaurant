@@ -744,7 +744,7 @@ export async function getReorderItems(reference: string): Promise<
     name: i.name,
     price: i.price,
     quantity: i.quantity,
-    image: imageBySlug.get(i.id) ?? "/images/hero-plateau-turc-premium.png",
+    image: imageBySlug.get(i.id) ?? "/images/africain/thiep-poisson.webp",
     options: i.options,
     note: i.note,
   }));
@@ -1087,7 +1087,7 @@ export async function adminCreateSeasonalProduct(
       slug,
       name,
       description,
-      image: image || "/images/hero-slide-desserts-turcs.png",
+      image: image || "/images/africain/desserts-africains.webp",
       price,
       salesStart: new Date(salesStart),
       salesEnd: new Date(salesEnd),
@@ -1115,7 +1115,7 @@ export async function adminUpdateSeasonalProduct(
       description: String(formData.get("description") ?? "").trim(),
       image:
         String(formData.get("image") ?? "").trim() ||
-        "/images/hero-slide-desserts-turcs.png",
+        "/images/africain/desserts-africains.webp",
       price: Number(formData.get("price") ?? 0),
       salesStart: new Date(String(formData.get("salesStart") ?? "")),
       salesEnd: new Date(String(formData.get("salesEnd") ?? "")),

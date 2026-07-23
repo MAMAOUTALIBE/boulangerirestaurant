@@ -5,16 +5,16 @@ import { aboutPoints } from "@/data/services";
 
 const gallery = [
   {
-    src: "/images/chez-mine/assiette-mixte.jpg",
-    alt: "Assiette mixte de grillades Chez Miné",
+    src: "/images/africain/thiep-poulet.webp",
+    alt: "Thiéboudiène au poulet Lauuale Simbo",
   },
   {
-    src: "/images/chez-mine/salle.jpg",
-    alt: "Salle du restaurant Chez Miné",
+    src: "/images/africain/yassa-poulet.webp",
+    alt: "Poulet yassa maison",
   },
   {
-    src: "/images/chez-mine/facade.jpg",
-    alt: "Façade de Grill Chez Miné",
+    src: "/images/africain/desserts-africains.webp",
+    alt: "Desserts africains maison",
   },
 ];
 
@@ -27,11 +27,11 @@ export function AboutSection() {
           À propos de nous
         </p>
         <h3 className="mt-3 font-display text-2xl font-bold leading-tight text-ink sm:text-3xl">
-          Un restaurant turc pensé pour le partage
+          Une cuisine africaine généreuse, pensée pour le partage
         </h3>
         <p className="mt-3 text-sm leading-relaxed text-ink/70">
-          {`Notre équipe prépare chaque jour grillades au charbon, kebabs, pide
-          et mezze, avec une exigence simple : des produits frais, des saveurs
+          {`Notre équipe prépare chaque jour les grands classiques d'Afrique de
+          l'Ouest avec une exigence simple : des produits frais, des recettes
           généreuses et un accueil chaleureux, midi et soir.`}
         </p>
 

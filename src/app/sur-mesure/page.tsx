@@ -13,14 +13,14 @@ export const metadata: Metadata = {
 
 const atouts = [
   "Anniversaires, fêtes de famille et événements d'entreprise",
-  "Plateaux de grillades, mezze et desserts au choix",
-  "Cuisine maison, produits frais et viandes marinées",
+  "Thiéboudiène, yassa, mafé, grillades et desserts au choix",
+  "Cuisine africaine maison et produits frais",
   "Devis personnalisé après votre demande",
 ];
 
 const atoutsMobile = ["Sur-mesure", "Maison", "Devis rapide"];
 
-const inspirations = ["Plateau grillades", "Menu mezze", "Buffet de fête"];
+const inspirations = ["Plateau africain", "Menu découverte", "Buffet de fête"];
 
 export default function SurMesurePage() {
   return (
@@ -71,8 +71,8 @@ export default function SurMesurePage() {
                 <figure className="overflow-hidden rounded-[28px] border border-gold/25 bg-white/[0.03] shadow-[0_28px_90px_-60px_rgba(245,158,11,0.75)]">
                   <div className="relative aspect-[16/9]">
                     <Image
-                      src="/images/hero-plateau-turc-premium.png"
-                      alt="Grand plateau de grillades turques à partager : kebabs, brochettes et accompagnements"
+                      src="/images/africain/attieke-poisson-alloco.webp"
+                      alt="Grand plateau africain à partager avec poisson, attiéké et alloco"
                       fill
                       priority
                       sizes="(min-width: 1024px) 54vw, 100vw"
