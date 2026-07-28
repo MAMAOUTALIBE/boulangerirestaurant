@@ -112,9 +112,19 @@ component: use it **everywhere** an image path is expected, never a raw text inp
   gets a real message instead of a parse error. Don't raise the global body limit —
   it protects the public routes too.
 - `source: "template"` rows are the repo's own files (`public/images`, `public/videos`),
-  indexed at seed time by `prisma/seeds/template-media.ts` (kept out of `src/lib`
-  because the seed runs outside Next and can't import `server-only`). They are
-  **not deletable** from the CRM — they'd come back on the next deploy.
+  indexed by `prisma/seeds/template-media.ts` (kept out of `src/lib` because it runs
+  outside Next and can't import `server-only`). They are **not deletable** from the
+  CRM — they'd come back on the next deploy.
+  **In production the seed never runs** (the demo profile is destructive), so the
+  indexing has its own safe, additive entry point — run it after any deploy that
+  adds or removes files under `public/`:
+  ```bash
+  npm run db:index-media                     # local
+  docker compose -p <projet> --env-file .env \
+    run --rm migrate node_modules/.bin/tsx prisma/index-media.ts   # production
+  ```
+  Skip it and `/admin/medias` opens on an empty grid while the site is already
+  illustrated — the image picker offers nothing.
 - `deleteMedia` refuses a media still referenced (`findMediaUsages`) — extend that
   function whenever a new model starts pointing at a media URL.
 

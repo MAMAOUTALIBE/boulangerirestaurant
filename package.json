@@ -15,7 +15,8 @@
     "db:studio": "prisma studio",
     "db:seed": "prisma db seed",
     "format": "prettier --write \"src/**/*.{ts,tsx,css}\"",
-    "format:check": "prettier --check \"src/**/*.{ts,tsx,css}\""
+    "format:check": "prettier --check \"src/**/*.{ts,tsx,css}\"",
+    "db:index-media": "tsx prisma/index-media.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

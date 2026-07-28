@@ -65,6 +65,16 @@ npm run build
 - GitHub contient l'historique source, mais le VPS ne fait pas de `git pull` :
   le déploiement se fait par `rsync` + rebuild Docker.
 - Les secrets restent exclus de `rsync` : `.env`, `.env.local`, `.env*.local`.
+- **Après un déploiement qui ajoute des visuels** dans `public/images` ou
+  `public/videos`, réindexez la médiathèque pour qu'ils soient choisissables
+  depuis le CRM (opération additive, sans risque, relançable) :
+
+  ```bash
+  ssh -i ~/.ssh/deploy_key root@213.130.144.215 \
+    "cd /root/restaurant-turc && docker compose -p restaurant-turc --env-file .env \
+       run --rm migrate node_modules/.bin/tsx prisma/index-media.ts"
+  ```
+
 - **Médias du CRM :** les photos téléversées depuis `/admin/medias` vivent dans
   le volume Docker `<projet>_uploads` (monté sur `/app/.data/uploads`), **pas**
   dans le dépôt. Le `rsync --delete` exclut `.data` : une mise à jour ne peut
