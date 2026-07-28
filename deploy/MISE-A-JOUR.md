@@ -65,5 +65,15 @@ npm run build
 - GitHub contient l'historique source, mais le VPS ne fait pas de `git pull` :
   le déploiement se fait par `rsync` + rebuild Docker.
 - Les secrets restent exclus de `rsync` : `.env`, `.env.local`, `.env*.local`.
+- **Médias du CRM :** les photos téléversées depuis `/admin/medias` vivent dans
+  le volume Docker `<projet>_uploads` (monté sur `/app/.data/uploads`), **pas**
+  dans le dépôt. Le `rsync --delete` exclut `.data` : une mise à jour ne peut
+  donc pas les effacer. Ne retirez jamais cette exclusion.
+  Sauvegarde du volume :
+
+  ```bash
+  docker run --rm -v restaurant-turc_uploads:/data -v /root/backups:/backup alpine \
+    tar czf /backup/medias-$(date +%F).tar.gz -C /data .
+  ```
 - Ne pas utiliser les paramètres de la boulangerie (`/root/boulangerie`,
   `lodene.org`, projet Compose `boulangerie`) pour ce site.

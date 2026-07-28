@@ -13,7 +13,7 @@ import { upsertCustomer } from "@/lib/customers";
 import { evaluatePromo } from "@/lib/promo";
 import { quoteDelivery } from "@/lib/delivery";
 import { awardPointsForOrder } from "@/lib/loyalty";
-import { formatPrice } from "@/lib/utils";
+import { formatPrice, roundCurrency } from "@/lib/utils";
 import { rawHtml, safeHtml } from "@/lib/html";
 import { sendEmail } from "@/lib/email";
 import { sendSms } from "@/lib/sms";
@@ -46,10 +46,6 @@ export class OrderCreationError extends Error {
     super(message);
     this.name = "OrderCreationError";
   }
-}
-
-function roundCurrency(value: number): number {
-  return Math.round(value * 100) / 100;
 }
 
 function normalizeQuantity(quantity: number): number {

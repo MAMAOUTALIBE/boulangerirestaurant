@@ -49,7 +49,7 @@ A running PostgreSQL instance and `DATABASE_URL` are **required** even for local
 
 ### Data model notes (`prisma/schema.prisma`)
 
-- Menu data (`Category`, `Dish`, `OptionGroup`, `Option`) lives in the DB and is editable from `/admin/menu`. `src/data/*.ts` are **legacy mock files**; the live source is the DB via `src/lib/dishes.ts`. The app-level `Dish.id` maps to the DB `slug` (stable), not the cuid. Queries use `distinct: ["slug"]` because slugs can be duplicated by historical data.
+- Menu data (`Category`, `Dish`, `OptionGroup`, `Option`) lives in the DB and is fully editable from `/admin/menu` — categories (name, accroche, banner via `MediaPicker`, `active`, reorder, delete with "détacher les plats"), dishes (inline price, duplicate, reorder, `featured`), and the complete option CRUD. `Category.active` hides a whole section from the public menu; `Dish.featured` drives both the home-page specialities and the "Populaire" badge — it replaced the `specialtySlugs` / `popularDishIds` arrays that used to be hard-coded in `FeaturedDishes.tsx` and `MenuBrowser.tsx`. Every admin mutation calls the `revalidateMenu()` helper in `actions.ts` (admin + `/` + `/menu` + `/menu/[slug]` + sitemap) — use it rather than a bare `revalidatePath("/admin/menu")`, otherwise a price change can stay invisible. `src/data/*.ts` are **legacy mock files**; the live source is the DB via `src/lib/dishes.ts`. The app-level `Dish.id` maps to the DB `slug` (stable), not the cuid. Queries use `distinct: ["slug"]` because slugs can be duplicated by historical data. `Dish.image` is now the **sole** source for a dish photo — the old `dishImageOverrides` map that hard-locked 12 slugs is gone (migration `20260728103100_dish_image_from_crm` copied its values into the DB). Never reintroduce a code-side image override: it silently disables the CRM.
 - `Order` has a French status string machine (`OrderStatus` in `src/types/index.ts`): `en attente → payée → en préparation → prête → en livraison → livrée → annulée`. Every transition is audited in `OrderEvent`. Loyalty points are awarded idempotently when status becomes `payée` (`pointsAwarded` flag). Order references look like `NK-<base36>`.
 - Multi-restaurant: orders attach to a default `Restaurant` (chosen by `DEFAULT_RESTAURANT_SLUG`, see `src/lib/restaurants.ts`); Stripe **Connect** routes funds to that restaurant's account via `transfer_data` (`src/lib/stripe-connect.ts`, `src/lib/payment.ts`).
 - **Naming**: the product is a restaurant. The schema keeps generic restaurant-era model names — `Restaurant` (= établissement), `Dish` (= plat), `Driver`.
@@ -62,6 +62,88 @@ Four self-contained features, each with a `src/lib` module, a public route, an `
 - **Demandes sur-mesure** (`/sur-mesure`, `/admin/sur-mesure`, `CustomRequest`): quote requests for group menus and sharing platters, status machine `nouveau → devis envoyé → confirmé → prêt → récupéré → annulé`.
 - **Précommandes de saison** (`seasonal.ts`, `/boutique-de-saison`, `/admin/saison`, `SeasonalProduct` + `SeasonalPreorder`): quota-limited preorders (baklava platters, festive menus…) with a sales window (`salesStart/End`) and a pickup window. `remaining = quota − sold`. Throws `SeasonalError` on closed window / sold out.
 - **Paniers anti-gaspi** (`antiwaste.ts`, `/anti-gaspi`, `/admin/paniers`, `AntiWasteOffer` + `AntiWasteReservation`): one surprise-basket offer **per day** (`date` is `@unique`), `remaining = quantity − sold`, throws `AntiWasteError`. Admin manages today's offer.
+
+### Médiathèque (`media.ts` + pure `media-rules.ts`, `/admin/medias`, `Media`)
+
+The CRM's image store — the reason the back-office can change any photo without a
+deploy. `MediaPicker` (`src/components/admin/MediaPicker.tsx`) is the shared field
+component: use it **everywhere** an image path is expected, never a raw text input.
+
+- **Storage is deliberately outside `public/`**: uploads land in `.data/uploads/AAAA/MM/`
+  (override with `MEDIA_DIR`) and are served by the `GET /media/[...path]` route.
+  `.data` is already excluded from the deploy `rsync --delete` and is a named Docker
+  volume (`<projet>_uploads`) in production — so a code update can never wipe a
+  client's photos. Same-origin path ⇒ `next/image` works with no `remotePatterns`
+  and the CSP `img-src 'self'` stays valid. **Don't move uploads into `public/`.**
+- **Nothing the browser claims is trusted**: the pure `media-rules.ts` sniffs the
+  MIME type from magic bytes (`sniffMimeType`), regenerates the filename server-side
+  (`safeMediaSlug` + random suffix) and enforces the 8 MB per-file cap.
+  `isSafeMediaUrl` backs `mediaUrlSchema` (`validation.ts`) so no external or
+  `javascript:` URL can be stored as an image.
+- **Input formats are wide, served formats are narrow — and that's the safety
+  model.** `IMAGE_MIME_WHITELIST` accepts JPEG, PNG, **HEIC/HEIF** (the iPhone
+  default), WebP, AVIF, GIF, TIFF, BMP and **SVG**, because `storeUpload`
+  re-encodes *every* image to WebP through sharp. The uploaded bytes never reach a
+  browser, so a scripted SVG comes back rasterized and inert. Consequently the
+  conversion is **mandatory**: if sharp is missing or fails, the upload is rejected —
+  never stored raw. Videos (`VIDEO_MIME_WHITELIST`: mp4/webm/mov) *are* stored as-is,
+  hence the short list. `contentTypeForPath` uses a separate, deliberately narrower
+  `SERVED_MIME_BY_EXTENSION` that omits `image/svg+xml` entirely (defense in depth).
+- **Any aspect ratio must fit its card.** Photos come from a restaurateur's phone,
+  so they can be panoramic, portrait or tiny. The rule across the site: put the
+  image in a container that owns its shape (`relative` + `aspect-[…]`/fixed size +
+  `overflow-hidden`) and render it with `fill` + `object-cover`. That crops, never
+  overflows. **Exception — the logo and the `MediaPicker` preview use
+  `object-contain`**: a wide logo cropped to a square is destroyed, and the admin
+  must see what they actually picked. `globals.css` adds a `max-width: 100%` net for
+  any raw `img`/`video`/`svg` (scoped with `:not([data-nimg])` so next/image `fill`
+  is untouched). Never render `<Image>` with a possibly-empty `src` — next/image
+  throws and takes the page down; guard it (see the poster-less video in
+  `GallerySection`).
+- **Replacing a file** (`replaceMedia`, `PUT /api/admin/media/[id]`) writes a *new*
+  URL — the old one is served `immutable` for a year, so reusing it would strand
+  visitors on the stale image — then rewrites every reference (dishes, categories,
+  seasonal products, content blocks, logo/favicon/OG) in one transaction and deletes
+  the old file. Add any new media-bearing column to **both** `replaceMedia` and
+  `findMediaUsages`, or replacing a photo will silently orphan it.
+- **Batching**: Next truncates request bodies over 10 MB (all routes), so
+  `planUploadBatches` splits a drop of N photos into several requests under
+  `MAX_REQUEST_BYTES`; the route also guards on `Content-Length` (413) so the admin
+  gets a real message instead of a parse error. Don't raise the global body limit —
+  it protects the public routes too.
+- `source: "template"` rows are the repo's own files (`public/images`, `public/videos`),
+  indexed at seed time by `prisma/seeds/template-media.ts` (kept out of `src/lib`
+  because the seed runs outside Next and can't import `server-only`). They are
+  **not deletable** from the CRM — they'd come back on the next deploy.
+- `deleteMedia` refuses a media still referenced (`findMediaUsages`) — extend that
+  function whenever a new model starts pointing at a media URL.
+
+### Contenus éditoriaux (`content.ts` + pure `content-blocks.ts`, `/admin/contenus`, `ContentBlock`)
+
+Everything editorial that used to be a hard-coded array in a component now lives here.
+**Never reintroduce a literal content array in a component** — add a section instead.
+
+- `content-blocks.ts` (pure, tested) holds `DEFAULT_CONTENT_BLOCKS` — an exact copy of the
+  template's original content — plus `resolveSection`. Fusion rule: **as soon as a DB row
+  exists for a `(section, key)` pair it wins outright** for every form field; untouched
+  blocks keep showing the default. So a fresh client, an empty table, or an unreachable
+  DB all render the original site — `getContentSection` (`content.ts`, React-`cache`d)
+  catches DB errors and falls back. Deleting the row ("réinitialiser") restores the default.
+- Sections: `hero`, `menu-hero`, `galerie`, `a-propos`, `a-propos-points`, `etapes`,
+  `infos-pratiques`, `qr-avantages`, `raccourcis`, `footer-atouts`, and the three
+  `page-*` legal pages. Adding one means: add to `CONTENT_SECTIONS`, `SECTION_LABELS`,
+  defaults, and a preview link in `/admin/contenus`. A test enforces every declared
+  section has at least one default block.
+- **Client components receive blocks as props** (`Hero`, `MenuHero`, `GallerySection` are
+  carousels with `useEffect`/`useRef`); server components read `getContentSection` directly.
+- Icons come from the DB, so they go through `ICON_WHITELIST` / `resolveIconName` and the
+  `ContentIcon` component — never a dynamic import or arbitrary lookup.
+- Long texts are **Markdown**, rendered by the pure `markdown.ts`: it escapes the whole
+  input with `escapeHtml` *first*, then re-injects only the allowed tags, and filters link
+  targets through `safeUrl`. HTML pasted into the CRM can never reach the page. The legal
+  pages wrap their template JSX in `LegalContent`, which swaps in the admin's Markdown
+  only once written.
+- `{ville}` inside `infos-pratiques` bodies is substituted with `contact.city` at render.
 
 ### Lead-capture features without a `src/lib` module
 
@@ -119,7 +201,7 @@ When a new order lands, `notifyOrderChannels` (`src/lib/order-notifications.ts`,
 - Tests are Vitest + Testing Library (`jsdom`), colocated as `*.test.ts(x)`. The Vitest setup clears `localStorage` after each test.
 - Theme colors are centralized in `tailwind.config.ts` (`ink`, `cream`, `gold`, `forest`, `muted`) — use these tokens, not raw hex. Those tokens resolve to CSS variables whose accent (`gold`/`forest`) is swapped at runtime by the **CRM-chosen palette**: `OrderingSetting.colorPalette` (`ambre` | `terracotta` | `emeraude`, set from `/admin/parametres`) is read in `src/app/layout.tsx` and written as `data-color-palette` on `:root`, which `globals.css` maps to overrides. Don't hard-code accent hex — add a palette variant in `globals.css` instead.
 - Site identity (name, shortName, description, contact phone/email/address/city, hours summary, socials/WhatsApp/Telegram) is **DB-backed and admin-editable** from `/admin/parametres` (see below) — never hard-code these. `contact.city` is the standalone town shown for local delivery/pickup/SEO (Hero, PracticalInfo, commander, QRCode, menu SEO, address-form placeholders) — use it instead of hard-coding the town anywhere. `src/lib/config.ts` holds only the `defaultSiteConfig` fallback + the `SiteConfig` type + pure helpers (`buildContactLinks`, `whatsappUrl`, `telegramUrl`); it has no static `siteConfig` export anymore. Overrides persist as the **`SiteSetting`** singleton (id `"default"`, every column nullable → blank falls back to the default) via the `adminUpdateSiteIdentity` action, which `revalidatePath("/", "layout")` so changes show immediately. Read the effective identity via **`getSiteConfig()`** from `@/lib/site-settings` in server code (React-`cache`d per request; merges the row over `defaultSiteConfig`) or **`useSiteConfig()`** from `@/context/SiteConfigContext` in client components (the root `layout.tsx` reads it once and feeds the provider). Pure/client-safe modules that can't reach the DB (e.g. `social-order.ts`) take the values as parameters defaulting to `defaultSiteConfig`. Technical fields (`url`, `locale`, `currency`, `priceRange`) stay env/code-driven.
-- Money is rounded with the `roundCurrency` helper (cents precision); don't introduce float drift.
+- Money is rounded with the `roundCurrency` helper — now exported from the pure `src/lib/utils.ts` and the **single** rounding point (`orders.ts`, `promo.ts`, `site-activity.ts` and the admin actions all import it). Don't re-inline `Math.round(x * 100) / 100`.
 
 ## Deployment
 

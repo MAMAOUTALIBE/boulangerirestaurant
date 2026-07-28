@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { isSafeMediaUrl } from "@/lib/media-rules";
 
 /** Validation de l'inscription newsletter. */
 export const newsletterSchema = z.object({
@@ -191,12 +192,64 @@ export const antiWasteSchema = z.object({
   message: z.string().max(300, "Message trop long.").optional(),
 });
 
+/**
+ * Chemin d'un média interne (`/media/…` téléversé, ou `/images|videos/…` livré
+ * avec le site). Refuse les URL externes : la CSP (`img-src 'self'`) et
+ * `next/image` (sans `remotePatterns`) les empêcheraient de s'afficher — mieux
+ * vaut le dire à l'admin que le laisser enregistrer une image morte.
+ */
+export const mediaUrlSchema = z
+  .string()
+  .min(1, "Image requise.")
+  .max(1000)
+  .refine(isSafeMediaUrl, "Choisissez une image de la médiathèque.");
+
+/**
+ * Prix en euros saisi dans un formulaire.
+ *
+ * ⚠️ Ne PAS utiliser `z.coerce.number()` seul : `Number("")` vaut 0, donc un
+ * champ prix effacé passerait la validation et publierait le plat à 0,00 €
+ * (commandes gratuites, prix d'origine perdu). On exige donc une saisie non
+ * vide avant toute conversion. L'attribut HTML `required` ne suffit pas : il
+ * ne protège pas d'une requête forgée.
+ */
+export const priceSchema = z
+  .union([z.string(), z.number()])
+  .transform((value) => {
+    if (typeof value === "number") return value;
+    // La virgule décimale est la saisie naturelle en français (« 12,50 »).
+    const texte = value.trim().replace(",", ".");
+    // `Number("")` vaut 0 : on force NaN pour que le champ vide soit REFUSÉ.
+    return texte === "" ? Number.NaN : Number(texte);
+  })
+  .refine(
+    (n) => Number.isFinite(n) && n >= 0 && n <= 100_000,
+    "Prix invalide.",
+  );
+
+/** Validation d'une catégorie de menu (back-office). */
+export const categorySchema = z.object({
+  name: z.string().min(2, "Nom requis.").max(120),
+  description: z.string().max(500).optional(),
+  // Bannière facultative : une chaîne vide vaut « pas d'image ».
+  image: z
+    .string()
+    .max(1000)
+    .optional()
+    .refine(
+      (value) => !value || isSafeMediaUrl(value),
+      "Choisissez une image de la médiathèque.",
+    ),
+  active: z.boolean().default(true),
+  sortOrder: z.coerce.number().int().default(0),
+});
+
 /** Validation d'un plat (back-office menu). */
 export const dishSchema = z.object({
   name: z.string().min(2, "Nom requis.").max(200),
   description: z.string().min(2, "Description requise.").max(5000),
-  price: z.coerce.number().nonnegative("Prix invalide.").max(100_000),
-  image: z.string().min(1, "Image requise.").max(1000),
+  price: priceSchema,
+  image: mediaUrlSchema,
   tag: z.string().max(100).optional(),
   sortOrder: z.coerce.number().int().default(0),
   available: z.boolean().default(true),

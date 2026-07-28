@@ -28,6 +28,21 @@ type SiteSettingRow = {
   whatsappNumber: string | null;
   telegramUsername: string | null;
   hoursSummary: string | null;
+  logoUrl?: string | null;
+  faviconUrl?: string | null;
+  ogImageUrl?: string | null;
+  tagline?: string | null;
+  metaTitle?: string | null;
+  metaDescription?: string | null;
+  keywords?: string | null;
+  legalCompany?: string | null;
+  legalStatus?: string | null;
+  legalCapital?: string | null;
+  legalSiret?: string | null;
+  legalVat?: string | null;
+  legalDirector?: string | null;
+  legalHost?: string | null;
+  accentColor?: string | null;
 };
 
 /** Fusionne une ligne SiteSetting par-dessus les valeurs par défaut du template. */
@@ -72,6 +87,33 @@ export function mergeSiteConfig(
       whatsapp: whatsappUrl(whatsappNumber) || defaults.socials.whatsapp,
       telegram: telegramUrl(telegramUsername) || defaults.socials.telegram,
     },
+    branding: {
+      logoUrl: pick(row.logoUrl, defaults.branding.logoUrl),
+      faviconUrl: pick(row.faviconUrl, defaults.branding.faviconUrl),
+      ogImageUrl: pick(row.ogImageUrl, defaults.branding.ogImageUrl),
+      tagline: pick(row.tagline, defaults.branding.tagline),
+    },
+    seo: {
+      metaTitle: pick(row.metaTitle, defaults.seo.metaTitle),
+      metaDescription: pick(row.metaDescription, defaults.seo.metaDescription),
+      // Saisis séparés par des virgules dans le CRM.
+      keywords: row.keywords?.trim()
+        ? row.keywords
+            .split(",")
+            .map((mot) => mot.trim())
+            .filter(Boolean)
+        : defaults.seo.keywords,
+    },
+    legal: {
+      company: pick(row.legalCompany, defaults.legal.company),
+      status: pick(row.legalStatus, defaults.legal.status),
+      capital: pick(row.legalCapital, defaults.legal.capital),
+      siret: pick(row.legalSiret, defaults.legal.siret),
+      vat: pick(row.legalVat, defaults.legal.vat),
+      director: pick(row.legalDirector, defaults.legal.director),
+      host: pick(row.legalHost, defaults.legal.host),
+    },
+    accentColor: pick(row.accentColor, defaults.accentColor),
   };
 }
 

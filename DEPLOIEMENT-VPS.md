@@ -152,11 +152,27 @@ Sur le serveur, `crontab -e` :
 0 10 * * 1 curl -s -H "Authorization: Bearer VOTRE_CRON_SECRET" https://lodene.cloud/api/cron/reengage
 ```
 
-## 9. Sauvegardes de la base (recommandé)
+## 9. Sauvegardes de la base et des médias (recommandé)
 
 ```bash
 # Dump quotidien à 3h
 0 3 * * * docker compose -p restaurant-turc -f /root/restaurant-turc/docker-compose.yml exec -T db pg_dump -U restaurant_turc restaurant_turc > /root/backups/restaurant-turc-$(date +\%F).sql
+```
+
+Les photos téléversées depuis le CRM (`/admin/medias`) ne sont **pas** dans la
+base ni dans le dépôt : elles vivent dans le volume Docker
+`restaurant-turc_uploads`, monté sur `/app/.data/uploads`. Sauvegardez-le aussi :
+
+```bash
+# Archive hebdomadaire des médias, le dimanche à 3h30
+30 3 * * 0 docker run --rm -v restaurant-turc_uploads:/data -v /root/backups:/backup alpine tar czf /backup/medias-$(date +\%F).tar.gz -C /data .
+```
+
+Restauration :
+
+```bash
+docker run --rm -v restaurant-turc_uploads:/data -v /root/backups:/backup alpine \
+  tar xzf /backup/medias-AAAA-MM-JJ.tar.gz -C /data
 ```
 
 ## 10. Mises à jour de l'app

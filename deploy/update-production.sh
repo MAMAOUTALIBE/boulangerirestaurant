@@ -67,6 +67,10 @@ npm run lint
 npm run build
 
 echo "==> 2/5  Synchronisation du code vers le VPS (rsync)"
+# NB : `--delete` efface côté distant tout ce qui n'est pas dans ce dépôt.
+# `.data` DOIT rester exclu : c'est le point de montage des médias téléversés
+# depuis le CRM (/admin/medias). Sans cette exclusion, chaque mise à jour
+# supprimerait les photos ajoutées par le client.
 ssh "${SSH_OPTS[@]}" "$VPS" "mkdir -p $remote_dir_q"
 rsync -az --delete \
   -e "ssh ${SSH_OPTS[*]}" \

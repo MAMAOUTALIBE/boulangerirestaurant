@@ -1,69 +1,231 @@
+import { ChevronDown, ChevronUp, Copy, Star, Trash2 } from "lucide-react";
 import { getAdminMenuData } from "@/lib/dishes";
 import { remainingStock } from "@/lib/stock";
 import {
-  adminCreateDish,
-  adminUpdateDish,
-  adminDeleteDish,
-  adminCreateCategory,
-  adminAddOptionGroup,
   adminAddOption,
+  adminAddOptionGroup,
+  adminCreateCategory,
+  adminCreateDish,
+  adminDeleteCategory,
+  adminDeleteDish,
+  adminDeleteOption,
   adminDeleteOptionGroup,
+  adminDuplicateDish,
+  adminMoveCategory,
+  adminMoveDish,
+  adminToggleDishFeatured,
+  adminUpdateCategory,
+  adminUpdateDish,
+  adminUpdateDishPrice,
+  adminUpdateOption,
+  adminUpdateOptionGroup,
 } from "@/app/actions";
 import { formatPrice } from "@/lib/utils";
+import { MediaPicker } from "@/components/admin/MediaPicker";
 
 export const dynamic = "force-dynamic";
 
 const inputClass =
   "w-full rounded-lg border border-white/10 bg-ink px-3 py-2 text-sm text-cream placeholder:text-muted focus:border-gold/60 focus:outline-none";
+const miniInput =
+  "rounded border border-white/10 bg-ink px-2 py-1 text-xs text-cream placeholder:text-muted focus:border-gold/60 focus:outline-none";
+const boutonPrimaire =
+  "rounded-lg bg-gold px-4 py-2 text-sm font-semibold text-ink transition hover:bg-gold-400";
+const boutonDiscret =
+  "rounded-lg border border-white/10 px-2 py-1 text-xs text-cream/70 transition hover:border-white/25 hover:text-cream";
 
-export default async function AdminMenuPage() {
-  const { categories, dishes } = await getAdminMenuData();
+/** Messages de retour des Server Actions (via ?saved= / ?error=). */
+const MESSAGES_SUCCES: Record<string, string> = {
+  categorie: "Catégorie enregistrée.",
+  "categorie-supprimee": "Catégorie supprimée.",
+  plat: "Plat enregistré.",
+  prix: "Prix mis à jour.",
+  duplication: "Plat dupliqué — il est masqué tant que vous ne l'activez pas.",
+};
+
+const MESSAGES_ERREUR: Record<string, string> = {
+  categorie: "Catégorie refusée : vérifiez le nom et la bannière.",
+  prix: "Prix invalide.",
+  "1": "Enregistrement refusé : vérifiez le nom, la description, le prix et la photo (elle doit venir de la médiathèque).",
+};
+
+export default async function AdminMenuPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ error?: string; saved?: string; plats?: string }>;
+}) {
+  const [{ categories, dishes }, params] = await Promise.all([
+    getAdminMenuData(),
+    searchParams,
+  ]);
+
+  const misEnAvant = dishes.filter((d) => d.featured).length;
+  const erreur =
+    params.error === "categorie-occupee"
+      ? `Cette catégorie contient encore ${params.plats ?? ""} plat·s. Cochez « détacher les plats » pour la supprimer sans les perdre.`
+      : params.error
+        ? (MESSAGES_ERREUR[params.error] ?? "Enregistrement refusé.")
+        : null;
 
   return (
     <div className="space-y-8">
-      <h1 className="font-display text-3xl font-bold text-cream">Menu</h1>
+      <div>
+        <h1 className="font-display text-3xl font-bold text-cream">Menu</h1>
+        <p className="mt-1 text-sm text-muted">
+          {dishes.length} plat·s · {categories.length} catégorie·s ·{" "}
+          {misEnAvant} mis en avant sur l&apos;accueil
+        </p>
+      </div>
 
-      {/* Catégories */}
-      <section className="rounded-2xl border border-white/10 bg-ink-soft p-6">
+      {erreur && (
+        <p className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">
+          {erreur}
+        </p>
+      )}
+      {params.saved && MESSAGES_SUCCES[params.saved] && (
+        <p className="rounded-xl border border-green-500/30 bg-green-500/10 px-4 py-3 text-sm text-green-300">
+          {MESSAGES_SUCCES[params.saved]}
+        </p>
+      )}
+
+      {/* ─── Catégories ────────────────────────────────────────────────── */}
+      <section className="space-y-4">
         <h2 className="font-display text-lg font-semibold text-cream">
           Catégories
         </h2>
-        <div className="mt-3 flex flex-wrap gap-2">
-          {categories.map((c) => (
-            <span
+
+        <div className="space-y-3">
+          {categories.map((c, index) => (
+            <div
               key={c.id}
-              className="rounded-full bg-white/10 px-3 py-1 text-sm text-cream"
+              className="rounded-2xl border border-white/10 bg-ink-soft p-4"
             >
-              {c.name}
-            </span>
+              <form
+                action={adminUpdateCategory}
+                className="grid gap-3 sm:grid-cols-2"
+              >
+                <input type="hidden" name="id" value={c.id} />
+                <input type="hidden" name="sortOrder" value={c.sortOrder} />
+                <input
+                  name="name"
+                  defaultValue={c.name}
+                  required
+                  className={inputClass}
+                />
+                <input
+                  name="description"
+                  defaultValue={c.description ?? ""}
+                  placeholder="Accroche affichée sur la carte (optionnel)"
+                  className={inputClass}
+                />
+                <MediaPicker
+                  name="image"
+                  label="Bannière de la catégorie"
+                  defaultValue={c.image}
+                  className="sm:col-span-2"
+                />
+                <label className="flex items-center gap-2 text-sm text-cream/80">
+                  <input
+                    type="checkbox"
+                    name="active"
+                    defaultChecked={c.active}
+                    className="accent-gold"
+                  />
+                  Visible sur le site
+                </label>
+                <div className="flex flex-wrap items-center justify-end gap-2">
+                  <button type="submit" className={boutonPrimaire}>
+                    Enregistrer
+                  </button>
+                </div>
+              </form>
+
+              <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-white/10 pt-3">
+                <span className="mr-auto text-xs text-muted">
+                  {c.slug} · {index + 1}
+                  <sup>e</sup> position
+                </span>
+                <form action={adminMoveCategory}>
+                  <input type="hidden" name="id" value={c.id} />
+                  <input type="hidden" name="direction" value="up" />
+                  <button
+                    className={boutonDiscret}
+                    disabled={index === 0}
+                    title="Monter"
+                  >
+                    <ChevronUp className="h-3.5 w-3.5" />
+                  </button>
+                </form>
+                <form action={adminMoveCategory}>
+                  <input type="hidden" name="id" value={c.id} />
+                  <input type="hidden" name="direction" value="down" />
+                  <button
+                    className={boutonDiscret}
+                    disabled={index === categories.length - 1}
+                    title="Descendre"
+                  >
+                    <ChevronDown className="h-3.5 w-3.5" />
+                  </button>
+                </form>
+                <form
+                  action={adminDeleteCategory}
+                  className="flex items-center gap-2"
+                >
+                  <input type="hidden" name="id" value={c.id} />
+                  <label className="flex items-center gap-1 text-xs text-muted">
+                    <input
+                      type="checkbox"
+                      name="detach"
+                      className="accent-gold"
+                    />
+                    détacher les plats
+                  </label>
+                  <button className="text-xs text-red-400 transition hover:text-red-300">
+                    Supprimer
+                  </button>
+                </form>
+              </div>
+            </div>
           ))}
         </div>
+
         <form
           action={adminCreateCategory}
-          className="mt-4 flex flex-wrap gap-2"
+          className="grid gap-3 rounded-2xl border border-dashed border-white/15 bg-ink-soft p-4 sm:grid-cols-2"
         >
           <input
             name="name"
             placeholder="Nouvelle catégorie"
             required
-            className={`${inputClass} max-w-xs`}
+            className={inputClass}
           />
+          <input
+            name="description"
+            placeholder="Accroche (optionnel)"
+            className={inputClass}
+          />
+          <MediaPicker
+            name="image"
+            label="Bannière (optionnel)"
+            className="sm:col-span-2"
+          />
+          <input type="hidden" name="active" value="on" />
           <input
             name="sortOrder"
             type="number"
             placeholder="Ordre"
-            className="w-24 rounded-lg border border-white/10 bg-ink px-3 py-2 text-sm text-cream focus:border-gold/60 focus:outline-none"
+            defaultValue={categories.length + 1}
+            className={inputClass}
           />
-          <button
-            type="submit"
-            className="rounded-lg bg-gold px-4 py-2 text-sm font-semibold text-ink transition hover:bg-gold-400"
-          >
-            Ajouter
-          </button>
+          <div className="flex items-end justify-end">
+            <button type="submit" className={boutonPrimaire}>
+              Ajouter la catégorie
+            </button>
+          </div>
         </form>
       </section>
 
-      {/* Ajout d'un plat */}
+      {/* ─── Ajout d'un plat ───────────────────────────────────────────── */}
       <section className="rounded-2xl border border-white/10 bg-ink-soft p-6">
         <h2 className="font-display text-lg font-semibold text-cream">
           Ajouter un plat
@@ -86,11 +248,11 @@ export default async function AdminMenuPage() {
             required
             className={inputClass}
           />
-          <input
+          <MediaPicker
             name="image"
-            placeholder="Image (/images/…)"
+            label="Photo du plat"
             required
-            className={`${inputClass} sm:col-span-2`}
+            className="sm:col-span-2"
           />
           <input
             name="description"
@@ -140,6 +302,10 @@ export default async function AdminMenuPage() {
             />
             Disponible
           </label>
+          <label className="flex items-center gap-2 text-sm text-cream/80">
+            <input type="checkbox" name="featured" className="accent-gold" />
+            Mettre en avant
+          </label>
           <div className="sm:col-span-2">
             <button type="submit" className="btn-primary">
               Ajouter le plat
@@ -148,16 +314,87 @@ export default async function AdminMenuPage() {
         </form>
       </section>
 
-      {/* Liste éditable */}
+      {/* ─── Liste éditable ────────────────────────────────────────────── */}
       <section className="space-y-4">
         <h2 className="font-display text-lg font-semibold text-cream">
           Plats ({dishes.length})
         </h2>
-        {dishes.map((d) => (
+        {dishes.map((d, index) => (
           <div
             key={d.id}
             className="rounded-2xl border border-white/10 bg-ink-soft p-5"
           >
+            {/* Prix en ligne : le geste le plus fréquent, isolé du reste. */}
+            <div className="mb-3 flex flex-wrap items-center gap-3 border-b border-white/10 pb-3">
+              <span className="font-display text-base font-semibold text-cream">
+                {d.name}
+              </span>
+              <form
+                action={adminUpdateDishPrice}
+                className="flex items-center gap-1.5"
+              >
+                <input type="hidden" name="id" value={d.id} />
+                <input
+                  name="price"
+                  type="number"
+                  step="0.1"
+                  min={0}
+                  defaultValue={d.price}
+                  aria-label={`Prix de ${d.name}`}
+                  className={`${miniInput} w-24`}
+                />
+                <button className={boutonDiscret}>€ Enregistrer</button>
+              </form>
+
+              <form action={adminToggleDishFeatured}>
+                <input type="hidden" name="id" value={d.id} />
+                <button
+                  className={`flex items-center gap-1 rounded-lg px-2 py-1 text-xs transition ${
+                    d.featured
+                      ? "bg-gold/15 text-gold"
+                      : "border border-white/10 text-muted hover:text-cream"
+                  }`}
+                  title="Afficher ce plat parmi les spécialités de l'accueil"
+                >
+                  <Star
+                    className={`h-3.5 w-3.5 ${d.featured ? "fill-gold" : ""}`}
+                  />
+                  {d.featured ? "Mis en avant" : "Mettre en avant"}
+                </button>
+              </form>
+
+              <div className="ml-auto flex items-center gap-2">
+                <form action={adminMoveDish}>
+                  <input type="hidden" name="id" value={d.id} />
+                  <input type="hidden" name="direction" value="up" />
+                  <button
+                    className={boutonDiscret}
+                    disabled={index === 0}
+                    title="Monter dans sa catégorie"
+                  >
+                    <ChevronUp className="h-3.5 w-3.5" />
+                  </button>
+                </form>
+                <form action={adminMoveDish}>
+                  <input type="hidden" name="id" value={d.id} />
+                  <input type="hidden" name="direction" value="down" />
+                  <button
+                    className={boutonDiscret}
+                    disabled={index === dishes.length - 1}
+                    title="Descendre dans sa catégorie"
+                  >
+                    <ChevronDown className="h-3.5 w-3.5" />
+                  </button>
+                </form>
+                <form action={adminDuplicateDish}>
+                  <input type="hidden" name="id" value={d.id} />
+                  <button className={boutonDiscret} title="Dupliquer ce plat">
+                    <Copy className="h-3.5 w-3.5" />
+                  </button>
+                </form>
+              </div>
+            </div>
+
             <form
               action={adminUpdateDish}
               className="grid gap-3 sm:grid-cols-2"
@@ -171,10 +408,12 @@ export default async function AdminMenuPage() {
                 defaultValue={d.price}
                 className={inputClass}
               />
-              <input
+              <MediaPicker
                 name="image"
+                label="Photo du plat"
                 defaultValue={d.image}
-                className={`${inputClass} sm:col-span-2`}
+                required
+                className="sm:col-span-2"
               />
               <input
                 name="description"
@@ -230,11 +469,17 @@ export default async function AdminMenuPage() {
                 />
                 Disponible {d.available ? "" : "(masqué)"}
               </label>
+              <label className="flex items-center gap-2 text-sm text-cream/80">
+                <input
+                  type="checkbox"
+                  name="featured"
+                  defaultChecked={d.featured}
+                  className="accent-gold"
+                />
+                Mis en avant
+              </label>
               <div className="flex items-center gap-3 sm:col-span-2">
-                <button
-                  type="submit"
-                  className="rounded-lg bg-gold px-4 py-2 text-sm font-semibold text-ink transition hover:bg-gold-400"
-                >
+                <button type="submit" className={boutonPrimaire}>
                   Enregistrer
                 </button>
                 <span className="text-xs text-muted">
@@ -257,57 +502,110 @@ export default async function AdminMenuPage() {
                     key={g.id}
                     className="rounded-lg border border-white/10 p-3"
                   >
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm font-medium text-cream">
-                        {g.name}{" "}
-                        <span className="text-xs text-muted">
-                          ({g.type === "multi" ? "plusieurs" : "1 choix"}
-                          {g.required ? ", obligatoire" : ""})
-                        </span>
-                      </span>
-                      <form action={adminDeleteOptionGroup}>
-                        <input type="hidden" name="id" value={g.id} />
-                        <button className="text-xs text-red-400 hover:text-red-300">
-                          Suppr. groupe
-                        </button>
-                      </form>
-                    </div>
-                    <ul className="mt-2 space-y-1 text-sm text-cream/80">
+                    <form
+                      action={adminUpdateOptionGroup}
+                      className="flex flex-wrap items-center gap-2"
+                    >
+                      <input type="hidden" name="id" value={g.id} />
+                      <input
+                        name="name"
+                        defaultValue={g.name}
+                        required
+                        className={`${miniInput} min-w-[10rem] flex-1`}
+                      />
+                      <select
+                        name="type"
+                        defaultValue={g.type}
+                        className={miniInput}
+                      >
+                        <option value="single">1 choix</option>
+                        <option value="multi">plusieurs</option>
+                      </select>
+                      <label className="flex items-center gap-1 text-xs text-cream/70">
+                        <input
+                          type="checkbox"
+                          name="required"
+                          defaultChecked={g.required}
+                          className="accent-gold"
+                        />
+                        obligatoire
+                      </label>
+                      <button className={boutonDiscret}>Enregistrer</button>
+                    </form>
+
+                    <ul className="mt-2 space-y-1.5">
                       {g.options.map((o) => (
-                        <li key={o.id} className="flex justify-between">
-                          <span>{o.name}</span>
-                          {o.priceDelta > 0 && (
-                            <span className="text-gold">
-                              + {formatPrice(o.priceDelta)}
+                        <li key={o.id} className="flex flex-wrap gap-2">
+                          <form
+                            action={adminUpdateOption}
+                            className="flex flex-1 flex-wrap items-center gap-2"
+                          >
+                            <input type="hidden" name="id" value={o.id} />
+                            <input
+                              name="name"
+                              defaultValue={o.name}
+                              required
+                              className={`${miniInput} min-w-[8rem] flex-1`}
+                            />
+                            <input
+                              name="priceDelta"
+                              type="number"
+                              step="0.5"
+                              defaultValue={o.priceDelta}
+                              aria-label="Supplément"
+                              className={`${miniInput} w-20`}
+                            />
+                            <span className="text-xs text-gold">
+                              {o.priceDelta > 0
+                                ? `+ ${formatPrice(o.priceDelta)}`
+                                : "inclus"}
                             </span>
-                          )}
+                            <button className={boutonDiscret}>OK</button>
+                          </form>
+                          <form action={adminDeleteOption}>
+                            <input type="hidden" name="id" value={o.id} />
+                            <button
+                              className="p-1 text-red-400 transition hover:text-red-300"
+                              title="Supprimer cette option"
+                            >
+                              <Trash2 className="h-3.5 w-3.5" />
+                            </button>
+                          </form>
                         </li>
                       ))}
                     </ul>
-                    <form
-                      action={adminAddOption}
-                      className="mt-2 flex flex-wrap gap-2"
-                    >
-                      <input type="hidden" name="groupId" value={g.id} />
-                      <input
-                        name="name"
-                        placeholder="Option"
-                        required
-                        className="rounded border border-white/10 bg-ink px-2 py-1 text-xs text-cream"
-                      />
-                      <input
-                        name="priceDelta"
-                        type="number"
-                        step="0.5"
-                        placeholder="+€"
-                        className="w-20 rounded border border-white/10 bg-ink px-2 py-1 text-xs text-cream"
-                      />
-                      <button className="rounded bg-white/10 px-3 py-1 text-xs text-cream hover:bg-white/20">
-                        + option
-                      </button>
-                    </form>
+
+                    <div className="mt-2 flex flex-wrap items-center gap-2 border-t border-white/10 pt-2">
+                      <form
+                        action={adminAddOption}
+                        className="flex flex-wrap gap-2"
+                      >
+                        <input type="hidden" name="groupId" value={g.id} />
+                        <input
+                          name="name"
+                          placeholder="Nouvelle option"
+                          required
+                          className={miniInput}
+                        />
+                        <input
+                          name="priceDelta"
+                          type="number"
+                          step="0.5"
+                          placeholder="+€"
+                          className={`${miniInput} w-20`}
+                        />
+                        <button className={boutonDiscret}>+ option</button>
+                      </form>
+                      <form action={adminDeleteOptionGroup} className="ml-auto">
+                        <input type="hidden" name="id" value={g.id} />
+                        <button className="text-xs text-red-400 hover:text-red-300">
+                          Supprimer le groupe
+                        </button>
+                      </form>
+                    </div>
                   </div>
                 ))}
+
                 <form
                   action={adminAddOptionGroup}
                   className="flex flex-wrap items-center gap-2"
@@ -317,12 +615,9 @@ export default async function AdminMenuPage() {
                     name="name"
                     placeholder="Nouveau groupe"
                     required
-                    className="rounded border border-white/10 bg-ink px-2 py-1 text-xs text-cream"
+                    className={miniInput}
                   />
-                  <select
-                    name="type"
-                    className="rounded border border-white/10 bg-ink px-2 py-1 text-xs text-cream"
-                  >
+                  <select name="type" className={miniInput}>
                     <option value="single">1 choix</option>
                     <option value="multi">plusieurs</option>
                   </select>
@@ -334,9 +629,7 @@ export default async function AdminMenuPage() {
                     />{" "}
                     obligatoire
                   </label>
-                  <button className="rounded bg-white/10 px-3 py-1 text-xs text-cream hover:bg-white/20">
-                    + groupe
-                  </button>
+                  <button className={boutonDiscret}>+ groupe</button>
                 </form>
               </div>
             </details>

@@ -6,6 +6,15 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
+/**
+ * Arrondit un montant au centime — le seul point d'arrondi monétaire du projet.
+ * Toute somme calculée passe par ici pour éviter la dérive des flottants
+ * (0.1 + 0.2 = 0.30000000000000004 finirait en base et sur une facture).
+ */
+export function roundCurrency(value: number): number {
+  return Math.round(value * 100) / 100;
+}
+
 /** Formate un nombre en prix euros (ex: 15 -> "15,00 €"). */
 export function formatPrice(value: number): string {
   return new Intl.NumberFormat("fr-FR", {

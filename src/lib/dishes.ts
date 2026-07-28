@@ -4,44 +4,15 @@ import { prisma } from "@/lib/prisma";
 import type { Dish } from "@/types";
 import { remainingStock, isSoldOut } from "@/lib/stock";
 
-const dishImageOverrides: Record<string, string> = {
-  "pastels-maison": "/images/africain/pastels-alloco.webp",
-  alloco: "/images/africain/pastels-alloco.webp",
-  "thieb-poisson": "/images/africain/thiep-poisson.webp",
-  "thieb-poulet": "/images/africain/thiep-poulet.webp",
-  "yassa-poulet": "/images/africain/yassa-poulet.webp",
-  "mafe-boeuf": "/images/africain/mafe-boeuf.webp",
-  "attieke-poisson-alloco":
-    "/images/africain/attieke-poisson-alloco.webp",
-  "poulet-braise-alloco": "/images/africain/thiep-poulet.webp",
-  "douceur-africaine": "/images/africain/desserts-africains.webp",
-  "bissap-maison":
-    "/images/africain/boissons-bissap-gingembre-bouye.webp",
-  "jus-gingembre":
-    "/images/africain/boissons-bissap-gingembre-bouye.webp",
-  "jus-bouye": "/images/africain/boissons-bissap-gingembre-bouye.webp",
-};
-
 // La visibilité publique d'un produit/catégorie est désormais pilotée par le
 // CRM (champ `available`), et non plus par une liste blanche de slugs figée :
 // tout produit actif créé/édité depuis /admin/menu apparaît côté public.
-
-/**
- * Image affichée : les produits éditoriaux connus ont une photo dédiée pour
- * éviter les inversions visuelles ; les produits créés au CRM gardent leur image.
- */
-function resolveDishImage(row: Pick<DishRow, "slug" | "image">): string {
-  return dishImageOverrides[row.slug] ?? row.image;
-}
-
-function withDishPresentation<T extends { slug: string; image: string }>(
-  row: T,
-): T {
-  return {
-    ...row,
-    image: dishImageOverrides[row.slug] ?? row.image,
-  };
-}
+//
+// L'image l'est aussi : `Dish.image` (choisi dans la médiathèque depuis
+// /admin/menu) est la seule source de vérité. La table `dishImageOverrides` qui
+// forçait la photo de certains slugs a été supprimée — elle rendait le champ du
+// CRM sans effet. Ses valeurs ont été recopiées en base par la migration
+// `20260728103100_dish_image_from_crm`.
 
 /** Convertit une ligne Prisma en `Dish` applicatif (id = slug, stable). */
 function toDish(row: DishRow): Dish {
@@ -50,7 +21,7 @@ function toDish(row: DishRow): Dish {
     name: row.name,
     description: row.description,
     price: row.price,
-    image: resolveDishImage(row),
+    image: row.image,
     tag: row.tag ?? undefined,
   };
 }
@@ -96,17 +67,38 @@ export interface MenuDish extends Dish {
   remaining: number | null;
   /** Stock limité tombé à zéro. */
   soldOut: boolean;
+  /** Mis en avant depuis /admin/menu (accueil + badge « Populaire »). */
+  featured: boolean;
 }
 export interface MenuCategory {
   id: string;
   slug: string;
   name: string;
+  /** Accroche éditable au CRM (facultative). */
+  description: string | null;
+  /** Bannière éditable au CRM (facultative). */
+  image: string | null;
   dishes: MenuDish[];
+}
+
+/** Présentation publique d'un plat (champs communs à toutes les vues carte). */
+function toMenuDish(
+  row: DishRow & { _count: { optionGroups: number } },
+): MenuDish {
+  return {
+    ...toDish(row),
+    available: row.available,
+    hasOptions: row._count.optionGroups > 0,
+    remaining: remainingStock(row),
+    soldOut: isSoldOut(row),
+    featured: row.featured,
+  };
 }
 
 /** Menu public structuré par catégories (produits disponibles ou épuisés). */
 export async function getMenu(): Promise<MenuCategory[]> {
   const categories = await prisma.category.findMany({
+    where: { active: true },
     orderBy: [{ sortOrder: "asc" }, { id: "asc" }],
     distinct: ["slug"],
     include: {
@@ -123,13 +115,9 @@ export async function getMenu(): Promise<MenuCategory[]> {
       id: c.id,
       slug: c.slug,
       name: c.name,
-      dishes: c.dishes.map((d) => ({
-        ...toDish(d),
-        available: d.available,
-        hasOptions: d._count.optionGroups > 0,
-        remaining: remainingStock(d),
-        soldOut: isSoldOut(d),
-      })),
+      description: c.description,
+      image: c.image,
+      dishes: c.dishes.map(toMenuDish),
     }))
     .filter((c) => c.dishes.length > 0);
 }
@@ -137,6 +125,7 @@ export async function getMenu(): Promise<MenuCategory[]> {
 /** Données du menu pour le browser interactif : catégories + produits à plat. */
 export async function getMenuForBrowser() {
   const categories = await prisma.category.findMany({
+    where: { active: true },
     orderBy: [{ sortOrder: "asc" }, { id: "asc" }],
     distinct: ["slug"],
   });
@@ -165,15 +154,13 @@ export async function getMenuForBrowser() {
         id: c.id,
         slug: c.slug,
         name: c.name,
+        description: c.description,
+        image: c.image,
       })),
     dishes: rows
       .filter((d) => d.categoryId)
       .map((d) => ({
-        ...toDish(d),
-        available: d.available,
-        hasOptions: d._count.optionGroups > 0,
-        remaining: remainingStock(d),
-        soldOut: isSoldOut(d),
+        ...toMenuDish(d),
         categoryId: d.categoryId as string,
       })),
   };
@@ -197,7 +184,7 @@ export async function getDishWithOptions(slug: string) {
   });
   return dish
     ? {
-        ...withDishPresentation(dish),
+        ...dish,
         remaining: remainingStock(dish),
         soldOut: isSoldOut(dish),
       }

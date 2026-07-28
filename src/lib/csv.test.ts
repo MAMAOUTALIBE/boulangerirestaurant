@@ -31,7 +31,7 @@ describe("csvCell", () => {
   it("échappe une formule qui contient aussi un séparateur", () => {
     // Contient `;` → guillemets ; les apostrophes ne sont PAS doublées (seuls
     // les guillemets le sont en CSV).
-    expect(csvCell("=cmd|'/c calc'!A1;x")).toBe('"\'=cmd|\'/c calc\'!A1;x"');
+    expect(csvCell("=cmd|'/c calc'!A1;x")).toBe("\"'=cmd|'/c calc'!A1;x\"");
   });
 
   it("ne préfixe pas un nombre négatif déjà numérique", () => {

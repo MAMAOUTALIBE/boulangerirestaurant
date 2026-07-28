@@ -6,6 +6,15 @@
 Déploiement recommandé : **Vercel** (app Next.js) + **base PostgreSQL managée**
 (Neon ou Supabase) + **Stripe** + **Resend**.
 
+> ⚠️ **La médiathèque du CRM (`/admin/medias`) ne fonctionne pas sur Vercel.**
+> Les photos téléversées sont écrites sur le système de fichiers
+> (`.data/uploads`, voir `src/lib/media.ts`), or celui de Vercel est éphémère et
+> non partagé entre instances : un envoi réussirait puis disparaîtrait au
+> déploiement suivant, laissant des images mortes en base. Un hébergement avec
+> disque persistant est requis — c'est le cas du VPS Docker décrit dans
+> `DEPLOIEMENT-VPS.md`, qui monte un volume `uploads`. Sur Vercel, seules les
+> images livrées avec le dépôt (`public/images`) restent utilisables.
+
 ---
 
 ## 1. Base de données PostgreSQL managée

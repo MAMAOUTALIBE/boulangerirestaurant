@@ -87,7 +87,10 @@ export async function POST(request: Request) {
   // Cap de taille avant parsing.
   const raw = await request.text();
   if (raw.length > MAX_BODY_BYTES) {
-    return NextResponse.json({ error: "Corps trop volumineux" }, { status: 413 });
+    return NextResponse.json(
+      { error: "Corps trop volumineux" },
+      { status: 413 },
+    );
   }
   let payload: unknown = null;
   try {

@@ -19,9 +19,7 @@ export async function GET(request: Request) {
       { status: 503 },
     );
   }
-  const provided = request.headers
-    .get("authorization")
-    ?.replace("Bearer ", "");
+  const provided = request.headers.get("authorization")?.replace("Bearer ", "");
   // Comparaison à temps constant (pas d'oracle de timing sur le secret).
   if (!provided || !timingSafeStrEqual(provided, secret)) {
     return NextResponse.json({ error: "Non autorisé" }, { status: 401 });

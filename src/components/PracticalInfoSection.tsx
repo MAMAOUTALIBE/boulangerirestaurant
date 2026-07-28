@@ -2,72 +2,33 @@ import Link from "next/link";
 import {
   ChevronRight,
   Clock3,
-  CreditCard,
   MapPin,
   MessageCircle,
   Phone,
   ShieldCheck,
   ShoppingBag,
   Star,
-  Truck,
   UtensilsCrossed,
-  type LucideIcon,
 } from "lucide-react";
 import { Reveal } from "@/components/ui/Reveal";
 import { getSiteConfig } from "@/lib/site-settings";
-
-const orderSteps = [
-  {
-    step: "01",
-    title: "Choisissez",
-    text: "Thiéboudiène, yassa, mafé, attiéké, grillades et desserts.",
-  },
-  {
-    step: "02",
-    title: "Validez",
-    text: "Créneau, coordonnées et paiement sécurisé.",
-  },
-  {
-    step: "03",
-    title: "Récupérez",
-    text: "À emporter, livraison locale ou service sur place.",
-  },
-];
-
-function buildPracticalItems(city: string): {
-  title: string;
-  text: string;
-  Icon: LucideIcon;
-}[] {
-  return [
-    {
-      title: "Livraison locale",
-      text: `${city} et alentours.`,
-      Icon: Truck,
-    },
-    {
-      title: "Retrait rapide",
-      text: "Commande prête au créneau choisi.",
-      Icon: ShoppingBag,
-    },
-    {
-      title: "Paiement simple",
-      text: "Commande en ligne avec confirmation.",
-      Icon: CreditCard,
-    },
-    {
-      title: "Fabrication fraîche",
-      text: "Préparation, cuisson et finition chaque jour.",
-      Icon: ShieldCheck,
-    },
-  ];
-}
+import { getContentSections } from "@/lib/content";
+import { blockText } from "@/lib/content-blocks";
+import { ContentIcon } from "@/components/ui/ContentIcon";
 
 /** Bandeau de réassurance placé avant la carte pour clarifier le parcours commande. */
 export async function PracticalInfoSection() {
-  const siteConfig = await getSiteConfig();
+  const [siteConfig, contenus] = await Promise.all([
+    getSiteConfig(),
+    getContentSections(["etapes", "infos-pratiques"]),
+  ]);
+  const etapes = contenus["etapes"] ?? [];
   const phoneHref = `tel:${siteConfig.contact.phone.replace(/\s/g, "")}`;
-  const practicalItems = buildPracticalItems(siteConfig.contact.city);
+  // `{ville}` permet à un texte du CRM de reprendre la ville de /admin/parametres.
+  const practicalItems = (contenus["infos-pratiques"] ?? []).map((bloc) => ({
+    ...bloc,
+    body: bloc.body?.replaceAll("{ville}", siteConfig.contact.city),
+  }));
 
   return (
     <section className="bg-[#F8F3EA] py-8 text-ink sm:py-10">
@@ -118,17 +79,18 @@ export async function PracticalInfoSection() {
           <div className="grid gap-5">
             <Reveal delay={0.08}>
               <div className="grid gap-3 border-y border-ink/10 py-4 sm:grid-cols-3">
-                {orderSteps.map((item) => (
-                  <div key={item.step} className="flex gap-3 sm:block">
+                {etapes.map((item, index) => (
+                  <div key={item.key} className="flex gap-3 sm:block">
                     <span className="font-display text-2xl font-bold text-gold-600">
-                      {item.step}
+                      {blockText(item, "numero") ??
+                        String(index + 1).padStart(2, "0")}
                     </span>
                     <div className="sm:mt-2">
                       <h3 className="text-base font-black text-ink">
                         {item.title}
                       </h3>
                       <p className="mt-1 text-sm leading-6 text-ink/65">
-                        {item.text}
+                        {item.body}
                       </p>
                     </div>
                   </div>
@@ -137,19 +99,23 @@ export async function PracticalInfoSection() {
             </Reveal>
 
             <div className="grid gap-3 sm:grid-cols-2">
-              {practicalItems.map(({ title, text, Icon }, index) => (
-                <Reveal key={title} delay={0.06 * index}>
+              {practicalItems.map((item, index) => (
+                <Reveal key={item.key} delay={0.06 * index}>
                   <div className="h-full rounded-lg border border-ink/10 bg-white p-4 shadow-[0_14px_34px_-30px_rgba(8,8,8,0.68)]">
                     <div className="flex items-start gap-3">
                       <span className="grid h-11 w-11 shrink-0 place-items-center rounded-lg border border-gold/45 bg-gold/10 text-gold-600">
-                        <Icon className="h-5 w-5" />
+                        <ContentIcon
+                          name={item.icon}
+                          fallback={ShieldCheck}
+                          className="h-5 w-5"
+                        />
                       </span>
                       <div>
                         <h3 className="text-base font-black text-ink">
-                          {title}
+                          {item.title}
                         </h3>
                         <p className="mt-1 text-sm leading-6 text-ink/65">
-                          {text}
+                          {item.body}
                         </p>
                       </div>
                     </div>

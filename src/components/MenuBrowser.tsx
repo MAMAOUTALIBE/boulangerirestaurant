@@ -22,23 +22,20 @@ export interface BrowserDish extends Dish {
   remaining: number | null;
   soldOut: boolean;
   categoryId: string;
+  /** Coché « mis en avant » dans /admin/menu → badge « Populaire ». */
+  featured: boolean;
 }
 export interface BrowserCategory {
   id: string;
   slug: string;
   name: string;
+  description?: string | null;
+  image?: string | null;
 }
 
 interface DisplayCategory extends BrowserCategory {
   sourceIds: string[];
 }
-
-const popularDishIds = new Set([
-  "thieb-poisson",
-  "yassa-poulet",
-  "mafe-boeuf",
-  "attieke-poisson-alloco",
-]);
 
 const dishDetails: Record<string, string[]> = {
   "pastels-maison": ["Croustillants", "Sauce maison", "À partager"],
@@ -182,6 +179,11 @@ export function MenuBrowser({
                 {g.items.length} produit{g.items.length > 1 ? "s" : ""}
               </span>
             </div>
+            {g.cat.description && (
+              <p className="mt-1.5 max-w-2xl text-sm text-cream/55 sm:mt-2">
+                {g.cat.description}
+              </p>
+            )}
             <div className="mt-3 grid grid-cols-1 gap-3 sm:mt-6 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3 2xl:grid-cols-4 3xl:grid-cols-5 4xl:grid-cols-6">
               {g.items.map((dish, i) => (
                 <MenuDishCard
@@ -287,13 +289,13 @@ function toDisplayCategories(categories: BrowserCategory[]): DisplayCategory[] {
 }
 
 function withDisplayTag(dish: BrowserDish): BrowserDish {
-  if (dish.tag || !popularDishIds.has(dish.id)) return dish;
+  if (dish.tag || !dish.featured) return dish;
   return { ...dish, tag: "Populaire" };
 }
 
 function getDishBadges(dish: BrowserDish) {
   const badges = [];
-  if (popularDishIds.has(dish.id)) badges.push("Populaire");
+  if (dish.featured) badges.push("Populaire");
   if (dish.hasOptions) badges.push("Options");
   return badges;
 }

@@ -276,7 +276,6 @@ function interpolate(
     .replaceAll("{meteo}", weather || "du jour");
 }
 
-
 export async function dispatchMarketingCampaign(input: {
   ruleId?: string;
   name: string;

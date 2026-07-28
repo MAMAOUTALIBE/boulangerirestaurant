@@ -6,6 +6,7 @@
  * Pur / framework-free (pas de `server-only`, pas de Prisma) → testable
  * isolément. La lecture en base vit dans `src/lib/testers.ts`.
  */
+import { roundCurrency } from "@/lib/utils";
 
 export type TesterStage = "contact" | "panier" | "commande";
 
@@ -64,11 +65,6 @@ export interface TesterProfile {
   lastStatus?: string;
   /** Activités du profil, de la plus récente à la plus ancienne. */
   activities: TesterActivity[];
-}
-
-/** Arrondi monétaire (centimes) — évite la dérive des flottants. */
-function roundCurrency(value: number): number {
-  return Math.round(value * 100) / 100;
 }
 
 export function normalizeEmail(value?: string | null): string | undefined {

@@ -5,78 +5,26 @@ import Image from "next/image";
 import { Camera, Play, X, ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-type GalleryItem =
+export type GalleryItem =
   | { type: "image"; src: string; alt: string; tag: string }
   | { type: "video"; src: string; poster: string; alt: string; tag: string };
 
-// Médias de la galerie.
-//
-// Pour AJOUTER UNE VIDÉO : dépose ton fichier dans `public/videos/`
-// (ex. `public/videos/grillades.mp4`) puis ajoute une entrée :
-//   { type: "video", src: "/videos/grillades.mp4",
-//     poster: "/images/africain/thiep-poisson.webp", alt: "La cuisine en action",
-//     tag: "Coulisses" },
-// Le poster est l'image affichée avant lecture.
-const items: GalleryItem[] = [
-  {
-    type: "image",
-    src: "/images/africain/thiep-poisson.webp",
-    alt: "Thiéboudiène au poisson et légumes mijotés",
-    tag: "Thiéboudiène",
-  },
-  {
-    type: "image",
-    src: "/images/africain/thiep-poulet.webp",
-    alt: "Thiéboudiène au poulet mariné",
-    tag: "Thiéboudiène",
-  },
-  {
-    type: "image",
-    src: "/images/africain/yassa-poulet.webp",
-    alt: "Yassa poulet aux oignons confits et citron",
-    tag: "Yassa",
-  },
-  {
-    type: "image",
-    src: "/images/africain/mafe-boeuf.webp",
-    alt: "Mafé de bœuf à la sauce arachide",
-    tag: "Mafé",
-  },
-  {
-    type: "image",
-    src: "/images/africain/attieke-poisson-alloco.webp",
-    alt: "Attiéké avec poisson grillé et alloco",
-    tag: "Attiéké",
-  },
-  {
-    type: "image",
-    src: "/images/africain/pastels-alloco.webp",
-    alt: "Pastels maison et bananes plantain alloco",
-    tag: "Entrées",
-  },
-  {
-    type: "image",
-    src: "/images/africain/desserts-africains.webp",
-    alt: "Assortiment de douceurs africaines maison",
-    tag: "Desserts",
-  },
-  {
-    type: "image",
-    src: "/images/africain/boissons-bissap-gingembre-bouye.webp",
-    alt: "Bissap, jus de gingembre et bouye maison",
-    tag: "Boissons",
-  },
-];
-
 type Filter = "all" | "image" | "video";
 
-const filters: { id: Filter; label: string }[] = [
-  { id: "all", label: "Tout" },
-  { id: "image", label: "Photos" },
-];
-
-export function GallerySection() {
+/**
+ * Médias de la galerie, désormais gérés depuis /admin/contenus (section
+ * « galerie ») : ajouter une photo ou une vidéo ne demande plus de toucher au
+ * code. L'onglet « Vidéos » n'apparaît que si la galerie en contient.
+ */
+export function GallerySection({ items }: { items: GalleryItem[] }) {
   const [filter, setFilter] = useState<Filter>("all");
+  const filters: { id: Filter; label: string }[] = [
+    { id: "all", label: "Tout" },
+    { id: "image", label: "Photos" },
+    ...(items.some((it) => it.type === "video")
+      ? [{ id: "video" as const, label: "Vidéos" }]
+      : []),
+  ];
   const [active, setActive] = useState<number | null>(null);
   const [canPrev, setCanPrev] = useState(false);
   const [canNext, setCanNext] = useState(false);
@@ -214,13 +162,20 @@ export function GallerySection() {
               aria-label={`Agrandir : ${item.alt}`}
               className="group relative aspect-[4/3] w-[80%] shrink-0 snap-start overflow-hidden rounded-2xl border border-white/10 bg-ink-soft min-[480px]:w-[60%] sm:w-[calc((100%-1rem)/2)] lg:w-[calc((100%-2rem)/3)]"
             >
-              <Image
-                src={item.type === "video" ? item.poster : item.src}
-                alt={item.alt}
-                fill
-                sizes="(max-width: 1024px) 60vw, 33vw"
-                className="object-cover transition duration-500 group-hover:scale-105"
-              />
+              {/*
+                Une vidéo sans affiche donnerait un `src` vide, ce qui fait
+                échouer next/image et casserait la page : dans ce cas on garde
+                simplement la tuile sombre avec son bouton de lecture.
+              */}
+              {(item.type === "video" ? item.poster : item.src) && (
+                <Image
+                  src={item.type === "video" ? item.poster : item.src}
+                  alt={item.alt}
+                  fill
+                  sizes="(max-width: 1024px) 60vw, 33vw"
+                  className="object-cover transition duration-500 group-hover:scale-105"
+                />
+              )}
               <span
                 className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/5 to-transparent"
                 aria-hidden

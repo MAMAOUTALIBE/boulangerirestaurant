@@ -78,6 +78,11 @@ services:
       CRON_SECRET: ${CRON_SECRET:-}
       UPSTASH_REDIS_REST_URL: ${UPSTASH_REDIS_REST_URL:-}
       UPSTASH_REDIS_REST_TOKEN: ${UPSTASH_REDIS_REST_TOKEN:-}
+    volumes:
+      # Médias téléversés depuis le CRM (/admin/medias). Volume nommé — donc
+      # conservé lors des `up -d --build` — et hors de `public/`, qui est
+      # reconstruit à chaque image. Voir src/lib/media.ts.
+      - uploads:/app/.data/uploads
     ports:
       # Exposé uniquement en local (Nginx fait le reverse-proxy).
       # Port hôte 3201 en production lodene.cloud.
@@ -85,3 +90,4 @@ services:
 
 volumes:
   pgdata:
+  uploads:

@@ -44,6 +44,31 @@ export interface SiteConfig {
   };
   currency: string;
   priceRange: string;
+  /** Image de marque — éditable depuis /admin/parametres. */
+  branding: {
+    logoUrl: string;
+    faviconUrl: string;
+    ogImageUrl: string;
+    tagline: string;
+  };
+  /** Référencement de la page d'accueil. */
+  seo: {
+    metaTitle: string;
+    metaDescription: string;
+    keywords: string[];
+  };
+  /** Mentions légales structurées (vides tant qu'elles ne sont pas saisies). */
+  legal: {
+    company: string;
+    status: string;
+    capital: string;
+    siret: string;
+    vat: string;
+    director: string;
+    host: string;
+  };
+  /** Couleur d'accent libre (hex), utilisée si la palette vaut « perso ». */
+  accentColor: string;
 }
 
 const whatsappOrderNumber =
@@ -96,6 +121,39 @@ export const defaultSiteConfig: SiteConfig = {
   },
   currency: "EUR",
   priceRange: "€€",
+  branding: {
+    logoUrl: "/images/logo-lauuale-simbo.webp",
+    faviconUrl: "",
+    ogImageUrl: "/images/africain/thiep-poisson.webp",
+    tagline: "",
+  },
+  seo: {
+    metaTitle: "",
+    metaDescription: "",
+    keywords: [
+      "restaurant africain",
+      "spécialités africaines",
+      "thiéboudiène",
+      "yassa poulet",
+      "mafé",
+      "attiéké",
+      "alloco",
+      "bissap",
+      "livraison",
+    ],
+  },
+  // Vides par défaut : les mentions légales sont propres à chaque exploitant et
+  // se saisissent dans /admin/parametres.
+  legal: {
+    company: "",
+    status: "",
+    capital: "",
+    siret: "",
+    vat: "",
+    director: "",
+    host: "",
+  },
+  accentColor: "",
 };
 
 /** Liens dérivés (tel:, mailto:, Google Maps) calculés à partir d'une config. */

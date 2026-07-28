@@ -12,6 +12,8 @@ import {
   ChefHat,
   Inbox,
   UtensilsCrossed,
+  Image as ImageIcon,
+  FileText,
   Mail,
   BarChart3,
   Settings,
@@ -62,6 +64,8 @@ const topLinks: NavLink[] = [
   { href: "/admin/livraisons", label: "Livraisons", Icon: Bike },
   { href: "/admin/messages", label: "Messages", Icon: Inbox },
   { href: "/admin/menu", label: "Menu", Icon: UtensilsCrossed },
+  { href: "/admin/medias", label: "Médias", Icon: ImageIcon },
+  { href: "/admin/contenus", label: "Contenus", Icon: FileText },
 ];
 
 // Fonctions secondaires — repliées dans des menus déroulants.

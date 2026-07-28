@@ -49,6 +49,12 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=builder /app/node_modules/@prisma/client ./node_modules/@prisma/client
 
+# Point de montage des médias téléversés depuis le CRM (volume nommé « uploads »
+# en production). Créé et donné à `nextjs` AVANT le changement d'utilisateur :
+# un volume Docker hérite des droits du dossier présent dans l'image, sinon
+# l'app tournerait sans droit d'écriture dessus.
+RUN mkdir -p /app/.data/uploads && chown -R nextjs:nodejs /app/.data
+
 USER nextjs
 EXPOSE 3000
 # Les migrations sont appliquées par le service « migrate » (image complète).

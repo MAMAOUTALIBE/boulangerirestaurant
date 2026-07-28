@@ -28,12 +28,18 @@ export function Logo({ className, tone = "light" }: LogoProps) {
             : "border-gold/60 bg-white",
         )}
       >
+        {/*
+          `object-contain` et non `object-cover` : le logo vient du CRM et peut
+          avoir n'importe quel rapport hauteur/largeur. Un logo panoramique
+          serait rogné en carré par `cover` — ici il est réduit pour tenir
+          entier dans la pastille, quelle que soit sa forme.
+        */}
         <Image
-          src="/images/logo-lauuale-simbo.webp"
+          src={siteConfig.branding.logoUrl}
           alt=""
           fill
           sizes="56px"
-          className="object-cover"
+          className="object-contain p-0.5"
           priority
         />
       </span>

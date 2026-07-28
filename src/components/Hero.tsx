@@ -13,6 +13,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { useSiteConfig } from "@/context/SiteConfigContext";
+import type { HeroSlide } from "@/lib/content-blocks";
 
 function buildServiceHighlights(city: string): {
   title: string;
@@ -44,68 +45,9 @@ function buildServiceHighlights(city: string): {
 }
 
 const HERO_SLIDE_INTERVAL_MS = 5600;
-type HeroSlideBase = {
-  label: string;
-  alt: string;
-  durationMs?: number;
-};
-
-type HeroImageSlide = HeroSlideBase & {
-  type: "image";
-  src: string;
-};
-
-type HeroVideoSlide = HeroSlideBase & {
-  type: "video";
-  src: string;
-  poster: string;
-  mediaClassName: string;
-  startAt: number;
-};
-
-type HeroSlide = HeroImageSlide | HeroVideoSlide;
-
-const heroSlides: readonly HeroSlide[] = [
-  {
-    type: "image",
-    label: "Saveurs africaines",
-    src: "/images/africain/thiep-poisson.webp",
-    alt: "Cuisine généreuse préparée minute chez Lauuale Simbo",
-  },
-  {
-    type: "image",
-    label: "Thiéboudiène poisson",
-    src: "/images/africain/thiep-poisson.webp",
-    alt: "Thiéboudiène au poisson, riz parfumé et légumes mijotés",
-  },
-  {
-    type: "image",
-    label: "Yassa poulet",
-    src: "/images/africain/yassa-poulet.webp",
-    alt: "Poulet yassa aux oignons confits et citron, servi avec du riz",
-  },
-  {
-    type: "image",
-    label: "Mafé de bœuf",
-    src: "/images/africain/mafe-boeuf.webp",
-    alt: "Mafé de bœuf dans sa sauce onctueuse à l'arachide",
-  },
-  {
-    type: "image",
-    label: "Attiéké poisson & alloco",
-    src: "/images/africain/attieke-poisson-alloco.webp",
-    alt: "Poisson grillé avec attiéké, alloco et crudités",
-  },
-  {
-    type: "image",
-    label: "Boissons maison",
-    src: "/images/africain/boissons-bissap-gingembre-bouye.webp",
-    alt: "Bissap, jus de gingembre et bouye préparés maison",
-  },
-];
 
 /** Hero premium : promesse forte, image immersive et réassurance immédiate. */
-export function Hero() {
+export function Hero({ slides }: { slides: readonly HeroSlide[] }) {
   const [activeSlide, setActiveSlide] = useState(0);
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
   const [readyVideoSrcs, setReadyVideoSrcs] = useState<Record<string, boolean>>(
@@ -140,21 +82,23 @@ export function Hero() {
       return;
     }
 
-    const active = heroSlides[activeSlide];
+    const active = slides[activeSlide];
+    if (!active) return;
 
     if (active.type === "video" && !readyVideoSrcs[active.src]) {
       return;
     }
 
     const timeout = window.setTimeout(() => {
-      setActiveSlide((current) => (current + 1) % heroSlides.length);
+      setActiveSlide((current) => (current + 1) % slides.length);
     }, active.durationMs ?? HERO_SLIDE_INTERVAL_MS);
 
     return () => window.clearTimeout(timeout);
-  }, [activeSlide, prefersReducedMotion, readyVideoSrcs]);
+  }, [activeSlide, prefersReducedMotion, readyVideoSrcs, slides]);
 
   useEffect(() => {
-    const active = heroSlides[activeSlide];
+    const active = slides[activeSlide];
+    if (!active) return;
 
     Object.entries(videoRefs.current).forEach(([src, video]) => {
       if (!video) {
@@ -178,7 +122,7 @@ export function Hero() {
 
       void video.play().catch(() => undefined);
     });
-  }, [activeSlide, prefersReducedMotion]);
+  }, [activeSlide, prefersReducedMotion, slides]);
 
   return (
     <section
@@ -186,7 +130,7 @@ export function Hero() {
       className="relative isolate overflow-hidden bg-[#050505] px-4 pb-3 pt-[5.15rem] text-cream sm:px-6 sm:pb-9 sm:pt-[6.75rem] lg:min-h-[min(840px,calc(100svh-0.5rem))] lg:pt-[7rem] 2xl:min-h-[min(920px,calc(100svh-0.5rem))] 2xl:pt-[7.35rem] 3xl:min-h-[min(1040px,calc(100svh-0.5rem))] 4xl:min-h-[min(1180px,calc(100svh-0.5rem))]"
     >
       <div className="pointer-events-none absolute inset-0 z-0 h-full w-full">
-        {heroSlides.map((slide, index) => (
+        {slides.map((slide, index) => (
           <motion.div
             key={slide.src}
             aria-hidden={index !== activeSlide}
@@ -327,7 +271,7 @@ export function Hero() {
                 className="mt-4 flex items-center gap-2 sm:mt-5 3xl:mt-7 3xl:gap-3"
                 aria-label="Visuels du hero"
               >
-                {heroSlides.map((slide, index) => (
+                {slides.map((slide, index) => (
                   <button
                     key={slide.src}
                     type="button"

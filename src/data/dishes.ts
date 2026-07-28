@@ -12,6 +12,8 @@ export interface SeedDish {
   category: string;
   tag?: string;
   sortOrder: number;
+  /** Mis en avant : spécialités de l'accueil + badge « Populaire ». */
+  featured?: boolean;
 }
 
 export const seedDishes: SeedDish[] = [
@@ -38,6 +40,7 @@ export const seedDishes: SeedDish[] = [
   },
   {
     slug: "thieb-poisson",
+    featured: true,
     name: "Thiéboudiène poisson",
     description:
       "Riz parfumé à la tomate, poisson mariné et légumes mijotés selon la tradition",
@@ -60,6 +63,7 @@ export const seedDishes: SeedDish[] = [
   },
   {
     slug: "yassa-poulet",
+    featured: true,
     name: "Yassa poulet",
     description:
       "Poulet mariné au citron, oignons doucement confits et riz parfumé",
@@ -71,6 +75,7 @@ export const seedDishes: SeedDish[] = [
   },
   {
     slug: "mafe-boeuf",
+    featured: true,
     name: "Mafé bœuf",
     description:
       "Bœuf mijoté dans une sauce onctueuse à l'arachide, servi avec du riz",
@@ -82,6 +87,7 @@ export const seedDishes: SeedDish[] = [
   },
   {
     slug: "attieke-poisson-alloco",
+    featured: true,
     name: "Attiéké poisson & alloco",
     description:
       "Poisson grillé, semoule de manioc, bananes plantain et crudités fraîches",

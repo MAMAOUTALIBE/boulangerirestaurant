@@ -4,29 +4,16 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import { Reveal } from "@/components/ui/Reveal";
 
-const slides = [
-  {
-    src: "/images/africain/thiep-poisson.webp",
-    alt: "Thiéboudiène au poisson et légumes mijotés",
-  },
-  {
-    src: "/images/africain/yassa-poulet.webp",
-    alt: "Poulet yassa aux oignons confits",
-  },
-  {
-    src: "/images/africain/mafe-boeuf.webp",
-    alt: "Mafé de bœuf à la sauce arachide",
-  },
-  {
-    src: "/images/africain/attieke-poisson-alloco.webp",
-    alt: "Attiéké, poisson grillé et alloco",
-  },
-] as const;
+/** Une image du bandeau de la carte. */
+export interface MenuHeroSlide {
+  src: string;
+  alt: string;
+}
 
 const SLIDE_INTERVAL_MS = 5200;
 
 /** Hero illustré de la carte, avec défilement doux et contrôles accessibles. */
-export function MenuHero() {
+export function MenuHero({ slides }: { slides: MenuHeroSlide[] }) {
   const [activeSlide, setActiveSlide] = useState(0);
 
   useEffect(() => {
@@ -38,7 +25,7 @@ export function MenuHero() {
     }, SLIDE_INTERVAL_MS);
 
     return () => window.clearInterval(timer);
-  }, []);
+  }, [slides.length]);
 
   return (
     <section className="relative flex min-h-[17rem] items-end overflow-hidden pb-7 pt-[6.5rem] sm:min-h-[23rem] sm:pb-12 sm:pt-32">

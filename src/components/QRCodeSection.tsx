@@ -3,35 +3,17 @@ import QRCode from "qrcode";
 import {
   ArrowDownRight,
   ArrowRight,
-  Clock,
   Gift,
   MessageCircle,
   PhoneCall,
   Send,
-  Truck,
   UtensilsCrossed,
 } from "lucide-react";
 import { Logo } from "@/components/Logo";
 import { Reveal } from "@/components/ui/Reveal";
 import { getSiteConfig } from "@/lib/site-settings";
-
-const benefits = [
-  {
-    title: "Accédez au menu complet",
-    detail: "Toute la carte du restaurant accessible en quelques clics.",
-    Icon: UtensilsCrossed,
-  },
-  {
-    title: "Commande rapide",
-    detail: "Personnalisez puis validez votre commande en quelques secondes.",
-    Icon: Clock,
-  },
-  {
-    title: "Retrait ou livraison",
-    detail: "À emporter, sur place ou livré selon votre choix.",
-    Icon: Truck,
-  },
-];
+import { getContentSection } from "@/lib/content";
+import { ContentIcon } from "@/components/ui/ContentIcon";
 
 function CameraIcon() {
   return (
@@ -48,7 +30,10 @@ function CameraIcon() {
 
 /** Section premium QR code : smartphone, QR, promo, avantages et contact. */
 export async function QRCodeSection() {
-  const siteConfig = await getSiteConfig();
+  const [siteConfig, avantages] = await Promise.all([
+    getSiteConfig(),
+    getContentSection("qr-avantages"),
+  ]);
   const socials = [
     {
       label: "Instagram",
@@ -164,21 +149,25 @@ export async function QRCodeSection() {
           </div>
 
           <div className="space-y-4 border-ink/10 lg:border-l lg:pl-7">
-            {benefits.map(({ title, detail, Icon }) => (
+            {avantages.map((item) => (
               <div
-                key={title}
+                key={item.key}
                 className="border-b border-ink/10 pb-4 last:border-b-0 last:pb-0"
               >
                 <div className="flex items-start gap-3">
                   <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full border border-gold/50 text-gold-600">
-                    <Icon className="h-5 w-5" />
+                    <ContentIcon
+                      name={item.icon}
+                      fallback={UtensilsCrossed}
+                      className="h-5 w-5"
+                    />
                   </span>
                   <div>
                     <p className="text-2xl font-semibold leading-tight text-ink">
-                      {title}
+                      {item.title}
                     </p>
                     <p className="mt-1 text-base leading-6 text-ink/70">
-                      {detail}
+                      {item.body}
                     </p>
                   </div>
                 </div>

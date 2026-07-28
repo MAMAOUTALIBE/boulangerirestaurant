@@ -7,8 +7,7 @@ import { ReservationForm } from "@/components/ReservationForm";
 
 export const metadata: Metadata = {
   title: "Réserver une table",
-  description:
-    "Réservez votre table chez Lauuale Simbo en quelques clics.",
+  description: "Réservez votre table chez Lauuale Simbo en quelques clics.",
 };
 
 const atoutsMobile = ["Confirmé", "Rapide", "Sans CB"];

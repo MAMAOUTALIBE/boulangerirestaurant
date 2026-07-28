@@ -29,15 +29,22 @@ restaurant** (stratégie _multi-instance_). Chaque restaurant a :
 | Palette de couleurs (ambre / terracotta / émeraude) | **CRM** `/admin/parametres` (DB `OrderingSetting.colorPalette`) | |
 | Menu : catégories, plats, prix, options | **CRM** `/admin/menu` (DB) | Contenu de départ éventuel via le **profil de seed** |
 | Zones de livraison, horaires, réglages de créneaux | **CRM** `/admin` (DB) | Valeurs de départ via le profil de seed |
-| Logo, favicon, photos (hero, galerie), image OG | **Overlay d'assets** `deploy/clients/<slug>/overlay/` | Poussé par rsync au déploiement, remplace les assets du template |
+| Photos des plats et de la galerie ajoutées par le client | **CRM** `/admin/medias` (DB `Media` + volume `<projet>_uploads`) | Téléversement direct, hors dépôt : survit aux mises à jour |
+| Logo, favicon, photos de départ (hero, galerie), image OG | **Overlay d'assets** `deploy/clients/<slug>/overlay/` | Poussé par rsync au déploiement, remplace les assets du template |
 | Domaine, port, projet Compose, VPS | `deploy/clients/<slug>.env` (cible) | Pas de secrets |
 | Secrets : DB, admin, Stripe, e-mail/SMS, cron | **`.env` distant** sur le VPS (`.env.client.example`) | Jamais commité, jamais rsync'é |
 | Restaurant par défaut (commandes + Stripe Connect) | `DEFAULT_RESTAURANT_SLUG` (`.env` distant) | Doit correspondre au restaurant **provisionné** |
 | Géolocalisation (distance livraison, SEO) | `RESTAURANT_LATITUDE` / `RESTAURANT_LONGITUDE` (`.env` distant) | |
 
 **Règle d'or :** tout ce qui est **texte affiché** se règle dans le CRM ; tout ce
-qui est **secret ou infrastructure** vit dans le `.env` distant ; tout ce qui est
-**média** vit dans l'overlay.
+qui est **secret ou infrastructure** vit dans le `.env` distant ; les **médias de
+départ** vivent dans l'overlay, et tout média **ajouté ensuite par le client**
+passe par la médiathèque du CRM.
+
+> Chaque instance a son propre volume de médias, nommé d'après le projet Compose
+> (`<projet>_uploads`). Comme `pgdata`, il est isolé par restaurant : rien à
+> configurer, mais il est à sauvegarder au même titre que la base
+> (voir `DEPLOIEMENT-VPS.md` §9).
 
 ---
 

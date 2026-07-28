@@ -18,6 +18,12 @@ export interface SeedCategory {
   slug: string;
   name: string;
   sortOrder: number;
+  /** Accroche affichée sur la carte (éditable ensuite au CRM). */
+  description?: string;
+  /** Bannière de la catégorie (chemin `/images/…` ou `/media/…`). */
+  image?: string;
+  /** Défaut : visible. */
+  active?: boolean;
 }
 
 export interface SeedDish {
@@ -30,6 +36,8 @@ export interface SeedDish {
   category: string;
   tag?: string;
   sortOrder: number;
+  /** Mis en avant : spécialités de l'accueil + badge « Populaire ». */
+  featured?: boolean;
 }
 
 export interface SeedOption {

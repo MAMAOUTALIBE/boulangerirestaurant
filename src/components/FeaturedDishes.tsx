@@ -4,11 +4,8 @@ import { ArrowRight } from "lucide-react";
 import { DishCard } from "@/components/DishCard";
 import { getMenuForBrowser } from "@/lib/dishes";
 
-const specialtySlugs = [
-  "thieb-poisson",
-  "yassa-poulet",
-  "attieke-poisson-alloco",
-];
+/** Nombre de spécialités affichées sur l'accueil. */
+const NOMBRE_SPECIALITES = 3;
 
 const mobileCategoryCardStyles = [
   "border-amber-400/55 shadow-[0_14px_34px_-18px_rgba(245,158,11,0.72)] hover:border-amber-300/90 hover:shadow-[0_18px_42px_-16px_rgba(245,158,11,0.9)]",
@@ -22,13 +19,14 @@ export async function FeaturedDishes() {
   const { categories, dishes } = await getMenuForBrowser();
   const mobileCategories = groupMobileCategories(categories);
   const availableDishes = dishes.filter((dish) => dish.available);
-  const specialtyDishes = specialtySlugs
-    .map((slug) => availableDishes.find((dish) => dish.id === slug))
-    .filter((dish): dish is (typeof availableDishes)[number] => Boolean(dish));
-  const featured =
-    specialtyDishes.length === specialtySlugs.length
-      ? specialtyDishes
-      : availableDishes.slice(0, 3);
+  // Les spécialités sont désormais cochées dans /admin/menu (« mis en avant »),
+  // dans l'ordre d'affichage de la carte. Repli sur les premiers plats si le
+  // restaurateur n'en a coché aucun, pour ne jamais laisser la section vide.
+  const misEnAvant = availableDishes.filter((dish) => dish.featured);
+  const featured = (misEnAvant.length > 0 ? misEnAvant : availableDishes).slice(
+    0,
+    NOMBRE_SPECIALITES,
+  );
 
   return (
     <section
@@ -57,7 +55,7 @@ export async function FeaturedDishes() {
                   className={`group relative min-h-[7rem] overflow-hidden rounded-2xl border bg-[#101010] transition duration-300 active:scale-[0.98] ${mobileCategoryCardStyles[index]}`}
                 >
                   <Image
-                    src={imageForCategory(category.imageSlug)}
+                    src={category.image}
                     alt=""
                     fill
                     sizes="50vw"
@@ -121,11 +119,14 @@ export async function FeaturedDishes() {
   );
 }
 
+/**
+ * Illustration de repli quand la catégorie n'a pas encore de bannière choisie
+ * dans le CRM. Dès qu'une image est définie sur la catégorie, c'est elle qui
+ * prime — cette table n'est qu'un filet de sécurité pour un site fraîchement
+ * installé.
+ */
 function imageForCategory(slug: string) {
-  if (
-    slug.includes("grillade") ||
-    slug.includes("attieke")
-  ) {
+  if (slug.includes("grillade") || slug.includes("attieke")) {
     return "/images/africain/attieke-poisson-alloco.webp";
   }
   if (
@@ -152,41 +153,27 @@ function imageForCategory(slug: string) {
   return "/images/africain/thiep-poulet.webp";
 }
 
+/**
+ * Vignettes de catégories du bandeau mobile : les vraies catégories de la carte
+ * (les 4 premières dans l'ordre du CRM), avec leur bannière si le restaurateur
+ * en a choisi une. Auparavant cette liste était figée dans le code — renommer
+ * ou ajouter une catégorie n'avait aucun effet ici.
+ */
 function groupMobileCategories(
-  categories: Array<{ id: string; slug: string; name: string }>,
+  categories: Array<{
+    id: string;
+    slug: string;
+    name: string;
+    image?: string | null;
+  }>,
 ) {
-  const availableSlugs = new Set(categories.map((category) => category.slug));
-  const mobileCategories = [
-    {
-      id: "mobile-plats",
-      name: "Plats",
-      slug: "plats-africains",
-      imageSlug: "plats-africains",
-    },
-    {
-      id: "mobile-entrees",
-      name: "Entrées",
-      slug: "entrees",
-      imageSlug: "entrees",
-    },
-    {
-      id: "mobile-desserts",
-      name: "Desserts",
-      slug: "desserts",
-      imageSlug: "desserts",
-    },
-    {
-      id: "mobile-boissons",
-      name: "Boissons",
-      slug: "boissons",
-      imageSlug: "boissons",
-    },
-  ];
-
-  return mobileCategories.map((category) => ({
-    ...category,
-    href: availableSlugs.has(category.slug)
-      ? `/menu#${category.slug}`
-      : "/menu",
-  }));
+  return categories
+    .slice(0, mobileCategoryCardStyles.length)
+    .map((category) => ({
+      id: category.id,
+      name: category.name,
+      slug: category.slug,
+      image: category.image || imageForCategory(category.slug),
+      href: `/menu#${category.slug}`,
+    }));
 }

@@ -8,13 +8,16 @@ import {
   cateringSchema,
   contactSchema,
   customQuoteSchema,
+  categorySchema,
   dishSchema,
+  priceSchema,
   newsletterSchema,
   orderSchema,
   reservationSchema,
   reviewSchema,
   seasonalPreorderSchema,
 } from "@/lib/validation";
+import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import {
   createOrder,
@@ -38,6 +41,15 @@ import {
 import type { OrderStatus } from "@/types";
 import { sendEmail } from "@/lib/email";
 import { rawHtml, safeHtml, safeUrl } from "@/lib/html";
+import { roundCurrency } from "@/lib/utils";
+import { planReorder } from "@/lib/menu-ordering";
+import {
+  CONTENT_SECTIONS,
+  resolveIconName,
+  resolveSection,
+} from "@/lib/content-blocks";
+import { isSafeMediaUrl } from "@/lib/media-rules";
+import { parseHex } from "@/lib/palette";
 import { getSiteConfig } from "@/lib/site-settings";
 import { clientIp, rateLimit } from "@/lib/rate-limit";
 import { recordDemoLead } from "@/lib/demo-leads";
@@ -60,7 +72,6 @@ export interface ActionState {
 function isBot(formData: FormData): boolean {
   return Boolean(formData.get("company"));
 }
-
 
 const TOO_MANY: ActionState = {
   ok: false,
@@ -1510,10 +1521,11 @@ export async function adminCreateDish(formData: FormData): Promise<void> {
       categoryId,
       prepMinutes,
       dailyStock,
+      featured: formData.get("featured") === "on",
     },
   });
-  revalidatePath("/admin/menu");
-  redirect("/admin/menu");
+  revalidateMenu();
+  redirect("/admin/menu?saved=plat");
 }
 
 /** Back-office : met à jour un plat (par id). */
@@ -1542,10 +1554,11 @@ export async function adminUpdateDish(formData: FormData): Promise<void> {
       categoryId,
       prepMinutes,
       dailyStock,
+      featured: formData.get("featured") === "on",
     },
   });
-  revalidatePath("/admin/menu");
-  redirect("/admin/menu");
+  revalidateMenu();
+  redirect("/admin/menu?saved=plat");
 }
 
 /** Back-office : met à jour les horaires d'ouverture d'un jour. */
@@ -1604,15 +1617,29 @@ export async function adminUpdateColorPalette(
   if (!(await isAdminSession())) redirect("/compte?admin=1");
 
   const parsed = z
-    .enum(["ambre", "terracotta", "emeraude"])
+    .enum(["ambre", "terracotta", "emeraude", "perso"])
     .safeParse(formData.get("palette"));
   if (!parsed.success) redirect("/admin/parametres?paletteError=invalid");
 
-  await prisma.orderingSetting.upsert({
-    where: { id: "default" },
-    update: { colorPalette: parsed.data },
-    create: { id: "default", colorPalette: parsed.data },
-  });
+  // En mode « perso », la couleur libre doit être un hexadécimal valide : sans
+  // elle, le site retomberait silencieusement sur l'ambre.
+  const accentColor = optionalText(formData.get("accentColor"));
+  if (parsed.data === "perso" && !(accentColor && parseHex(accentColor))) {
+    redirect("/admin/parametres?paletteError=couleur");
+  }
+
+  await prisma.$transaction([
+    prisma.orderingSetting.upsert({
+      where: { id: "default" },
+      update: { colorPalette: parsed.data },
+      create: { id: "default", colorPalette: parsed.data },
+    }),
+    prisma.siteSetting.upsert({
+      where: { id: "default" },
+      update: { accentColor },
+      create: { id: "default", accentColor },
+    }),
+  ]);
   revalidatePath("/", "layout");
   revalidatePath("/admin/parametres");
   redirect("/admin/parametres?paletteSaved=1");
@@ -1622,6 +1649,16 @@ export async function adminUpdateColorPalette(
 function optionalText(value: FormDataEntryValue | null): string | null {
   const text = typeof value === "string" ? value.trim() : "";
   return text.length ? text : null;
+}
+
+/**
+ * Idem pour un chemin de média : une valeur hors médiathèque est ramenée à
+ * `null` plutôt que d'enregistrer un logo ou un favicon qui ne s'afficherait
+ * pas (CSP `img-src 'self'`, `next/image` sans `remotePatterns`).
+ */
+function optionalMedia(value: FormDataEntryValue | null): string | null {
+  const chemin = optionalText(value);
+  return chemin && isSafeMediaUrl(chemin) ? chemin : null;
 }
 
 /**
@@ -1652,6 +1689,24 @@ export async function adminUpdateSiteIdentity(
     whatsappNumber: optionalText(formData.get("whatsappNumber")),
     telegramUsername: optionalText(formData.get("telegramUsername")),
     hoursSummary: optionalText(formData.get("hoursSummary")),
+
+    // Image de marque : les médias doivent venir de la médiathèque.
+    logoUrl: optionalMedia(formData.get("logoUrl")),
+    faviconUrl: optionalMedia(formData.get("faviconUrl")),
+    ogImageUrl: optionalMedia(formData.get("ogImageUrl")),
+    tagline: optionalText(formData.get("tagline")),
+
+    metaTitle: optionalText(formData.get("metaTitle")),
+    metaDescription: optionalText(formData.get("metaDescription")),
+    keywords: optionalText(formData.get("keywords")),
+
+    legalCompany: optionalText(formData.get("legalCompany")),
+    legalStatus: optionalText(formData.get("legalStatus")),
+    legalCapital: optionalText(formData.get("legalCapital")),
+    legalSiret: optionalText(formData.get("legalSiret")),
+    legalVat: optionalText(formData.get("legalVat")),
+    legalDirector: optionalText(formData.get("legalDirector")),
+    legalHost: optionalText(formData.get("legalHost")),
   };
 
   await prisma.siteSetting.upsert({
@@ -1837,18 +1892,264 @@ export async function adminRelaunchCart(formData: FormData): Promise<void> {
   redirect("/admin/paniers");
 }
 
+/**
+ * Invalide tout ce qui dépend de la carte après une modification au CRM :
+ * l'écran d'administration, l'accueil (spécialités), la carte, les fiches
+ * produit et le plan du site. Sans cela, un changement de prix ou de photo
+ * pourrait rester invisible jusqu'au prochain déploiement.
+ */
+function revalidateMenu(): void {
+  revalidatePath("/admin/menu");
+  revalidatePath("/");
+  revalidatePath("/menu");
+  revalidatePath("/menu/[slug]", "page");
+  revalidatePath("/sitemap.xml");
+}
+
+/** Lit les champs communs d'une catégorie depuis le formulaire. */
+function categoryFields(formData: FormData) {
+  return categorySchema.safeParse({
+    name: formData.get("name"),
+    description: String(formData.get("description") ?? "").trim() || undefined,
+    image: String(formData.get("image") ?? "").trim() || undefined,
+    active: formData.get("active") === "on",
+    sortOrder: formData.get("sortOrder") || 0,
+  });
+}
+
 /** Back-office : crée une catégorie de menu. */
 export async function adminCreateCategory(formData: FormData): Promise<void> {
   if (!(await isAdminSession())) redirect("/compte");
-  const name = String(formData.get("name") ?? "").trim();
-  const sortOrder = Number(formData.get("sortOrder") ?? 0);
-  if (name) {
-    await prisma.category
-      .create({
-        data: { name, slug: slugify(name) || `cat-${Date.now()}`, sortOrder },
-      })
-      .catch(() => {});
-    revalidatePath("/admin/menu");
+  const parsed = categoryFields(formData);
+  if (!parsed.success) redirect("/admin/menu?error=categorie");
+
+  const base = slugify(parsed.data.name) || "categorie";
+  let slug = base;
+  let n = 1;
+  while (await prisma.category.findUnique({ where: { slug } })) {
+    slug = `${base}-${++n}`;
+  }
+
+  await prisma.category.create({
+    data: {
+      slug,
+      name: parsed.data.name,
+      description: parsed.data.description ?? null,
+      image: parsed.data.image ?? null,
+      active: parsed.data.active,
+      sortOrder: parsed.data.sortOrder,
+    },
+  });
+  revalidateMenu();
+  redirect("/admin/menu?saved=categorie");
+}
+
+/** Back-office : modifie une catégorie (nom, accroche, bannière, visibilité). */
+export async function adminUpdateCategory(formData: FormData): Promise<void> {
+  if (!(await isAdminSession())) redirect("/compte");
+  const id = String(formData.get("id") ?? "");
+  const parsed = categoryFields(formData);
+  if (!id || !parsed.success) redirect("/admin/menu?error=categorie");
+
+  await prisma.category.update({
+    where: { id },
+    data: {
+      name: parsed.data.name,
+      description: parsed.data.description ?? null,
+      image: parsed.data.image ?? null,
+      active: parsed.data.active,
+      sortOrder: parsed.data.sortOrder,
+    },
+  });
+  revalidateMenu();
+  redirect("/admin/menu?saved=categorie");
+}
+
+/**
+ * Back-office : supprime une catégorie.
+ *
+ * Refuse tant qu'elle contient des plats — sauf case « détacher » cochée, qui
+ * les rend « sans catégorie » plutôt que de les supprimer avec elle. Un plat ne
+ * doit jamais disparaître par effet de bord d'un ménage de catégories.
+ */
+export async function adminDeleteCategory(formData: FormData): Promise<void> {
+  if (!(await isAdminSession())) redirect("/compte");
+  const id = String(formData.get("id") ?? "");
+  if (!id) redirect("/admin/menu");
+
+  const dishes = await prisma.dish.count({ where: { categoryId: id } });
+  if (dishes > 0 && formData.get("detach") !== "on") {
+    redirect(`/admin/menu?error=categorie-occupee&plats=${dishes}`);
+  }
+  if (dishes > 0) {
+    await prisma.dish.updateMany({
+      where: { categoryId: id },
+      data: { categoryId: null },
+    });
+  }
+  await prisma.category.delete({ where: { id } }).catch(() => {});
+  revalidateMenu();
+  redirect("/admin/menu?saved=categorie-supprimee");
+}
+
+/**
+ * Déplace une ligne d'un cran (catégorie ou plat) puis **renumérote toute la
+ * liste**, en une seule transaction.
+ *
+ * Renuméroter l'intégralité n'est pas un luxe : les `sortOrder` en base vivent
+ * sur une échelle quelconque (1..n pour les seeds, valeur libre saisie au CRM,
+ * doublons créés par la duplication d'un plat). N'écrire que les deux lignes
+ * échangées les projetterait sur l'échelle des rangs et les ferait sauter
+ * devant leurs voisines — « monter » une catégorie pouvait ainsi l'envoyer en
+ * première position. La transaction évite d'exposer un ordre à moitié réécrit.
+ */
+async function moveInList(
+  rows: { id: string; sortOrder: number }[],
+  id: string,
+  direction: "up" | "down",
+  persist: (id: string, sortOrder: number) => Prisma.PrismaPromise<unknown>,
+): Promise<void> {
+  // Le calcul vit dans le module pur `menu-ordering.ts` (et y est testé) ;
+  // ici on ne fait qu'écrire, en une transaction pour ne jamais exposer un
+  // ordre à moitié réécrit.
+  const plan = planReorder(rows, id, direction);
+  if (plan.length === 0) return;
+  await prisma.$transaction(
+    plan.map((entree) => persist(entree.id, entree.sortOrder)),
+  );
+}
+
+/** Back-office : monte ou descend une catégorie dans la carte. */
+export async function adminMoveCategory(formData: FormData): Promise<void> {
+  if (!(await isAdminSession())) redirect("/compte");
+  const id = String(formData.get("id") ?? "");
+  const direction = formData.get("direction") === "up" ? "up" : "down";
+
+  const rows = await prisma.category.findMany({
+    orderBy: [{ sortOrder: "asc" }, { id: "asc" }],
+    select: { id: true, sortOrder: true },
+  });
+  await moveInList(rows, id, direction, (rowId, sortOrder) =>
+    prisma.category.update({ where: { id: rowId }, data: { sortOrder } }),
+  );
+  revalidateMenu();
+  redirect("/admin/menu");
+}
+
+/** Back-office : monte ou descend un plat dans sa catégorie. */
+export async function adminMoveDish(formData: FormData): Promise<void> {
+  if (!(await isAdminSession())) redirect("/compte");
+  const id = String(formData.get("id") ?? "");
+  const direction = formData.get("direction") === "up" ? "up" : "down";
+
+  const dish = await prisma.dish.findUnique({
+    where: { id },
+    select: { categoryId: true },
+  });
+  if (!dish) redirect("/admin/menu");
+
+  const rows = await prisma.dish.findMany({
+    where: { categoryId: dish.categoryId },
+    orderBy: [{ sortOrder: "asc" }, { id: "asc" }],
+    select: { id: true, sortOrder: true },
+  });
+  await moveInList(rows, id, direction, (rowId, sortOrder) =>
+    prisma.dish.update({ where: { id: rowId }, data: { sortOrder } }),
+  );
+  revalidateMenu();
+  redirect("/admin/menu");
+}
+
+/** Back-office : duplique un plat (base de travail pour une variante). */
+export async function adminDuplicateDish(formData: FormData): Promise<void> {
+  if (!(await isAdminSession())) redirect("/compte");
+  const id = String(formData.get("id") ?? "");
+  const source = await prisma.dish.findUnique({
+    where: { id },
+    include: { optionGroups: { include: { options: true } } },
+  });
+  if (!source) redirect("/admin/menu");
+
+  const base = `${slugify(source.name)}-copie`;
+  let slug = base;
+  let n = 1;
+  while (await prisma.dish.findUnique({ where: { slug } })) {
+    slug = `${base}-${++n}`;
+  }
+
+  const copie = await prisma.dish.create({
+    data: {
+      slug,
+      name: `${source.name} (copie)`,
+      description: source.description,
+      price: source.price,
+      image: source.image,
+      tag: source.tag,
+      categoryId: source.categoryId,
+      prepMinutes: source.prepMinutes,
+      dailyStock: source.dailyStock,
+      sortOrder: source.sortOrder + 1,
+      // Une copie n'est ni publiée ni mise en avant : l'admin la relit d'abord.
+      available: false,
+      featured: false,
+    },
+  });
+
+  // Les options font partie du produit : une copie sans elles serait un piège.
+  for (const groupe of source.optionGroups) {
+    await prisma.optionGroup.create({
+      data: {
+        dishId: copie.id,
+        name: groupe.name,
+        type: groupe.type,
+        required: groupe.required,
+        sortOrder: groupe.sortOrder,
+        options: {
+          create: groupe.options.map((option) => ({
+            name: option.name,
+            priceDelta: option.priceDelta,
+            sortOrder: option.sortOrder,
+          })),
+        },
+      },
+    });
+  }
+
+  revalidateMenu();
+  redirect("/admin/menu?saved=duplication");
+}
+
+/** Back-office : modifie uniquement le prix d'un plat (édition en ligne). */
+export async function adminUpdateDishPrice(formData: FormData): Promise<void> {
+  if (!(await isAdminSession())) redirect("/compte");
+  const id = String(formData.get("id") ?? "");
+  const parsed = priceSchema.safeParse(formData.get("price"));
+  if (!id || !parsed.success) redirect("/admin/menu?error=prix");
+
+  await prisma.dish.update({
+    where: { id },
+    data: { price: roundCurrency(parsed.data) },
+  });
+  revalidateMenu();
+  redirect("/admin/menu?saved=prix");
+}
+
+/** Back-office : bascule la mise en avant d'un plat (accueil + badge carte). */
+export async function adminToggleDishFeatured(
+  formData: FormData,
+): Promise<void> {
+  if (!(await isAdminSession())) redirect("/compte");
+  const id = String(formData.get("id") ?? "");
+  const dish = await prisma.dish.findUnique({
+    where: { id },
+    select: { featured: true },
+  });
+  if (dish) {
+    await prisma.dish.update({
+      where: { id },
+      data: { featured: !dish.featured },
+    });
+    revalidateMenu();
   }
   redirect("/admin/menu");
 }
@@ -1862,7 +2163,7 @@ export async function adminAddOptionGroup(formData: FormData): Promise<void> {
   const required = formData.get("required") === "on";
   if (dishId && name) {
     await prisma.optionGroup.create({ data: { dishId, name, type, required } });
-    revalidatePath("/admin/menu");
+    revalidateMenu();
   }
   redirect("/admin/menu");
 }
@@ -1875,12 +2176,31 @@ export async function adminAddOption(formData: FormData): Promise<void> {
   const priceDelta = Number(formData.get("priceDelta") ?? 0);
   if (groupId && name) {
     await prisma.option.create({ data: { groupId, name, priceDelta } });
-    revalidatePath("/admin/menu");
+    revalidateMenu();
   }
   redirect("/admin/menu");
 }
 
-/** Back-office : supprime un groupe d'options. */
+/** Back-office : renomme / reconfigure un groupe d'options. */
+export async function adminUpdateOptionGroup(
+  formData: FormData,
+): Promise<void> {
+  if (!(await isAdminSession())) redirect("/compte");
+  const id = String(formData.get("id") ?? "");
+  const name = String(formData.get("name") ?? "").trim();
+  const type = formData.get("type") === "multi" ? "multi" : "single";
+  const required = formData.get("required") === "on";
+  if (id && name) {
+    await prisma.optionGroup.update({
+      where: { id },
+      data: { name, type, required },
+    });
+    revalidateMenu();
+  }
+  redirect("/admin/menu");
+}
+
+/** Back-office : supprime un groupe d'options (et ses options, en cascade). */
 export async function adminDeleteOptionGroup(
   formData: FormData,
 ): Promise<void> {
@@ -1888,9 +2208,176 @@ export async function adminDeleteOptionGroup(
   const id = String(formData.get("id") ?? "");
   if (id) {
     await prisma.optionGroup.delete({ where: { id } }).catch(() => {});
-    revalidatePath("/admin/menu");
+    revalidateMenu();
   }
   redirect("/admin/menu");
+}
+
+/** Back-office : modifie une option (libellé et supplément). */
+export async function adminUpdateOption(formData: FormData): Promise<void> {
+  if (!(await isAdminSession())) redirect("/compte");
+  const id = String(formData.get("id") ?? "");
+  const name = String(formData.get("name") ?? "").trim();
+  const parsed = z.coerce
+    .number()
+    .min(-10_000)
+    .max(10_000)
+    .safeParse(formData.get("priceDelta") ?? 0);
+  if (id && name && parsed.success) {
+    await prisma.option.update({
+      where: { id },
+      data: { name, priceDelta: roundCurrency(parsed.data) },
+    });
+    revalidateMenu();
+  }
+  redirect("/admin/menu");
+}
+
+/** Back-office : supprime une option d'un groupe. */
+export async function adminDeleteOption(formData: FormData): Promise<void> {
+  if (!(await isAdminSession())) redirect("/compte");
+  const id = String(formData.get("id") ?? "");
+  if (id) {
+    await prisma.option.delete({ where: { id } }).catch(() => {});
+    revalidateMenu();
+  }
+  redirect("/admin/menu");
+}
+
+// ─── Contenus éditoriaux (/admin/contenus) ──────────────────────────────────
+
+/** Invalide toutes les pages publiques après une modification de contenu. */
+function revalidateContenus(): void {
+  revalidatePath("/", "layout");
+}
+
+/** Champ texte du formulaire : chaîne nettoyée, ou `null` si vide. */
+function texteOuNull(value: FormDataEntryValue | null): string | null {
+  const texte = typeof value === "string" ? value.trim() : "";
+  return texte.length ? texte : null;
+}
+
+/**
+ * Back-office : enregistre un bloc de contenu.
+ *
+ * Écrit TOUS les champs du formulaire : une fois le bloc repris en main depuis
+ * le CRM, c'est la base qui fait autorité (voir `resolveSection`), donc laisser
+ * un champ vide doit bien le vider — pas retomber silencieusement sur le
+ * modèle. La section et le média sont validés avant écriture.
+ */
+export async function adminSaveContentBlock(formData: FormData): Promise<void> {
+  if (!(await isAdminSession())) redirect("/compte");
+
+  const section = String(formData.get("section") ?? "");
+  const key = String(formData.get("key") ?? "").trim();
+  if (!CONTENT_SECTIONS.includes(section as never) || !key) {
+    redirect("/admin/contenus?error=section");
+  }
+
+  const mediaUrl = texteOuNull(formData.get("mediaUrl"));
+  const posterUrl = texteOuNull(formData.get("posterUrl"));
+  for (const media of [mediaUrl, posterUrl]) {
+    if (media && !isSafeMediaUrl(media)) {
+      redirect(`/admin/contenus?section=${section}&error=media`);
+    }
+  }
+
+  const donnees = {
+    sortOrder: Number(formData.get("sortOrder") ?? 0) || 0,
+    active: formData.get("active") === "on",
+    title: texteOuNull(formData.get("title")),
+    subtitle: texteOuNull(formData.get("subtitle")),
+    body: texteOuNull(formData.get("body")),
+    mediaUrl,
+    posterUrl,
+    alt: texteOuNull(formData.get("alt")),
+    href: texteOuNull(formData.get("href")),
+    ctaLabel: texteOuNull(formData.get("ctaLabel")),
+    icon: resolveIconName(texteOuNull(formData.get("icon"))) ?? null,
+    data: texteOuNull(formData.get("tag"))
+      ? { tag: texteOuNull(formData.get("tag")) }
+      : Prisma.DbNull,
+  };
+
+  await prisma.contentBlock.upsert({
+    where: { section_key: { section, key } },
+    update: donnees,
+    create: { section, key, ...donnees },
+  });
+
+  revalidateContenus();
+  redirect(`/admin/contenus?section=${section}&saved=1`);
+}
+
+/**
+ * Back-office : réinitialise un bloc au contenu du modèle.
+ * Supprimer la ligne suffit — `resolveSection` retombe alors sur le défaut.
+ */
+export async function adminResetContentBlock(
+  formData: FormData,
+): Promise<void> {
+  if (!(await isAdminSession())) redirect("/compte");
+  const section = String(formData.get("section") ?? "");
+  const key = String(formData.get("key") ?? "");
+  if (section && key) {
+    await prisma.contentBlock
+      .delete({ where: { section_key: { section, key } } })
+      .catch(() => {});
+    revalidateContenus();
+  }
+  redirect(`/admin/contenus?section=${section}&saved=reset`);
+}
+
+/** Back-office : monte ou descend un bloc dans sa section. */
+export async function adminMoveContentBlock(formData: FormData): Promise<void> {
+  if (!(await isAdminSession())) redirect("/compte");
+  const section = String(formData.get("section") ?? "");
+  const key = String(formData.get("key") ?? "");
+  const direction = formData.get("direction") === "up" ? "up" : "down";
+  if (!section || !key) redirect("/admin/contenus");
+
+  // L'ordre affiché mêle défauts et personnalisations : on part donc du
+  // résultat résolu, puis on matérialise en base la nouvelle numérotation.
+  const rows = await prisma.contentBlock.findMany({ where: { section } });
+  const blocs = resolveSection(section, rows);
+  const plan = planReorder(
+    blocs.map((b) => ({ id: b.key, sortOrder: b.sortOrder })),
+    key,
+    direction,
+  );
+  if (plan.length === 0) redirect(`/admin/contenus?section=${section}`);
+
+  const parCle = new Map(blocs.map((b) => [b.key, b]));
+  await prisma.$transaction(
+    plan.map((entree) => {
+      const bloc = parCle.get(entree.id);
+      return prisma.contentBlock.upsert({
+        where: { section_key: { section, key: entree.id } },
+        update: { sortOrder: entree.sortOrder },
+        create: {
+          section,
+          key: entree.id,
+          sortOrder: entree.sortOrder,
+          active: bloc?.active ?? true,
+          title: bloc?.title ?? null,
+          subtitle: bloc?.subtitle ?? null,
+          body: bloc?.body ?? null,
+          mediaUrl: bloc?.mediaUrl ?? null,
+          posterUrl: bloc?.posterUrl ?? null,
+          alt: bloc?.alt ?? null,
+          href: bloc?.href ?? null,
+          ctaLabel: bloc?.ctaLabel ?? null,
+          icon: bloc?.icon ?? null,
+          data: bloc?.data
+            ? (bloc.data as Prisma.InputJsonValue)
+            : Prisma.DbNull,
+        },
+      });
+    }),
+  );
+
+  revalidateContenus();
+  redirect(`/admin/contenus?section=${section}`);
 }
 
 /** Back-office : crée/modifie une zone de livraison. */
@@ -1927,7 +2414,7 @@ export async function adminDeleteDish(formData: FormData): Promise<void> {
   const id = String(formData.get("id") ?? "");
   if (id) {
     await prisma.dish.delete({ where: { id } }).catch(() => {});
-    revalidatePath("/admin/menu");
+    revalidateMenu();
   }
   redirect("/admin/menu");
 }

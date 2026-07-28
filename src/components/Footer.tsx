@@ -20,6 +20,8 @@ import { NewsletterForm } from "@/components/NewsletterForm";
 import { MobileInformationPanel } from "@/components/MobileInformationPanel";
 import { getSiteConfig } from "@/lib/site-settings";
 import { buildContactLinks } from "@/lib/contactLinks";
+import { getContentSection } from "@/lib/content";
+import { ContentIcon } from "@/components/ui/ContentIcon";
 
 /* --- Icônes de marque (SVG inline, absentes de lucide) --- */
 function IconFacebook() {
@@ -101,28 +103,6 @@ const mobileQuickLinks = [
   ],
 ] as const;
 
-const footerHighlights = [
-  {
-    label: "Commander en ligne",
-    description: "Plats africains et grillades à retirer ou en livraison.",
-    href: "/commander",
-    Icon: ShoppingBag,
-  },
-  {
-    label: "Menus de groupe",
-    description:
-      "Plateaux à partager et devis personnalisé pour vos événements.",
-    href: "/sur-mesure",
-    Icon: UsersRound,
-  },
-  {
-    label: "Service traiteur",
-    description: "Buffets et plateaux africains pour tous vos événements.",
-    href: "/traiteur",
-    Icon: ChefHat,
-  },
-] as const;
-
 type FooterLinkGroup = {
   title: string;
   links: Array<{
@@ -174,7 +154,10 @@ const payments = ["VISA", "Mastercard", "PayPal", "Apple Pay"];
 
 /** Pied de page complet : logo, réseaux, liens, contact, newsletter, paiements. */
 export async function Footer() {
-  const siteConfig = await getSiteConfig();
+  const [siteConfig, atouts] = await Promise.all([
+    getSiteConfig(),
+    getContentSection("footer-atouts"),
+  ]);
   const { phoneHref, emailHref, mapsHref } = buildContactLinks(siteConfig);
 
   const socials = [
@@ -221,21 +204,25 @@ export async function Footer() {
           aria-label="Accès rapides premium"
           className="grid gap-3 lg:grid-cols-3"
         >
-          {footerHighlights.map(({ label, description, href, Icon }) => (
+          {atouts.map((item) => (
             <Link
-              key={href}
-              href={href}
+              key={item.key}
+              href={item.href as string}
               className="group flex min-h-24 items-center gap-4 rounded-[22px] border border-gold/20 bg-cream p-4 shadow-[0_24px_60px_-42px_rgba(0,0,0,0.75)] transition hover:-translate-y-0.5 hover:border-gold/55"
             >
               <span className="grid h-12 w-12 shrink-0 place-items-center rounded-full border border-gold/35 bg-gold/10 text-gold transition group-hover:bg-gold group-hover:text-ink">
-                <Icon className="h-5 w-5" />
+                <ContentIcon
+                  name={item.icon}
+                  fallback={ShoppingBag}
+                  className="h-5 w-5"
+                />
               </span>
               <span className="min-w-0">
                 <span className="block font-display text-xl font-bold leading-tight text-ink transition group-hover:text-gold-600">
-                  {label}
+                  {item.title}
                 </span>
                 <span className="mt-1 block text-sm leading-5 text-ink/60">
-                  {description}
+                  {item.body}
                 </span>
               </span>
               <ChevronRight className="ml-auto h-5 w-5 shrink-0 text-gold transition group-hover:translate-x-1" />

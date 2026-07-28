@@ -1,5 +1,6 @@
 import "server-only";
 import { prisma } from "@/lib/prisma";
+import { roundCurrency } from "@/lib/utils";
 
 export interface PromoResult {
   valid: boolean;
@@ -31,7 +32,7 @@ export async function evaluatePromo(
   const raw =
     promo.type === "percent" ? (subtotal * promo.value) / 100 : promo.value;
   // La remise ne dépasse jamais le sous-total.
-  const discount = Math.min(Math.round(raw * 100) / 100, subtotal);
+  const discount = Math.min(roundCurrency(raw), subtotal);
 
   return { valid: true, code, discount };
 }

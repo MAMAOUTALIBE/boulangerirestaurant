@@ -4,7 +4,11 @@ import type { Service, NavLink } from "@/types";
 /** Badges de réassurance affichés sous le hero. */
 export const services: Service[] = [
   { id: "frais", label: "Produits frais et recettes maison", icon: Leaf },
-  { id: "prepare", label: "Cuisine généreuse, préparée sur place", icon: ChefHat },
+  {
+    id: "prepare",
+    label: "Cuisine généreuse, préparée sur place",
+    icon: ChefHat,
+  },
   { id: "livraison", label: "Livraison rapide à domicile", icon: Truck },
   { id: "paiement", label: "Paiement sécurisé en ligne", icon: ShieldCheck },
 ];

@@ -153,11 +153,17 @@ model DemoLead {
 
 /// Catégorie de menu (Entrées, Plats, Desserts, Boissons…).
 model Category {
-  id        String @id @default(cuid())
-  slug      String @unique
-  name      String
-  sortOrder Int    @default(0)
-  dishes    Dish[]
+  id          String  @id @default(cuid())
+  slug        String  @unique
+  name        String
+  /// Accroche affichée sous le titre de la catégorie (optionnelle).
+  description String?
+  /// Bannière de la catégorie, choisie dans la médiathèque (optionnelle).
+  image       String?
+  /// Masquer une catégorie sans supprimer ses plats.
+  active      Boolean @default(true)
+  sortOrder   Int     @default(0)
+  dishes      Dish[]
 }
 
 /// Plat du menu (éditable depuis le back-office).
@@ -170,6 +176,9 @@ model Dish {
   image        String
   tag          String?
   available    Boolean       @default(true)
+  /// Mis en avant : spécialités de l'accueil et badge « Populaire » sur la carte.
+  /// Remplace les listes de slugs qui étaient codées en dur dans les composants.
+  featured     Boolean       @default(false)
   /// Stock du jour (null = illimité). Limite les ventes et affiche « épuisé ».
   dailyStock   Int?
   /// Unités déjà vendues pour la date `stockDate` (compteur quotidien).
@@ -292,6 +301,37 @@ model SiteSetting {
   telegramUsername  String?
   /// Résumé des horaires affiché (ex. « Lun – Dim : 11h30 – 23h00 »).
   hoursSummary      String?
+
+  // ── Image de marque (choisie dans la médiathèque) ──────────────────────────
+  /// Logo affiché dans l'en-tête et le pied de page.
+  logoUrl           String?
+  /// Favicon (onglet du navigateur).
+  faviconUrl        String?
+  /// Image de partage sur les réseaux (Open Graph / Twitter).
+  ogImageUrl        String?
+  /// Accroche courte affichée sous le nom.
+  tagline           String?
+
+  // ── Référencement ──────────────────────────────────────────────────────────
+  /// Titre de la page d'accueil (défaut : « <nom> | <description> »).
+  metaTitle         String?
+  /// Description pour les moteurs de recherche et les partages.
+  metaDescription   String?
+  /// Mots-clés séparés par des virgules.
+  keywords          String?
+
+  // ── Mentions légales ───────────────────────────────────────────────────────
+  legalCompany      String?
+  legalStatus       String?
+  legalCapital      String?
+  legalSiret        String?
+  legalVat          String?
+  legalDirector     String?
+  legalHost         String?
+
+  /// Couleur d'accent personnalisée (hex), utilisée si la palette vaut « perso ».
+  accentColor       String?
+
   updatedAt         DateTime @updatedAt @default(now())
 }
 
@@ -540,4 +580,77 @@ model ProcessedStripeEvent {
   id          String   @id
   type        String
   processedAt DateTime @default(now())
+}
+
+/// Bloc de contenu éditorial, éditable depuis /admin/contenus.
+///
+/// Modèle volontairement générique : une ligne = un élément d'une section
+/// (une diapositive du hero, une photo de la galerie, une étape de commande,
+/// une colonne du footer, une page légale…). `section` désigne l'emplacement,
+/// `key` identifie le bloc de façon stable à l'intérieur de la section.
+///
+/// Les valeurs par défaut vivent dans le code (`DEFAULT_CONTENT_BLOCKS`,
+/// src/lib/content-blocks.ts) : la base ne contient que ce qui a été
+/// personnalisé, et un site dont la table est vide s'affiche normalement.
+model ContentBlock {
+  id        String   @id @default(cuid())
+  /// Emplacement (ex. « hero », « galerie », « page-cgv »).
+  section   String
+  /// Identifiant stable du bloc dans sa section.
+  key       String
+  sortOrder Int      @default(0)
+  /// Masquer un bloc sans le supprimer.
+  active    Boolean  @default(true)
+  title     String?
+  subtitle  String?
+  /// Corps en Markdown (rendu par `renderMarkdown`, jamais du HTML brut).
+  body      String?
+  /// Média principal (chemin `/media/…` ou `/images/…`).
+  mediaUrl  String?
+  /// Vignette d'une vidéo.
+  posterUrl String?
+  /// Texte alternatif du média.
+  alt       String?
+  href      String?
+  ctaLabel  String?
+  /// Nom d'icône lucide, restreint à une liste blanche côté rendu.
+  icon      String?
+  /// Champs spécifiques à une section (durée d'une diapositive, tag…).
+  data      Json?
+  updatedAt DateTime @updatedAt @default(now())
+
+  @@unique([section, key])
+  @@index([section])
+}
+
+/// Médiathèque du CRM : toute image/vidéo utilisable depuis /admin.
+///
+/// Deux origines (`source`) :
+///  - `"upload"`   : fichier téléversé depuis /admin/medias. Stocké hors de
+///                   `public/` (voir `src/lib/media.ts`) et servi par la route
+///                   `/media/[...path]` ; supprimable depuis le CRM.
+///  - `"template"` : fichier livré avec le dépôt (`public/images`,
+///                   `public/videos`), indexé au seed pour être choisissable.
+///                   NON supprimable depuis le CRM (il reviendrait au déploiement).
+model Media {
+  id        String   @id @default(cuid())
+  /// Chemin public servant de référence partout (`/media/…` ou `/images/…`).
+  url       String   @unique
+  filename  String
+  mimeType  String
+  /// Taille en octets.
+  size      Int      @default(0)
+  width     Int?
+  height    Int?
+  /// Texte alternatif (accessibilité + SEO).
+  alt       String?
+  /// Classement libre pour filtrer la médiathèque (« plats », « galerie »…).
+  folder    String?
+  /// "upload" | "template"
+  source    String   @default("upload")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt @default(now())
+
+  @@index([source])
+  @@index([folder])
 }

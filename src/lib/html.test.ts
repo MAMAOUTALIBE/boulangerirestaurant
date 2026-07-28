@@ -3,9 +3,7 @@ import { escapeHtml, rawHtml, safeHtml, safeUrl } from "./html";
 
 describe("escapeHtml", () => {
   it("échappe les caractères sensibles", () => {
-    expect(escapeHtml('<script>"&\'')).toBe(
-      "&lt;script&gt;&quot;&amp;&#39;",
-    );
+    expect(escapeHtml("<script>\"&'")).toBe("&lt;script&gt;&quot;&amp;&#39;");
   });
 });
 

@@ -2,6 +2,8 @@ import { describe, it, expect } from "vitest";
 import {
   cartTrackingSchema,
   contactSchema,
+  dishSchema,
+  priceSchema,
   customQuoteSchema,
   newsletterSchema,
   orderSchema,
@@ -81,7 +83,9 @@ describe("orderSchema", () => {
       name: "Jean Dupont",
       email: "a@b.fr",
       phone: "0612345678",
-      items: [{ id: "x", name: "Adana kebab", price: 14.9, quantity: 1_000_000 }],
+      items: [
+        { id: "x", name: "Adana kebab", price: 14.9, quantity: 1_000_000 },
+      ],
     });
     expect(r.success).toBe(false);
   });
@@ -143,5 +147,62 @@ describe("cartTrackingSchema — email", () => {
     });
     expect(r.success).toBe(true);
     if (r.success) expect(r.data.email).toBe("client@example.com");
+  });
+});
+
+describe("priceSchema", () => {
+  it('refuse un champ vide — sinon Number("") publierait le plat à 0,00 €', () => {
+    expect(priceSchema.safeParse("").success).toBe(false);
+    expect(priceSchema.safeParse("   ").success).toBe(false);
+    expect(priceSchema.safeParse(null).success).toBe(false);
+    expect(priceSchema.safeParse(undefined).success).toBe(false);
+  });
+
+  it("accepte la virgule décimale française", () => {
+    const r = priceSchema.safeParse("12,50");
+    expect(r.success).toBe(true);
+    if (r.success) expect(r.data).toBe(12.5);
+  });
+
+  it("accepte un prix nul explicite (produit offert)", () => {
+    const r = priceSchema.safeParse("0");
+    expect(r.success).toBe(true);
+    if (r.success) expect(r.data).toBe(0);
+  });
+
+  it("refuse un prix négatif, non numérique ou démesuré", () => {
+    expect(priceSchema.safeParse("-3").success).toBe(false);
+    expect(priceSchema.safeParse("abc").success).toBe(false);
+    expect(priceSchema.safeParse("999999").success).toBe(false);
+  });
+});
+
+describe("dishSchema — le prix hérite de la même garde", () => {
+  const base = {
+    name: "Yassa poulet",
+    description: "Poulet mariné aux oignons confits.",
+    image: "/images/africain/yassa-poulet.webp",
+    sortOrder: 0,
+    available: true,
+  };
+
+  it("refuse un plat dont le prix a été effacé", () => {
+    expect(dishSchema.safeParse({ ...base, price: "" }).success).toBe(false);
+  });
+
+  it("refuse une image hors médiathèque", () => {
+    expect(
+      dishSchema.safeParse({
+        ...base,
+        price: "14",
+        image: "https://exemple.test/photo.jpg",
+      }).success,
+    ).toBe(false);
+  });
+
+  it("accepte un plat valide", () => {
+    const r = dishSchema.safeParse({ ...base, price: "14,90" });
+    expect(r.success).toBe(true);
+    if (r.success) expect(r.data.price).toBe(14.9);
   });
 });

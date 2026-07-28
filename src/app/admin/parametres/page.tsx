@@ -17,6 +17,7 @@ import {
   adminUpdateRestaurantStripeAccount,
 } from "@/app/actions";
 import { formatPrice } from "@/lib/utils";
+import { MediaPicker } from "@/components/admin/MediaPicker";
 
 export const dynamic = "force-dynamic";
 
@@ -181,6 +182,115 @@ export default async function AdminParametresPage() {
             defaultValue={identity?.hoursSummary ?? ""}
             placeholder={defaultSiteConfig.hours.summary}
           />
+
+          {/* ── Image de marque ─────────────────────────────────────────── */}
+          <h3 className="border-t border-white/10 pt-5 font-display text-base font-semibold text-cream">
+            Image de marque
+          </h3>
+          <div className="grid gap-4 sm:grid-cols-3">
+            <MediaPicker
+              name="logoUrl"
+              label="Logo"
+              defaultValue={
+                identity?.logoUrl ?? defaultSiteConfig.branding.logoUrl
+              }
+            />
+            <MediaPicker
+              name="faviconUrl"
+              label="Favicon (onglet)"
+              defaultValue={identity?.faviconUrl ?? ""}
+            />
+            <MediaPicker
+              name="ogImageUrl"
+              label="Image de partage (réseaux)"
+              defaultValue={
+                identity?.ogImageUrl ?? defaultSiteConfig.branding.ogImageUrl
+              }
+            />
+          </div>
+          <IdentityField
+            name="tagline"
+            label="Accroche courte"
+            defaultValue={identity?.tagline ?? ""}
+            placeholder="Cuisine africaine généreuse, à emporter ou livrée"
+          />
+
+          {/* ── Référencement ───────────────────────────────────────────── */}
+          <h3 className="border-t border-white/10 pt-5 font-display text-base font-semibold text-cream">
+            Référencement (Google, partages)
+          </h3>
+          <IdentityField
+            name="metaTitle"
+            label="Titre de la page d'accueil"
+            defaultValue={identity?.metaTitle ?? ""}
+            placeholder={`${defaultSiteConfig.name} | Spécialités africaines`}
+          />
+          <IdentityField
+            name="metaDescription"
+            label="Description (150 à 160 caractères)"
+            defaultValue={identity?.metaDescription ?? ""}
+            placeholder={defaultSiteConfig.description}
+          />
+          <IdentityField
+            name="keywords"
+            label="Mots-clés (séparés par des virgules)"
+            defaultValue={identity?.keywords ?? ""}
+            placeholder={defaultSiteConfig.seo.keywords.join(", ")}
+          />
+
+          {/* ── Mentions légales ────────────────────────────────────────── */}
+          <h3 className="border-t border-white/10 pt-5 font-display text-base font-semibold text-cream">
+            Mentions légales
+          </h3>
+          <p className="text-xs text-muted">
+            Ces informations alimentent la page « Mentions légales ». Une ligne
+            laissée vide n&apos;y apparaît pas — mieux vaut une mention absente
+            qu&apos;un « [numéro] » publié en ligne.
+          </p>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <IdentityField
+              name="legalCompany"
+              label="Raison sociale"
+              defaultValue={identity?.legalCompany ?? ""}
+              placeholder="Lauuale Simbo SARL"
+            />
+            <IdentityField
+              name="legalStatus"
+              label="Forme juridique"
+              defaultValue={identity?.legalStatus ?? ""}
+              placeholder="SARL"
+            />
+            <IdentityField
+              name="legalCapital"
+              label="Capital social"
+              defaultValue={identity?.legalCapital ?? ""}
+              placeholder="10 000 €"
+            />
+            <IdentityField
+              name="legalSiret"
+              label="SIRET"
+              defaultValue={identity?.legalSiret ?? ""}
+              placeholder="123 456 789 00012"
+            />
+            <IdentityField
+              name="legalVat"
+              label="TVA intracommunautaire"
+              defaultValue={identity?.legalVat ?? ""}
+              placeholder="FR00123456789"
+            />
+            <IdentityField
+              name="legalDirector"
+              label="Directeur de la publication"
+              defaultValue={identity?.legalDirector ?? ""}
+              placeholder="Nom du responsable légal"
+            />
+          </div>
+          <IdentityField
+            name="legalHost"
+            label="Hébergeur (nom et adresse)"
+            defaultValue={identity?.legalHost ?? ""}
+            placeholder="Hostinger International Ltd, 61 Lordou Vironos, Larnaca, Chypre"
+          />
           <div className="grid gap-4 sm:grid-cols-2">
             <IdentityField
               name="whatsappNumber"
@@ -282,6 +392,34 @@ export default async function AdminParametresPage() {
             );
           })}
         </div>
+
+        {/* Couleur libre : une seule teinte, les nuances en sont dérivées. */}
+        <form
+          action={adminUpdateColorPalette}
+          className="mt-4 flex flex-wrap items-end gap-3 border-t border-white/10 pt-4"
+        >
+          <input type="hidden" name="palette" value="perso" />
+          <label className="text-sm text-cream/80">
+            <span className="mb-1 block">Couleur personnalisée</span>
+            <input
+              type="color"
+              name="accentColor"
+              defaultValue={identity?.accentColor || "#F59E0B"}
+              className="h-11 w-24 cursor-pointer rounded-lg border border-white/10 bg-ink p-1"
+            />
+          </label>
+          <button
+            type="submit"
+            className="rounded-lg bg-gold px-4 py-2 text-sm font-semibold text-ink transition hover:bg-gold-400"
+          >
+            Appliquer cette couleur
+          </button>
+          <p className="w-full text-xs text-muted">
+            Les nuances claires et foncées, ainsi que le ton secondaire, sont
+            calculées automatiquement à partir de cette teinte.
+            {setting?.colorPalette === "perso" && " (active actuellement)"}
+          </p>
+        </form>
       </section>
 
       {/* Administrateurs */}

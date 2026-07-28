@@ -12,6 +12,7 @@ import { getSiteConfig } from "@/lib/site-settings";
 import { SiteConfigProvider } from "@/context/SiteConfigContext";
 import { prisma } from "@/lib/prisma";
 import { serializeJsonLd } from "@/lib/utils";
+import { buildPaletteStyle, resolvePaletteName } from "@/lib/palette";
 
 const sans = Inter({
   subsets: ["latin"],
@@ -26,50 +27,40 @@ const display = Playfair_Display({
   weight: ["500", "600", "700", "800"],
 });
 
-const heroImage = "/images/africain/thiep-poisson.webp";
-
 export async function generateMetadata(): Promise<Metadata> {
   const siteConfig = await getSiteConfig();
+  // Titre, description, mots-clés, image de partage et favicon viennent tous de
+  // /admin/parametres ; les valeurs ci-dessous ne servent que si rien n'est saisi.
+  const titre =
+    siteConfig.seo.metaTitle || `${siteConfig.name} | Spécialités africaines`;
+  const description = siteConfig.seo.metaDescription || siteConfig.description;
+  const partage = siteConfig.branding.ogImageUrl;
+
   return {
     metadataBase: new URL(siteConfig.url),
-    title: {
-      default: `${siteConfig.name} | Spécialités africaines`,
-      template: `%s | ${siteConfig.name}`,
-    },
-    description: siteConfig.description,
-    keywords: [
-      "restaurant africain",
-      "spécialités africaines",
-      "thiéboudiène",
-      "yassa poulet",
-      "mafé",
-      "attiéké",
-      "alloco",
-      "bissap",
-      "livraison",
-    ],
+    title: { default: titre, template: `%s | ${siteConfig.name}` },
+    description,
+    keywords: siteConfig.seo.keywords,
+    ...(siteConfig.branding.faviconUrl
+      ? { icons: { icon: siteConfig.branding.faviconUrl } }
+      : {}),
     alternates: { canonical: "/" },
     openGraph: {
-      title: siteConfig.name,
-      description: siteConfig.description,
+      title: titre,
+      description,
       type: "website",
       locale: siteConfig.locale,
       url: siteConfig.url,
       siteName: siteConfig.name,
-      images: [
-        {
-          url: heroImage,
-          width: 1200,
-          height: 630,
-          alt: siteConfig.name,
-        },
-      ],
+      images: partage
+        ? [{ url: partage, width: 1200, height: 630, alt: siteConfig.name }]
+        : undefined,
     },
     twitter: {
       card: "summary_large_image",
-      title: siteConfig.name,
-      description: siteConfig.description,
-      images: [heroImage],
+      title: titre,
+      description,
+      images: partage ? [partage] : undefined,
     },
     robots: {
       index: true,
@@ -92,11 +83,10 @@ export default async function RootLayout({
       .catch(() => null),
     getSiteConfig(),
   ]);
-  const colorPalette =
-    appearance?.colorPalette === "terracotta" ||
-    appearance?.colorPalette === "emeraude"
-      ? appearance.colorPalette
-      : "ambre";
+  const colorPalette = resolvePaletteName(appearance?.colorPalette);
+  // Palette « perso » : les nuances sont dérivées de la couleur choisie au CRM
+  // et injectées en variables CSS ; les palettes prêtes vivent dans globals.css.
+  const paletteStyle = buildPaletteStyle(colorPalette, siteConfig.accentColor);
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -113,7 +103,9 @@ export default async function RootLayout({
       streetAddress: siteConfig.contact.address,
       addressCountry: "FR",
     },
-    image: [`${siteConfig.url}${heroImage}`],
+    image: siteConfig.branding.ogImageUrl
+      ? [`${siteConfig.url}${siteConfig.branding.ogImageUrl}`]
+      : undefined,
     menu: `${siteConfig.url}/menu`,
     acceptsReservations: true,
   };
@@ -122,6 +114,7 @@ export default async function RootLayout({
     <html
       lang="fr"
       data-color-palette={colorPalette}
+      style={paletteStyle}
       data-scroll-behavior="smooth"
       className={`${sans.variable} ${display.variable}`}
     >

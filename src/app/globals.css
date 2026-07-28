@@ -40,6 +40,28 @@
   text-rendering: optimizeLegibility;
 }
 
+/*
+ * Filet de sécurité pour les médias venus du CRM.
+ *
+ * Les photos sont téléversées par le restaurateur : elles peuvent être
+ * panoramiques, en portrait de téléphone ou minuscules. Les cartes du site les
+ * cadrent déjà (conteneur au rapport fixe + `object-cover`), mais cette règle
+ * garantit qu'aucune image ne peut déborder de son conteneur — y compris dans
+ * un futur emplacement où l'on aurait oublié le cadrage.
+ *
+ * `:not([data-nimg])` épargne les images `fill` de next/image, qui sont
+ * positionnées en absolu avec leurs propres dimensions.
+ */
+img:not([data-nimg]),
+video,
+svg {
+  max-width: 100%;
+}
+
+img:not([data-nimg]) {
+  height: auto;
+}
+
 html {
   scroll-behavior: smooth;
 }

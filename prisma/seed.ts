@@ -17,6 +17,7 @@ import { PrismaClient } from "@prisma/client";
 import type { SeedOptionGroup, SeedProfile } from "./seeds/types";
 import anatoliaGrill from "./seeds/anatolia-grill";
 import blank from "./seeds/blank";
+import { indexTemplateMedia } from "./seeds/template-media";
 
 const prisma = new PrismaClient();
 
@@ -92,10 +93,20 @@ async function main() {
   // ── Catégories ─────────────────────────────────────────────────────────────
   const catBySlug = new Map<string, string>();
   for (const c of profile.categories) {
+    const visuals = {
+      description: c.description ?? null,
+      image: c.image ?? null,
+      active: c.active ?? true,
+    };
     const row = await prisma.category.upsert({
       where: { slug: c.slug },
-      update: { name: c.name, sortOrder: c.sortOrder },
-      create: c,
+      update: { name: c.name, sortOrder: c.sortOrder, ...visuals },
+      create: {
+        slug: c.slug,
+        name: c.name,
+        sortOrder: c.sortOrder,
+        ...visuals,
+      },
     });
     catBySlug.set(c.slug, row.id);
   }
@@ -114,6 +125,7 @@ async function main() {
         tag: d.tag ?? null,
         available: true,
         sortOrder: d.sortOrder,
+        featured: d.featured ?? false,
         prepMinutes,
         categoryId,
       },
@@ -126,6 +138,7 @@ async function main() {
         tag: d.tag ?? null,
         available: true,
         sortOrder: d.sortOrder,
+        featured: d.featured ?? false,
         prepMinutes,
         categoryId,
       },
@@ -183,10 +196,15 @@ async function main() {
   // ── Fixtures de démonstration (stock / saison / anti-gaspi) ─────────────────
   if (profile.demo) await seedDemoFixtures(profile.demo);
 
+  // ── Médiathèque : indexation des visuels livrés avec le dépôt ──────────────
+  // Sans cela, un nouveau client ouvre /admin/medias sur une grille vide alors
+  // que le site est déjà illustré. Idempotent, non destructif, tous profils.
+  const media = await indexTemplateMedia(prisma);
+
   const dishes = await prisma.dish.count();
   const zones = await prisma.deliveryZone.count();
   console.log(
-    `✓ Seed [${profileName}] : ${dishes} produits, ${profile.categories.length} catégories, ${zones} zones, établissement ${restaurant.slug}.`,
+    `✓ Seed [${profileName}] : ${dishes} produits, ${profile.categories.length} catégories, ${zones} zones, ${media} médias, établissement ${restaurant.slug}.`,
   );
 }
 
