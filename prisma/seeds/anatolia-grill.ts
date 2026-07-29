@@ -15,8 +15,9 @@ const lauualeSimbo: SeedProfile = {
     { slug: "entrees", name: "Entrées & accompagnements", sortOrder: 1 },
     { slug: "plats-africains", name: "Plats africains", sortOrder: 2 },
     { slug: "grillades", name: "Grillades", sortOrder: 3 },
-    { slug: "desserts", name: "Desserts", sortOrder: 4 },
-    { slug: "boissons", name: "Boissons maison", sortOrder: 5 },
+    { slug: "menus-complets", name: "Menus complets", sortOrder: 4 },
+    { slug: "desserts", name: "Desserts", sortOrder: 5 },
+    { slug: "boissons", name: "Boissons maison", sortOrder: 6 },
   ],
   dishes: seedDishes,
   optionGroups: [

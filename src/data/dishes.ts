@@ -108,6 +108,116 @@ export const seedDishes: SeedDish[] = [
     sortOrder: 2,
   },
   {
+    slug: "poisson-tubercules-sauce",
+    name: "Poisson, tubercules & sauce",
+    description:
+      "Poisson frit, tubercules dorés, oignons marinés et sauce tomate maison",
+    price: 5,
+    image: "/images/africain/01_poisson_tubercules_sauce.webp",
+    category: "plats-africains",
+    sortOrder: 5,
+  },
+  {
+    slug: "haricots-poulet",
+    name: "Haricots au poulet",
+    description:
+      "Haricots mijotés servis avec poulet, légumes et sauce maison",
+    price: 5,
+    image: "/images/africain/02_haricots_au_poulet.webp",
+    category: "plats-africains",
+    sortOrder: 6,
+  },
+  {
+    slug: "mafe-poulet",
+    name: "Mafé au poulet",
+    description:
+      "Poulet mijoté dans une sauce onctueuse à l'arachide, servi avec du riz blanc",
+    price: 5,
+    image: "/images/africain/03_mafe_au_poulet.webp",
+    category: "plats-africains",
+    sortOrder: 7,
+  },
+  {
+    slug: "poisson-alloko",
+    name: "Poisson & alloko",
+    description:
+      "Poisson frit accompagné de bananes plantain alloko et sauce maison",
+    price: 5,
+    image: "/images/africain/04_poisson_alloko.webp",
+    category: "grillades",
+    sortOrder: 3,
+  },
+  {
+    slug: "poisson-grille-crudites",
+    name: "Poisson grillé & crudités",
+    description:
+      "Poisson grillé servi avec des crudités fraîches et une sauce maison",
+    price: 5,
+    image: "/images/africain/05_poisson_grille_crudites.webp",
+    category: "grillades",
+    sortOrder: 4,
+  },
+  {
+    slug: "poisson-oignons",
+    name: "Poisson aux oignons",
+    description:
+      "Poisson entier frit garni d'oignons marinés et accompagné de piment",
+    price: 5,
+    image: "/images/africain/06_poisson_aux_oignons.webp",
+    category: "grillades",
+    sortOrder: 5,
+  },
+  {
+    slug: "riz-rouge-poulet",
+    name: "Riz rouge au poulet",
+    description:
+      "Riz rouge parfumé servi avec poulet mariné et légumes mijotés",
+    price: 5,
+    image: "/images/africain/07_riz_rouge_poulet.webp",
+    category: "plats-africains",
+    sortOrder: 8,
+  },
+  {
+    slug: "menu-poisson-alloko",
+    name: "Menu poisson & alloko",
+    description:
+      "Poisson aux oignons, alloko, dégué et boisson maison",
+    price: 5,
+    image: "/images/africain/08_menu_alloko_poisson_logo.webp",
+    category: "menus-complets",
+    sortOrder: 1,
+  },
+  {
+    slug: "menu-poisson-alloko-degue-orange",
+    name: "Menu poisson complet",
+    description:
+      "Poisson aux oignons, alloko, dégué et jus d'orange",
+    price: 5,
+    image: "/images/africain/09_menu_alloko_poisson_degue_jus_orange.webp",
+    category: "menus-complets",
+    sortOrder: 2,
+  },
+  {
+    slug: "menu-mafe-degue-orange",
+    name: "Menu mafé complet",
+    description: "Mafé, riz blanc, alloko, dégué et jus d'orange",
+    price: 5,
+    image: "/images/africain/10_menu_mafe_degue_jus_orange.webp",
+    category: "menus-complets",
+    sortOrder: 3,
+  },
+  {
+    slug: "menu-riz-rouge-poulet-alloko",
+    name: "Menu riz rouge complet",
+    description:
+      "Riz rouge au poulet, légumes, alloko, dégué et bissap",
+    price: 5,
+    image:
+      "/images/africain/11_menu_riz_rouge_poulet_alloko_degue_bissap.webp",
+    category: "menus-complets",
+    sortOrder: 4,
+  },
+  {
     slug: "douceur-africaine",
     name: "Douceur africaine",
     description:

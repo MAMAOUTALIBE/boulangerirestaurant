@@ -314,94 +314,118 @@ function bloc(
 export const DEFAULT_CONTENT_BLOCKS: ContentBlockData[] = [
   // ── Accueil : bandeau principal ────────────────────────────────────────────
   bloc("hero", "saveurs", 1, {
-    title: "Saveurs africaines",
-    mediaUrl: "/images/africain/thiep-poisson.webp",
-    alt: "Cuisine généreuse préparée minute chez Lauuale Simbo",
+    title: "Poisson, tubercules & sauce",
+    mediaUrl: "/images/africain/01_poisson_tubercules_sauce.webp",
+    alt: "Poisson frit, tubercules dorés, oignons et sauce tomate",
   }),
   bloc("hero", "thieb-poisson", 2, {
-    title: "Thiéboudiène poisson",
-    mediaUrl: "/images/africain/thiep-poisson.webp",
-    alt: "Thiéboudiène au poisson, riz parfumé et légumes mijotés",
+    title: "Haricots au poulet",
+    mediaUrl: "/images/africain/02_haricots_au_poulet.webp",
+    alt: "Haricots mijotés servis avec poulet, légumes et sauce maison",
   }),
   bloc("hero", "yassa", 3, {
-    title: "Yassa poulet",
-    mediaUrl: "/images/africain/yassa-poulet.webp",
-    alt: "Poulet yassa aux oignons confits et citron, servi avec du riz",
+    title: "Mafé au poulet",
+    mediaUrl: "/images/africain/03_mafe_au_poulet.webp",
+    alt: "Mafé au poulet, sauce onctueuse à l'arachide et riz blanc",
   }),
   bloc("hero", "mafe", 4, {
-    title: "Mafé de bœuf",
-    mediaUrl: "/images/africain/mafe-boeuf.webp",
-    alt: "Mafé de bœuf dans sa sauce onctueuse à l'arachide",
+    title: "Poisson & alloko",
+    mediaUrl: "/images/africain/04_poisson_alloko.webp",
+    alt: "Poisson frit accompagné de bananes plantain alloko et sauce maison",
   }),
   bloc("hero", "attieke", 5, {
-    title: "Attiéké poisson & alloco",
-    mediaUrl: "/images/africain/attieke-poisson-alloco.webp",
-    alt: "Poisson grillé avec attiéké, alloco et crudités",
+    title: "Poisson grillé & crudités",
+    mediaUrl: "/images/africain/05_poisson_grille_crudites.webp",
+    alt: "Poisson grillé servi avec crudités fraîches et sauce maison",
   }),
   bloc("hero", "boissons", 6, {
-    title: "Boissons maison",
-    mediaUrl: "/images/africain/boissons-bissap-gingembre-bouye.webp",
-    alt: "Bissap, jus de gingembre et bouye préparés maison",
+    title: "Poisson aux oignons",
+    mediaUrl: "/images/africain/06_poisson_aux_oignons.webp",
+    alt: "Poisson entier frit garni d'oignons marinés et de piment",
+  }),
+  bloc("hero", "riz-rouge-poulet", 7, {
+    title: "Riz rouge au poulet",
+    mediaUrl: "/images/africain/07_riz_rouge_poulet.webp",
+    alt: "Riz rouge parfumé servi avec poulet et légumes mijotés",
   }),
 
   // ── Carte : bandeau ────────────────────────────────────────────────────────
   bloc("menu-hero", "thieb", 1, {
-    mediaUrl: "/images/africain/thiep-poisson.webp",
-    alt: "Thiéboudiène au poisson et légumes mijotés",
+    mediaUrl:
+      "/images/africain/11_menu_riz_rouge_poulet_alloko_degue_bissap.webp",
+    alt: "Menu riz rouge au poulet avec alloko, dégué et bissap",
   }),
   bloc("menu-hero", "yassa", 2, {
-    mediaUrl: "/images/africain/yassa-poulet.webp",
-    alt: "Poulet yassa aux oignons confits",
+    mediaUrl:
+      "/images/africain/09_menu_alloko_poisson_degue_jus_orange.webp",
+    alt: "Menu poisson aux oignons avec alloko, dégué et jus d'orange",
   }),
   bloc("menu-hero", "mafe", 3, {
-    mediaUrl: "/images/africain/mafe-boeuf.webp",
-    alt: "Mafé de bœuf à la sauce arachide",
+    mediaUrl: "/images/africain/10_menu_mafe_degue_jus_orange.webp",
+    alt: "Menu mafé avec riz blanc, alloko, dégué et jus d'orange",
   }),
   bloc("menu-hero", "attieke", 4, {
-    mediaUrl: "/images/africain/attieke-poisson-alloco.webp",
-    alt: "Attiéké, poisson grillé et alloco",
+    mediaUrl: "/images/africain/08_menu_alloko_poisson_logo.webp",
+    alt: "Menu poisson aux oignons, alloko, dégué et jus maison",
   }),
 
   // ── Galerie ────────────────────────────────────────────────────────────────
-  bloc("galerie", "thieb-poisson", 1, {
-    mediaUrl: "/images/africain/thiep-poisson.webp",
-    alt: "Thiéboudiène au poisson et légumes mijotés",
-    data: { tag: "Thiéboudiène" },
+  bloc("galerie", "poisson-tubercules", 1, {
+    mediaUrl: "/images/africain/01_poisson_tubercules_sauce.webp",
+    alt: "Poisson frit, tubercules dorés, oignons et sauce tomate",
+    data: { tag: "Poisson & tubercules" },
   }),
-  bloc("galerie", "thieb-poulet", 2, {
-    mediaUrl: "/images/africain/thiep-poulet.webp",
-    alt: "Thiéboudiène au poulet mariné",
-    data: { tag: "Thiéboudiène" },
+  bloc("galerie", "haricots-poulet", 2, {
+    mediaUrl: "/images/africain/02_haricots_au_poulet.webp",
+    alt: "Haricots mijotés avec poulet, légumes et sauce maison",
+    data: { tag: "Haricots au poulet" },
   }),
-  bloc("galerie", "yassa", 3, {
-    mediaUrl: "/images/africain/yassa-poulet.webp",
-    alt: "Yassa poulet aux oignons confits et citron",
-    data: { tag: "Yassa" },
+  bloc("galerie", "mafe-poulet", 3, {
+    mediaUrl: "/images/africain/03_mafe_au_poulet.webp",
+    alt: "Mafé au poulet avec sauce arachide et riz blanc",
+    data: { tag: "Mafé au poulet" },
   }),
-  bloc("galerie", "mafe", 4, {
-    mediaUrl: "/images/africain/mafe-boeuf.webp",
-    alt: "Mafé de bœuf à la sauce arachide",
-    data: { tag: "Mafé" },
+  bloc("galerie", "poisson-alloko", 4, {
+    mediaUrl: "/images/africain/04_poisson_alloko.webp",
+    alt: "Poisson frit accompagné de bananes plantain alloko",
+    data: { tag: "Poisson & alloko" },
   }),
-  bloc("galerie", "attieke", 5, {
-    mediaUrl: "/images/africain/attieke-poisson-alloco.webp",
-    alt: "Attiéké avec poisson grillé et alloco",
-    data: { tag: "Attiéké" },
+  bloc("galerie", "poisson-crudites", 5, {
+    mediaUrl: "/images/africain/05_poisson_grille_crudites.webp",
+    alt: "Poisson grillé servi avec des crudités fraîches",
+    data: { tag: "Poisson & crudités" },
   }),
-  bloc("galerie", "pastels", 6, {
-    mediaUrl: "/images/africain/pastels-alloco.webp",
-    alt: "Pastels maison et bananes plantain alloco",
-    data: { tag: "Entrées" },
+  bloc("galerie", "poisson-oignons", 6, {
+    mediaUrl: "/images/africain/06_poisson_aux_oignons.webp",
+    alt: "Poisson entier frit garni d'oignons marinés",
+    data: { tag: "Poisson aux oignons" },
   }),
-  bloc("galerie", "desserts", 7, {
-    mediaUrl: "/images/africain/desserts-africains.webp",
-    alt: "Assortiment de douceurs africaines maison",
-    data: { tag: "Desserts" },
+  bloc("galerie", "riz-rouge-poulet", 7, {
+    mediaUrl: "/images/africain/07_riz_rouge_poulet.webp",
+    alt: "Riz rouge parfumé servi avec poulet et légumes",
+    data: { tag: "Riz rouge au poulet" },
   }),
-  bloc("galerie", "boissons", 8, {
-    mediaUrl: "/images/africain/boissons-bissap-gingembre-bouye.webp",
-    alt: "Bissap, jus de gingembre et bouye maison",
-    data: { tag: "Boissons" },
+  bloc("galerie", "menu-poisson-alloko-logo", 8, {
+    mediaUrl: "/images/africain/08_menu_alloko_poisson_logo.webp",
+    alt: "Menu poisson aux oignons, alloko, dégué et jus maison",
+    data: { tag: "Menu poisson & alloko" },
+  }),
+  bloc("galerie", "menu-poisson-alloko", 9, {
+    mediaUrl:
+      "/images/africain/09_menu_alloko_poisson_degue_jus_orange.webp",
+    alt: "Menu poisson aux oignons avec alloko, dégué et jus d'orange",
+    data: { tag: "Menu poisson complet" },
+  }),
+  bloc("galerie", "menu-mafe", 10, {
+    mediaUrl: "/images/africain/10_menu_mafe_degue_jus_orange.webp",
+    alt: "Menu mafé avec riz blanc, alloko, dégué et jus d'orange",
+    data: { tag: "Menu mafé complet" },
+  }),
+  bloc("galerie", "menu-riz-rouge-poulet", 11, {
+    mediaUrl:
+      "/images/africain/11_menu_riz_rouge_poulet_alloko_degue_bissap.webp",
+    alt: "Menu riz rouge au poulet avec alloko, dégué et bissap",
+    data: { tag: "Menu riz rouge complet" },
   }),
 
   // ── Accueil : à propos ─────────────────────────────────────────────────────

@@ -142,10 +142,10 @@ export function Hero({ slides }: { slides: readonly HeroSlide[] }) {
                 index === activeSlide
                   ? slide.type === "video"
                     ? 1.02
-                    : 1.055
+                    : 1.012
                   : slide.type === "video"
                     ? 1
-                    : 1.015,
+                    : 1,
             }}
             transition={{
               opacity: { duration: 1.05, ease: "easeInOut" },
@@ -205,7 +205,7 @@ export function Hero({ slides }: { slides: readonly HeroSlide[] }) {
                 fill
                 priority={index === 0}
                 sizes="100vw"
-                className="origin-right object-cover object-[58%_60%] brightness-[1.08] contrast-[1.08] saturate-[1.08] sm:object-[58%_60%] lg:object-[58%_62%] 3xl:object-[60%_62%]"
+                className="origin-center object-contain object-center brightness-[1.04] contrast-[1.04] saturate-[1.06]"
               />
             )}
           </motion.div>

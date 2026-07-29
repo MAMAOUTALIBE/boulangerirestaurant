@@ -56,8 +56,8 @@ describe("DEFAULT_CONTENT_BLOCKS", () => {
   });
 
   it("fournit bien le contenu d'origine des sections migrées", () => {
-    expect(resolveSection("hero")).toHaveLength(6);
-    expect(resolveSection("galerie")).toHaveLength(8);
+    expect(resolveSection("hero")).toHaveLength(7);
+    expect(resolveSection("galerie")).toHaveLength(11);
     expect(resolveSection("menu-hero")).toHaveLength(4);
     expect(resolveSection("etapes")).toHaveLength(3);
     expect(resolveSection("raccourcis")).toHaveLength(3);
