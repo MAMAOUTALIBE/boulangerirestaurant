@@ -1,5 +1,11 @@
 import Link from "next/link";
-import { ChevronDown, ChevronUp, ExternalLink, RotateCcw } from "lucide-react";
+import {
+  ChevronDown,
+  ChevronRight,
+  ChevronUp,
+  ExternalLink,
+  RotateCcw,
+} from "lucide-react";
 import {
   adminMoveContentBlock,
   adminResetContentBlock,
@@ -30,6 +36,33 @@ const SECTIONS_AVEC_AFFICHE_VIDEO: ContentSection[] = [
   "menu-hero",
   "galerie",
 ];
+const STYLES_CARTES = [
+  {
+    carte: "border-amber-400/35 bg-amber-400/[0.045]",
+    numero: "border-amber-300/30 bg-amber-400/15 text-amber-200",
+    accent: "bg-amber-400",
+  },
+  {
+    carte: "border-emerald-400/35 bg-emerald-400/[0.045]",
+    numero: "border-emerald-300/30 bg-emerald-400/15 text-emerald-200",
+    accent: "bg-emerald-400",
+  },
+  {
+    carte: "border-sky-400/35 bg-sky-400/[0.045]",
+    numero: "border-sky-300/30 bg-sky-400/15 text-sky-200",
+    accent: "bg-sky-400",
+  },
+  {
+    carte: "border-violet-400/35 bg-violet-400/[0.045]",
+    numero: "border-violet-300/30 bg-violet-400/15 text-violet-200",
+    accent: "bg-violet-400",
+  },
+  {
+    carte: "border-rose-400/35 bg-rose-400/[0.045]",
+    numero: "border-rose-300/30 bg-rose-400/15 text-rose-200",
+    accent: "bg-rose-400",
+  },
+] as const;
 
 /** Page publique où chaque section se voit (bouton « voir sur le site »). */
 const APERCU: Partial<Record<ContentSection, string>> = {
@@ -124,21 +157,27 @@ export default async function AdminContenusPage({
         ))}
       </nav>
 
-      <div className="flex flex-wrap items-center gap-3">
-        <h2 className="font-display text-lg font-semibold text-cream">
-          {SECTION_LABELS[section]}
-        </h2>
-        {apercu && (
-          <a
-            href={apercu}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-1 text-xs text-gold hover:underline"
-          >
-            <ExternalLink className="h-3.5 w-3.5" />
-            voir sur le site
-          </a>
-        )}
+      <div>
+        <div className="flex flex-wrap items-center gap-3">
+          <h2 className="font-display text-lg font-semibold text-cream">
+            {SECTION_LABELS[section]}
+          </h2>
+          {apercu && (
+            <a
+              href={apercu}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 text-xs text-gold hover:underline"
+            >
+              <ExternalLink className="h-3.5 w-3.5" />
+              voir sur le site
+            </a>
+          )}
+        </div>
+        <p className="mt-1 text-xs text-muted">
+          {tousLesBlocs.length} bloc{tousLesBlocs.length > 1 ? "s" : ""} ·
+          cliquez sur une carte pour afficher ses réglages
+        </p>
       </div>
 
       {section === "hero" && (
@@ -157,202 +196,232 @@ export default async function AdminContenusPage({
         {tousLesBlocs.map((bloc, index) => {
           const personnalise = personnalises.has(bloc.key);
           const desactive = masques.includes(bloc.key);
+          const style = STYLES_CARTES[index % STYLES_CARTES.length];
+          const titre = bloc.title?.trim() || "Bloc sans titre";
+          const media = bloc.mediaUrl
+            ? bloc.mediaUrl.match(/\.(mp4|webm|mov|m4v)(?:\?|$)/i)
+              ? "vidéo choisie"
+              : "image choisie"
+            : "aucun média";
           return (
-            <div
+            <details
               key={bloc.key}
-              className={`rounded-2xl border p-5 ${
+              open={index === 0}
+              className={`group overflow-hidden rounded-2xl border transition ${
                 desactive
-                  ? "border-white/5 bg-ink-soft/50"
-                  : "border-white/10 bg-ink-soft"
+                  ? "border-white/10 bg-ink-soft/50 opacity-75"
+                  : style.carte
               }`}
             >
-              <div className="mb-3 flex flex-wrap items-center gap-2">
-                <span className="font-mono text-xs text-muted">{bloc.key}</span>
-                {personnalise ? (
-                  <span className="rounded-full bg-gold/15 px-2 py-0.5 text-[0.7rem] text-gold">
-                    personnalisé
+              <summary className="relative flex cursor-pointer select-none list-none items-center gap-3 p-4 pr-5 [&::-webkit-details-marker]:hidden">
+                <span
+                  className={`absolute inset-y-0 left-0 w-1 ${style.accent}`}
+                />
+                <span
+                  className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border font-mono text-sm font-bold ${style.numero}`}
+                >
+                  {String(index + 1).padStart(2, "0")}
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span className="block truncate text-sm font-semibold text-cream sm:text-base">
+                    {titre}
                   </span>
-                ) : (
-                  <span className="rounded-full bg-white/5 px-2 py-0.5 text-[0.7rem] text-muted">
-                    contenu d&apos;origine
+                  <span className="mt-0.5 block truncate text-xs text-muted">
+                    {bloc.key} · {media} ·{" "}
+                    {desactive ? "masqué sur le site" : "visible sur le site"}
                   </span>
-                )}
-                {desactive && (
-                  <span className="rounded-full bg-red-500/15 px-2 py-0.5 text-[0.7rem] text-red-300">
-                    masqué
-                  </span>
-                )}
+                </span>
+                <span className="hidden rounded-full bg-black/20 px-2 py-1 text-[0.68rem] text-cream/70 sm:inline">
+                  {personnalise ? "personnalisé" : "contenu d’origine"}
+                </span>
+                <ChevronRight className="h-5 w-5 shrink-0 text-cream/60 transition-transform group-open:rotate-90" />
+              </summary>
 
-                <div className="ml-auto flex items-center gap-2">
+              <div className="border-t border-white/10 bg-black/10 p-4 sm:p-5">
+                <div className="mb-4 flex flex-wrap items-center gap-2">
+                  <p className="text-xs font-semibold uppercase tracking-[0.16em] text-cream/60">
+                    Réglages du bloc
+                  </p>
+                  {desactive && (
+                    <span className="rounded-full bg-red-500/15 px-2 py-0.5 text-[0.7rem] text-red-300">
+                      masqué
+                    </span>
+                  )}
+                  <div className="ml-auto flex items-center gap-2">
+                    {!estMarkdown && (
+                      <>
+                        <form action={adminMoveContentBlock}>
+                          <input type="hidden" name="section" value={section} />
+                          <input type="hidden" name="key" value={bloc.key} />
+                          <input type="hidden" name="direction" value="up" />
+                          <button
+                            className={boutonDiscret}
+                            disabled={index === 0}
+                            title="Monter"
+                          >
+                            <ChevronUp className="h-3.5 w-3.5" />
+                          </button>
+                        </form>
+                        <form action={adminMoveContentBlock}>
+                          <input type="hidden" name="section" value={section} />
+                          <input type="hidden" name="key" value={bloc.key} />
+                          <input type="hidden" name="direction" value="down" />
+                          <button
+                            className={boutonDiscret}
+                            disabled={index === tousLesBlocs.length - 1}
+                            title="Descendre"
+                          >
+                            <ChevronDown className="h-3.5 w-3.5" />
+                          </button>
+                        </form>
+                      </>
+                    )}
+                    {personnalise && (
+                      <form action={adminResetContentBlock}>
+                        <input type="hidden" name="section" value={section} />
+                        <input type="hidden" name="key" value={bloc.key} />
+                        <button
+                          className={boutonDiscret}
+                          title="Revenir au contenu d'origine"
+                        >
+                          <RotateCcw className="h-3.5 w-3.5" />
+                        </button>
+                      </form>
+                    )}
+                  </div>
+                </div>
+
+                <form
+                  action={adminSaveContentBlock}
+                  className="grid gap-3 sm:grid-cols-2"
+                >
+                  <input type="hidden" name="section" value={section} />
+                  <input type="hidden" name="key" value={bloc.key} />
+                  <input
+                    type="hidden"
+                    name="sortOrder"
+                    value={bloc.sortOrder}
+                  />
+
+                  <input
+                    name="title"
+                    defaultValue={bloc.title ?? ""}
+                    placeholder="Titre"
+                    className={inputClass}
+                  />
+                  <input
+                    name="subtitle"
+                    defaultValue={bloc.subtitle ?? ""}
+                    placeholder="Sur-titre (optionnel)"
+                    className={inputClass}
+                  />
+
+                  <textarea
+                    name="body"
+                    defaultValue={bloc.body ?? ""}
+                    rows={estMarkdown ? 18 : 3}
+                    placeholder={
+                      estMarkdown
+                        ? "Texte de la page en Markdown :\n\n## Un titre\n\nUn paragraphe avec du **gras**, de l'*italique* et un [lien](/contact).\n\n- une puce\n- une autre"
+                        : "Texte du bloc"
+                    }
+                    className={`${inputClass} font-mono sm:col-span-2`}
+                  />
+
+                  {estMarkdown && (
+                    <p className="text-xs text-muted sm:col-span-2">
+                      Mise en forme acceptée : <code>## Titre</code>,{" "}
+                      <code>**gras**</code>, <code>*italique*</code>,{" "}
+                      <code>- puce</code>, <code>[lien](/page)</code>. Le HTML
+                      n&apos;est pas interprété. Laissez vide pour conserver le
+                      texte modèle livré avec le site.
+                    </p>
+                  )}
+
                   {!estMarkdown && (
                     <>
-                      <form action={adminMoveContentBlock}>
-                        <input type="hidden" name="section" value={section} />
-                        <input type="hidden" name="key" value={bloc.key} />
-                        <input type="hidden" name="direction" value="up" />
-                        <button
-                          className={boutonDiscret}
-                          disabled={index === 0}
-                          title="Monter"
-                        >
-                          <ChevronUp className="h-3.5 w-3.5" />
-                        </button>
-                      </form>
-                      <form action={adminMoveContentBlock}>
-                        <input type="hidden" name="section" value={section} />
-                        <input type="hidden" name="key" value={bloc.key} />
-                        <input type="hidden" name="direction" value="down" />
-                        <button
-                          className={boutonDiscret}
-                          disabled={index === tousLesBlocs.length - 1}
-                          title="Descendre"
-                        >
-                          <ChevronDown className="h-3.5 w-3.5" />
-                        </button>
-                      </form>
-                    </>
-                  )}
-                  {personnalise && (
-                    <form action={adminResetContentBlock}>
-                      <input type="hidden" name="section" value={section} />
-                      <input type="hidden" name="key" value={bloc.key} />
-                      <button
-                        className={boutonDiscret}
-                        title="Revenir au contenu d'origine"
-                      >
-                        <RotateCcw className="h-3.5 w-3.5" />
-                      </button>
-                    </form>
-                  )}
-                </div>
-              </div>
-
-              <form
-                action={adminSaveContentBlock}
-                className="grid gap-3 sm:grid-cols-2"
-              >
-                <input type="hidden" name="section" value={section} />
-                <input type="hidden" name="key" value={bloc.key} />
-                <input type="hidden" name="sortOrder" value={bloc.sortOrder} />
-
-                <input
-                  name="title"
-                  defaultValue={bloc.title ?? ""}
-                  placeholder="Titre"
-                  className={inputClass}
-                />
-                <input
-                  name="subtitle"
-                  defaultValue={bloc.subtitle ?? ""}
-                  placeholder="Sur-titre (optionnel)"
-                  className={inputClass}
-                />
-
-                <textarea
-                  name="body"
-                  defaultValue={bloc.body ?? ""}
-                  rows={estMarkdown ? 18 : 3}
-                  placeholder={
-                    estMarkdown
-                      ? "Texte de la page en Markdown :\n\n## Un titre\n\nUn paragraphe avec du **gras**, de l'*italique* et un [lien](/contact).\n\n- une puce\n- une autre"
-                      : "Texte du bloc"
-                  }
-                  className={`${inputClass} font-mono sm:col-span-2`}
-                />
-
-                {estMarkdown && (
-                  <p className="text-xs text-muted sm:col-span-2">
-                    Mise en forme acceptée : <code>## Titre</code>,{" "}
-                    <code>**gras**</code>, <code>*italique*</code>,{" "}
-                    <code>- puce</code>, <code>[lien](/page)</code>. Le HTML
-                    n&apos;est pas interprété. Laissez vide pour conserver le
-                    texte modèle livré avec le site.
-                  </p>
-                )}
-
-                {!estMarkdown && (
-                  <>
-                    <MediaPicker
-                      name="mediaUrl"
-                      label={
-                        section === "hero"
-                          ? "Photo ou vidéo du slide"
-                          : "Image ou vidéo"
-                      }
-                      defaultValue={bloc.mediaUrl}
-                      className="sm:col-span-2"
-                    />
-                    {SECTIONS_AVEC_AFFICHE_VIDEO.includes(section) ? (
                       <MediaPicker
-                        name="posterUrl"
-                        label="Affiche de la vidéo (optionnelle)"
-                        defaultValue={bloc.posterUrl}
-                        mediaKind="image"
+                        name="mediaUrl"
+                        label={
+                          section === "hero"
+                            ? "Photo ou vidéo du slide"
+                            : "Image ou vidéo"
+                        }
+                        defaultValue={bloc.mediaUrl}
                         className="sm:col-span-2"
                       />
-                    ) : (
+                      {SECTIONS_AVEC_AFFICHE_VIDEO.includes(section) ? (
+                        <MediaPicker
+                          name="posterUrl"
+                          label="Affiche de la vidéo (optionnelle)"
+                          defaultValue={bloc.posterUrl}
+                          mediaKind="image"
+                          className="sm:col-span-2"
+                        />
+                      ) : (
+                        <input
+                          type="hidden"
+                          name="posterUrl"
+                          value={bloc.posterUrl ?? ""}
+                        />
+                      )}
                       <input
-                        type="hidden"
-                        name="posterUrl"
-                        value={bloc.posterUrl ?? ""}
+                        name="alt"
+                        defaultValue={bloc.alt ?? ""}
+                        placeholder="Description de l'image (accessibilité)"
+                        className={inputClass}
                       />
-                    )}
-                    <input
-                      name="alt"
-                      defaultValue={bloc.alt ?? ""}
-                      placeholder="Description de l'image (accessibilité)"
-                      className={inputClass}
-                    />
-                    <input
-                      name="tag"
-                      defaultValue={blockText(bloc, "tag") ?? ""}
-                      placeholder="Étiquette (galerie)"
-                      className={inputClass}
-                    />
-                    <input
-                      name="href"
-                      defaultValue={bloc.href ?? ""}
-                      placeholder="Lien (/commander, #contact…)"
-                      className={inputClass}
-                    />
-                    <input
-                      name="ctaLabel"
-                      defaultValue={bloc.ctaLabel ?? ""}
-                      placeholder="Libellé du bouton"
-                      className={inputClass}
-                    />
-                    <select
-                      name="icon"
-                      defaultValue={bloc.icon ?? ""}
-                      className={inputClass}
-                    >
-                      <option value="">— Icône —</option>
-                      {ICON_WHITELIST.map((nom) => (
-                        <option key={nom} value={nom}>
-                          {nom}
-                        </option>
-                      ))}
-                    </select>
-                  </>
-                )}
+                      <input
+                        name="tag"
+                        defaultValue={blockText(bloc, "tag") ?? ""}
+                        placeholder="Étiquette (galerie)"
+                        className={inputClass}
+                      />
+                      <input
+                        name="href"
+                        defaultValue={bloc.href ?? ""}
+                        placeholder="Lien (/commander, #contact…)"
+                        className={inputClass}
+                      />
+                      <input
+                        name="ctaLabel"
+                        defaultValue={bloc.ctaLabel ?? ""}
+                        placeholder="Libellé du bouton"
+                        className={inputClass}
+                      />
+                      <select
+                        name="icon"
+                        defaultValue={bloc.icon ?? ""}
+                        className={inputClass}
+                      >
+                        <option value="">— Icône —</option>
+                        {ICON_WHITELIST.map((nom) => (
+                          <option key={nom} value={nom}>
+                            {nom}
+                          </option>
+                        ))}
+                      </select>
+                    </>
+                  )}
 
-                <label className="flex items-center gap-2 text-sm text-cream/80">
-                  <input
-                    type="checkbox"
-                    name="active"
-                    defaultChecked={!desactive}
-                    className="accent-gold"
-                  />
-                  Visible sur le site
-                </label>
+                  <label className="flex items-center gap-2 text-sm text-cream/80">
+                    <input
+                      type="checkbox"
+                      name="active"
+                      defaultChecked={!desactive}
+                      className="accent-gold"
+                    />
+                    Visible sur le site
+                  </label>
 
-                <div className="flex items-end justify-end sm:col-span-2">
-                  <button type="submit" className={boutonPrimaire}>
-                    Enregistrer
-                  </button>
-                </div>
-              </form>
-            </div>
+                  <div className="flex items-end justify-end sm:col-span-2">
+                    <button type="submit" className={boutonPrimaire}>
+                      Enregistrer
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </details>
           );
         })}
       </div>
