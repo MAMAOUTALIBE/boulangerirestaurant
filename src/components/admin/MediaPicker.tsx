@@ -14,6 +14,8 @@ interface MediaPickerProps {
   label?: string;
   required?: boolean;
   className?: string;
+  /** Restreint la médiathèque aux images (ex. affiche d'une vidéo). */
+  mediaKind?: "all" | "image";
 }
 
 /**
@@ -29,6 +31,7 @@ export function MediaPicker({
   label = "Image",
   required = false,
   className,
+  mediaKind = "all",
 }: MediaPickerProps) {
   const [value, setValue] = useState(defaultValue ?? "");
   const [open, setOpen] = useState(false);
@@ -125,7 +128,7 @@ export function MediaPicker({
             )}
             title={value}
           >
-            {value || (manquant ? "Photo obligatoire" : "Aucune image choisie")}
+            {value || (manquant ? "Média obligatoire" : "Aucun média choisi")}
           </p>
           <div className="mt-1.5 flex flex-wrap items-center gap-2">
             <button
@@ -133,7 +136,7 @@ export function MediaPicker({
               onClick={() => setOpen(true)}
               className="rounded-lg bg-gold px-3 py-1 text-xs font-semibold text-ink transition hover:bg-gold-400"
             >
-              Choisir une image
+              Choisir ou téléverser
             </button>
             <button
               type="button"
@@ -198,6 +201,7 @@ export function MediaPicker({
                   initialMedia={media}
                   selectedUrl={value}
                   compact
+                  allowedKind={mediaKind}
                   onSelect={(item) => {
                     setValue(item.url);
                     setOpen(false);

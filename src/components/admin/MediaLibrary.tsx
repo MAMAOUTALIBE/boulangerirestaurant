@@ -43,6 +43,8 @@ interface MediaLibraryProps {
   selectedUrl?: string | null;
   /** Masque l'édition du texte alternatif et la suppression (mode sélecteur). */
   compact?: boolean;
+  /** Restreint la sélection et le téléversement aux images. */
+  allowedKind?: "all" | "image";
 }
 
 /** Poids lisible d'un fichier (Ko / Mo). */
@@ -61,6 +63,7 @@ export function MediaLibrary({
   onSelect,
   selectedUrl,
   compact = false,
+  allowedKind = "all",
 }: MediaLibraryProps) {
   const [media, setMedia] = useState<MediaItem[]>(initialMedia);
   const [query, setQuery] = useState("");
@@ -70,6 +73,10 @@ export function MediaLibrary({
   const [error, setError] = useState<string | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const visibleMedia =
+    allowedKind === "image"
+      ? media.filter((item) => item.mimeType.startsWith("image/"))
+      : media;
 
   const refresh = useCallback(async (search: string) => {
     const response = await fetch(
@@ -89,70 +96,77 @@ export function MediaLibrary({
     return () => window.clearTimeout(timeout);
   }, [query, refresh]);
 
-  const upload = useCallback(async (files: FileList | File[]) => {
-    const list = Array.from(files);
-    if (list.length === 0) return;
-
-    setBusy(true);
-    setError(null);
-    setMessage(null);
-
-    // Un envoi unique dépasserait la limite de corps de requête dès quelques
-    // photos de téléphone : on répartit en plusieurs requêtes, transparent pour
-    // l'utilisateur qui a simplement déposé ses 10 photos d'un coup.
-    const { batches, tooLarge } = planUploadBatches(list.map((f) => f.size));
-    const added: MediaItem[] = [];
-    const failures = tooLarge.map((index) => ({
-      filename: list[index].name || "fichier",
-      message: `Photo trop lourde (max ${MAX_UPLOAD_MO} Mo).`,
-    }));
-
-    for (const batch of batches) {
-      const formData = new FormData();
-      for (const index of batch) formData.append("files", list[index]);
-
-      const response = await fetch("/api/admin/media", {
-        method: "POST",
-        body: formData,
-      }).catch(() => null);
-
-      if (!response) {
-        failures.push({
-          filename: `${batch.length} fichier·s`,
-          message: "envoi interrompu, vérifiez votre connexion",
-        });
-        continue;
-      }
-
-      const data = (await response.json().catch(() => null)) as {
-        media?: MediaItem[];
-        errors?: { filename: string; message: string }[];
-        error?: string;
-      } | null;
-
-      if (data?.media?.length) added.push(...data.media);
-      if (data?.errors?.length) failures.push(...data.errors);
-      else if (!data?.media?.length) {
-        failures.push({
-          filename: `${batch.length} fichier·s`,
-          message: data?.error ?? "téléversement impossible",
-        });
-      }
-    }
-
-    setBusy(false);
-    if (added.length > 0) {
-      setMedia((current) => [...added, ...current]);
-      setMessage(
-        `${added.length} média${added.length > 1 ? "s" : ""} ajouté${
-          added.length > 1 ? "s" : ""
-        }.`,
+  const upload = useCallback(
+    async (files: FileList | File[]) => {
+      const list = Array.from(files).filter(
+        (file) => allowedKind === "all" || file.type.startsWith("image/"),
       );
-    }
-    if (failures.length > 0) {
-      setError(failures.map((f) => `${f.filename} : ${f.message}`).join(" — "));
-    }
-  }, []);
+      if (list.length === 0) return;
+
+      setBusy(true);
+      setError(null);
+      setMessage(null);
+
+      // Un envoi unique dépasserait la limite de corps de requête dès quelques
+      // photos de téléphone : on répartit en plusieurs requêtes, transparent pour
+      // l'utilisateur qui a simplement déposé ses 10 photos d'un coup.
+      const { batches, tooLarge } = planUploadBatches(list.map((f) => f.size));
+      const added: MediaItem[] = [];
+      const failures = tooLarge.map((index) => ({
+        filename: list[index].name || "fichier",
+        message: `Photo trop lourde (max ${MAX_UPLOAD_MO} Mo).`,
+      }));
+
+      for (const batch of batches) {
+        const formData = new FormData();
+        for (const index of batch) formData.append("files", list[index]);
+
+        const response = await fetch("/api/admin/media", {
+          method: "POST",
+          body: formData,
+        }).catch(() => null);
+
+        if (!response) {
+          failures.push({
+            filename: `${batch.length} fichier·s`,
+            message: "envoi interrompu, vérifiez votre connexion",
+          });
+          continue;
+        }
+
+        const data = (await response.json().catch(() => null)) as {
+          media?: MediaItem[];
+          errors?: { filename: string; message: string }[];
+          error?: string;
+        } | null;
+
+        if (data?.media?.length) added.push(...data.media);
+        if (data?.errors?.length) failures.push(...data.errors);
+        else if (!data?.media?.length) {
+          failures.push({
+            filename: `${batch.length} fichier·s`,
+            message: data?.error ?? "téléversement impossible",
+          });
+        }
+      }
+
+      setBusy(false);
+      if (added.length > 0) {
+        setMedia((current) => [...added, ...current]);
+        setMessage(
+          `${added.length} média${added.length > 1 ? "s" : ""} ajouté${
+            added.length > 1 ? "s" : ""
+          }.`,
+        );
+      }
+      if (failures.length > 0) {
+        setError(
+          failures.map((f) => `${f.filename} : ${f.message}`).join(" — "),
+        );
+      }
+    },
+    [allowedKind],
+  );
 
   const remove = useCallback(async (item: MediaItem) => {
     setError(null);
@@ -262,7 +276,9 @@ export function MediaLibrary({
         <input
           ref={inputRef}
           type="file"
-          accept={ACCEPT_UPLOAD}
+          accept={
+            allowedKind === "image" ? "image/*,.heic,.heif" : ACCEPT_UPLOAD
+          }
           multiple
           className="hidden"
           onChange={(event) => {
@@ -305,13 +321,13 @@ export function MediaLibrary({
       </label>
 
       {/* Grille */}
-      {media.length === 0 ? (
+      {visibleMedia.length === 0 ? (
         <p className="rounded-2xl border border-white/10 bg-ink-soft p-10 text-center text-sm text-muted">
           Aucun média pour le moment.
         </p>
       ) : (
         <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-          {media.map((item) => {
+          {visibleMedia.map((item) => {
             const isVideo = item.mimeType.startsWith("video/");
             const selected = selectedUrl === item.url;
             return (

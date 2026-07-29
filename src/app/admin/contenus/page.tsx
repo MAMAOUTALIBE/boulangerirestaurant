@@ -25,6 +25,11 @@ const boutonPrimaire =
   "rounded-lg bg-gold px-4 py-2 text-sm font-semibold text-ink transition hover:bg-gold-400";
 const boutonDiscret =
   "rounded-lg border border-white/10 px-2 py-1 text-xs text-cream/70 transition hover:border-white/25 hover:text-cream";
+const SECTIONS_AVEC_AFFICHE_VIDEO: ContentSection[] = [
+  "hero",
+  "menu-hero",
+  "galerie",
+];
 
 /** Page publique où chaque section se voit (bouton « voir sur le site »). */
 const APERCU: Partial<Record<ContentSection, string>> = {
@@ -135,6 +140,18 @@ export default async function AdminContenusPage({
           </a>
         )}
       </div>
+
+      {section === "hero" && (
+        <div className="rounded-2xl border border-gold/25 bg-gold/5 p-4 text-sm text-cream/80">
+          <p className="font-semibold text-gold">Gérer les slides du hero</p>
+          <p className="mt-1 leading-6">
+            Dans chaque slide, cliquez sur « Choisir ou téléverser » pour
+            envoyer une photo ou une vidéo depuis votre appareil. Vous pouvez
+            ensuite modifier son titre, la masquer ou changer son ordre avec les
+            flèches.
+          </p>
+        </div>
+      )}
 
       <div className="space-y-4">
         {tousLesBlocs.map((bloc, index) => {
@@ -257,10 +274,29 @@ export default async function AdminContenusPage({
                   <>
                     <MediaPicker
                       name="mediaUrl"
-                      label="Image ou vidéo"
+                      label={
+                        section === "hero"
+                          ? "Photo ou vidéo du slide"
+                          : "Image ou vidéo"
+                      }
                       defaultValue={bloc.mediaUrl}
                       className="sm:col-span-2"
                     />
+                    {SECTIONS_AVEC_AFFICHE_VIDEO.includes(section) ? (
+                      <MediaPicker
+                        name="posterUrl"
+                        label="Affiche de la vidéo (optionnelle)"
+                        defaultValue={bloc.posterUrl}
+                        mediaKind="image"
+                        className="sm:col-span-2"
+                      />
+                    ) : (
+                      <input
+                        type="hidden"
+                        name="posterUrl"
+                        value={bloc.posterUrl ?? ""}
+                      />
+                    )}
                     <input
                       name="alt"
                       defaultValue={bloc.alt ?? ""}
@@ -297,11 +333,6 @@ export default async function AdminContenusPage({
                         </option>
                       ))}
                     </select>
-                    <input
-                      type="hidden"
-                      name="posterUrl"
-                      value={bloc.posterUrl ?? ""}
-                    />
                   </>
                 )}
 
