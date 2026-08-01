@@ -422,6 +422,20 @@ aside {
   }
 }
 
+/* Accueil mobile : une présentation complète dans une seule hauteur d'écran. */
+@media (max-width: 639px) {
+  .home-page-mobile-viewport,
+  .home-page-main {
+    height: 100dvh;
+    overflow: hidden;
+  }
+
+  .home-page-sections,
+  .home-page-footer {
+    display: none;
+  }
+}
+
 /* Champs de formulaire natifs (date, heure, nombre) lisibles sur fond sombre */
 input[type="date"],
 input[type="time"],

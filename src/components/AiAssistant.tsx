@@ -110,7 +110,9 @@ export function AiAssistant() {
   }
 
   return (
-    <div className="fixed bottom-4 right-4 z-40 flex flex-col items-end sm:bottom-7 sm:right-7 print:hidden">
+    <div
+      className={`fixed bottom-4 right-4 z-40 flex-col items-end sm:bottom-7 sm:right-7 print:hidden ${pathname === "/" ? "hidden sm:flex" : "flex"}`}
+    >
       {open && (
         <section
           aria-label={`Assistant ${siteConfig.name}`}

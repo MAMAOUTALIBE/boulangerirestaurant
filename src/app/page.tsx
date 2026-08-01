@@ -17,15 +17,19 @@ export default async function Home() {
   const diapos = toHeroSlides(await getContentSection("hero"));
 
   return (
-    <>
+    <div className="home-page-mobile-viewport">
       <Header />
-      <main>
+      <main className="home-page-main">
         <Hero slides={diapos} />
-        <HomeShortcuts />
-        <FeaturedDishes />
-        <PremiumEngagementSection />
+        <div className="home-page-sections">
+          <HomeShortcuts />
+          <FeaturedDishes />
+          <PremiumEngagementSection />
+        </div>
       </main>
-      <Footer />
-    </>
+      <div className="home-page-footer">
+        <Footer />
+      </div>
+    </div>
   );
 }

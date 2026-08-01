@@ -97,13 +97,13 @@ export function Header() {
   return (
     <header
       className={cn(
-        "fixed inset-x-0 top-3 z-50 px-3 transition-all duration-300 sm:top-4 sm:px-6 3xl:px-10",
-        scrolled && "top-3",
+        "fixed inset-x-0 top-0 z-50 px-0 transition-all duration-300 sm:top-4 sm:px-6 3xl:px-10",
+        scrolled && "sm:top-3",
       )}
     >
       <div
         className={cn(
-          "mx-auto grid h-[68px] w-full max-w-[1800px] grid-cols-[auto_auto] items-center justify-between gap-3 rounded-[22px] border border-gold/35 bg-[linear-gradient(110deg,rgba(5,5,5,0.94)_0%,rgba(19,16,12,0.92)_45%,rgba(77,50,9,0.55)_100%)] px-3 shadow-[0_22px_70px_-45px_rgba(0,0,0,0.95)] backdrop-blur-xl sm:h-[78px] sm:gap-4 sm:rounded-[28px] sm:px-5 lg:h-[90px] lg:grid-cols-[auto_auto_auto] lg:gap-5 lg:px-6 xl:grid-cols-[auto_auto_minmax(300px,1fr)_auto] xl:gap-6 2xl:h-[96px] 2xl:max-w-[1880px] 2xl:grid-cols-[auto_auto_minmax(420px,1fr)_auto] 2xl:gap-7 2xl:px-8 3xl:h-[104px] 3xl:max-w-[2200px] 3xl:gap-10 4xl:max-w-[2460px]",
+          "mx-auto grid h-[68px] w-full max-w-[1800px] grid-cols-[auto_auto] items-center justify-between gap-3 border-x-0 border-b border-t-0 border-gold/35 bg-[linear-gradient(110deg,rgba(5,5,5,0.94)_0%,rgba(19,16,12,0.92)_45%,rgba(77,50,9,0.55)_100%)] px-3 shadow-[0_22px_70px_-45px_rgba(0,0,0,0.95)] backdrop-blur-xl sm:h-[78px] sm:gap-4 sm:rounded-[28px] sm:border sm:px-5 lg:h-[90px] lg:grid-cols-[auto_auto_auto] lg:gap-5 lg:px-6 xl:grid-cols-[auto_auto_minmax(300px,1fr)_auto] xl:gap-6 2xl:h-[96px] 2xl:max-w-[1880px] 2xl:grid-cols-[auto_auto_minmax(420px,1fr)_auto] 2xl:gap-7 2xl:px-8 3xl:h-[104px] 3xl:max-w-[2200px] 3xl:gap-10 4xl:max-w-[2460px]",
           scrolled &&
             "h-[64px] border-gold/45 bg-[linear-gradient(110deg,rgba(5,5,5,0.96)_0%,rgba(19,16,12,0.94)_45%,rgba(77,50,9,0.62)_100%)] shadow-[0_18px_55px_-42px_rgba(216,154,28,0.5)] sm:h-[72px] lg:h-[82px] 2xl:h-[86px] 3xl:h-[92px]",
         )}

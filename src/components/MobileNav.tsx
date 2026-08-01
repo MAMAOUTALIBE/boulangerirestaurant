@@ -37,7 +37,7 @@ export function MobileNav({ open, onClose, links, cartCount }: MobileNavProps) {
             aria-hidden="true"
           />
           <motion.aside
-            className="fixed right-0 top-0 z-50 flex h-full w-[88%] max-w-sm flex-col overflow-y-auto bg-ink-soft px-5 py-5 shadow-card lg:hidden"
+            className="fixed right-0 top-0 z-50 flex h-full w-[88%] max-w-sm flex-col overflow-y-auto bg-ink-soft px-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))] pt-[calc(1.25rem+env(safe-area-inset-top))] shadow-card lg:hidden"
             initial={{ x: "100%" }}
             animate={{ x: 0 }}
             exit={{ x: "100%" }}

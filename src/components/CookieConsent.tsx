@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 
 const STORAGE_KEY = "restaurant-turc-cookie-consent";
@@ -8,6 +9,8 @@ const STORAGE_KEY = "restaurant-turc-cookie-consent";
 /** Bandeau de consentement cookies (RGPD), persisté en localStorage. */
 export function CookieConsent() {
   const [visible, setVisible] = useState(false);
+  const pathname = usePathname();
+  const compactHome = pathname === "/";
 
   useEffect(() => {
     try {
@@ -36,9 +39,11 @@ export function CookieConsent() {
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: 100, opacity: 0 }}
           transition={{ duration: 0.3, ease: "easeOut" }}
-          className="fixed inset-x-3 bottom-3 z-[60] mx-auto max-w-md rounded-2xl border border-white/10 bg-ink-soft p-3 shadow-card sm:inset-x-auto sm:bottom-6 sm:left-6 sm:mx-0 sm:max-w-[34rem] sm:p-4 lg:max-w-[38rem]"
+          className={`fixed inset-x-3 z-[60] mx-auto max-w-md rounded-2xl border border-white/10 bg-ink-soft shadow-card sm:inset-x-auto sm:bottom-6 sm:left-6 sm:top-auto sm:mx-0 sm:max-w-[34rem] sm:p-4 lg:max-w-[38rem] ${compactHome ? "top-[72px] p-2.5" : "bottom-3 p-3"}`}
         >
-          <p className="text-xs leading-relaxed text-cream/85 sm:text-sm">
+          <p
+            className={`text-cream/85 sm:text-sm ${compactHome ? "text-[0.68rem] leading-snug" : "text-xs leading-relaxed"}`}
+          >
             <span className="sm:hidden">
               Cookie nécessaire au site. Mesure d&apos;audience avec
               accord.{" "}
@@ -53,16 +58,20 @@ export function CookieConsent() {
             </a>
             .
           </p>
-          <div className="mt-3 flex shrink-0 gap-2">
+          <div
+            className={`flex shrink-0 gap-2 ${compactHome ? "mt-2" : "mt-3"}`}
+          >
             <button
+              type="button"
               onClick={() => decide("refused")}
-              className="min-h-11 flex-1 rounded-full border border-white/15 px-4 text-sm text-cream transition hover:border-white/40 sm:flex-none"
+              className={`flex-1 rounded-full border border-white/15 px-4 text-cream transition hover:border-white/40 sm:min-h-11 sm:flex-none sm:text-sm ${compactHome ? "min-h-9 text-xs" : "min-h-11 text-sm"}`}
             >
               Refuser
             </button>
             <button
+              type="button"
               onClick={() => decide("accepted")}
-              className="min-h-11 flex-1 rounded-full bg-gold px-4 text-sm font-semibold text-ink transition hover:bg-gold-400 sm:flex-none"
+              className={`flex-1 rounded-full bg-gold px-4 font-semibold text-ink transition hover:bg-gold-400 sm:min-h-11 sm:flex-none sm:text-sm ${compactHome ? "min-h-9 text-xs" : "min-h-11 text-sm"}`}
             >
               Accepter
             </button>

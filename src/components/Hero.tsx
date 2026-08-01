@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import {
+  CalendarCheck,
   Flame,
   MapPin,
   MessageCircle,
@@ -127,7 +128,7 @@ export function Hero({ slides }: { slides: readonly HeroSlide[] }) {
   return (
     <section
       id="accueil"
-      className="relative isolate overflow-hidden bg-[#050505] px-4 pb-3 pt-[5.15rem] text-cream sm:px-6 sm:pb-9 sm:pt-[6.75rem] lg:min-h-[min(840px,calc(100svh-0.5rem))] lg:pt-[7rem] 2xl:min-h-[min(920px,calc(100svh-0.5rem))] 2xl:pt-[7.35rem] 3xl:min-h-[min(1040px,calc(100svh-0.5rem))] 4xl:min-h-[min(1180px,calc(100svh-0.5rem))]"
+      className="relative isolate flex h-dvh flex-col overflow-hidden bg-[#050505] px-4 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-[68px] text-cream sm:block sm:h-auto sm:px-6 sm:pb-9 sm:pt-[6.75rem] lg:min-h-[min(840px,calc(100svh-0.5rem))] lg:pt-[7rem] 2xl:min-h-[min(920px,calc(100svh-0.5rem))] 2xl:pt-[7.35rem] 3xl:min-h-[min(1040px,calc(100svh-0.5rem))] 4xl:min-h-[min(1180px,calc(100svh-0.5rem))]"
     >
       <div className="pointer-events-none absolute inset-0 z-0 h-full w-full">
         {slides.map((slide, index) => (
@@ -193,21 +194,16 @@ export function Hero({ slides }: { slides: readonly HeroSlide[] }) {
                 <source src={slide.src} type="video/mp4" />
               </video>
             ) : null}
-            {slide.type === "video" ? (
-              <div
-                className="absolute inset-0 bg-[linear-gradient(180deg,rgba(5,5,5,0.52)_0%,rgba(5,5,5,0.36)_34%,rgba(5,5,5,0.7)_72%,rgba(5,5,5,0.46)_100%)] sm:bg-[linear-gradient(90deg,rgba(5,5,5,0.84)_0%,rgba(5,5,5,0.62)_46%,rgba(5,5,5,0.24)_76%,rgba(5,5,5,0.08)_100%)] lg:bg-[linear-gradient(90deg,rgba(5,5,5,0.76)_0%,rgba(5,5,5,0.5)_40%,rgba(5,5,5,0.16)_70%,rgba(5,5,5,0.04)_100%)]"
-                aria-hidden
-              />
-            ) : (
+            {slide.type !== "video" ? (
               <Image
                 src={slide.src}
                 alt={index === activeSlide ? slide.alt : ""}
                 fill
                 priority={index === 0}
                 sizes="100vw"
-                className="origin-center object-contain object-center brightness-[1.04] contrast-[1.04] saturate-[1.06]"
+                className="origin-center object-cover object-center brightness-[1.04] contrast-[1.04] saturate-[1.06] sm:object-contain"
               />
-            )}
+            ) : null}
           </motion.div>
         ))}
         <div
@@ -216,25 +212,25 @@ export function Hero({ slides }: { slides: readonly HeroSlide[] }) {
         />
       </div>
 
-      <div className="relative z-30 mx-auto flex w-full max-w-[1680px] flex-col gap-5 sm:gap-6 lg:gap-7 3xl:max-w-[2100px] 4xl:max-w-[2360px]">
-        <div className="flex min-h-[420px] items-center pb-1 min-[390px]:min-h-[460px] sm:min-h-[560px] sm:pb-2 md:min-h-[600px] lg:min-h-[560px] 2xl:min-h-[630px] 3xl:min-h-[720px] 4xl:min-h-[820px]">
+      <div className="relative z-30 mx-auto flex min-h-0 w-full max-w-[1680px] flex-1 flex-col gap-2 sm:gap-6 lg:gap-7 3xl:max-w-[2100px] 4xl:max-w-[2360px]">
+        <div className="flex min-h-0 flex-1 items-center pb-1 sm:min-h-[560px] sm:pb-2 md:min-h-[600px] lg:min-h-[560px] 2xl:min-h-[630px] 3xl:min-h-[720px] 4xl:min-h-[820px]">
           <motion.div
-            className="relative isolate z-20 -mt-8 max-w-[620px] py-3 sm:-mt-[5.25rem] sm:max-w-[650px] sm:py-4 lg:-mt-[6rem] lg:pl-2 xl:-mt-[6.75rem] xl:pl-4 3xl:-mt-32 3xl:max-w-[780px]"
+            className="relative isolate z-20 max-w-[620px] py-2 sm:-mt-[5.25rem] sm:max-w-[650px] sm:py-4 lg:-mt-[6rem] lg:pl-2 xl:-mt-[6.75rem] xl:pl-4 3xl:-mt-32 3xl:max-w-[780px]"
             initial={false}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.65 }}
           >
             <div
-              className="pointer-events-none absolute -bottom-5 -left-5 -right-8 -top-5 z-0 bg-[linear-gradient(90deg,rgba(5,5,5,0.76)_0%,rgba(5,5,5,0.58)_56%,rgba(5,5,5,0.18)_82%,transparent_100%)] sm:-left-7 lg:-bottom-8 lg:-left-10 lg:-right-24 lg:-top-8"
+              className="pointer-events-none absolute -bottom-5 -left-5 -right-2 -top-5 z-0 bg-[radial-gradient(ellipse_at_left,rgba(5,5,5,0.56)_0%,rgba(5,5,5,0.32)_48%,transparent_76%)] sm:-left-7 sm:right-8 lg:-bottom-8 lg:-left-10 lg:-top-8"
               aria-hidden
             />
 
             <div className="relative z-20">
-              <h1 className="font-display text-[2.65rem] font-bold leading-[0.98] text-[#F8F3EA] drop-shadow-[0_3px_8px_rgba(0,0,0,0.96)] min-[390px]:text-5xl sm:text-6xl lg:text-[4.15rem] xl:text-[4.8rem] 3xl:text-[5.8rem] 4xl:text-[6.5rem]">
+              <h1 className="font-display text-[clamp(2.2rem,12vw,3rem)] font-bold leading-[0.98] text-[#F8F3EA] drop-shadow-[0_3px_8px_rgba(0,0,0,0.96)] sm:text-6xl lg:text-[4.15rem] xl:text-[4.8rem] 3xl:text-[5.8rem] 4xl:text-[6.5rem]">
                 <span className="block text-gold">{siteConfig.name}</span>
               </h1>
 
-              <p className="text-[#F8F3EA]/88 mt-3 max-w-[18rem] text-sm font-semibold leading-5 drop-shadow-[0_2px_5px_rgba(0,0,0,0.98)] sm:mt-5 sm:max-w-xl sm:text-xl sm:leading-8 3xl:max-w-3xl 3xl:text-2xl 3xl:leading-10">
+              <p className="text-[#F8F3EA]/88 mt-2 max-w-[18rem] text-sm font-semibold leading-5 drop-shadow-[0_2px_5px_rgba(0,0,0,0.98)] sm:mt-5 sm:max-w-xl sm:text-xl sm:leading-8 3xl:max-w-3xl 3xl:text-2xl 3xl:leading-10">
                 Grillades au charbon. Commandez maintenant.
               </p>
 
@@ -268,7 +264,7 @@ export function Hero({ slides }: { slides: readonly HeroSlide[] }) {
               </div>
 
               <div
-                className="mt-4 flex items-center gap-2 sm:mt-5 3xl:mt-7 3xl:gap-3"
+                className="mt-3 flex items-center gap-2 sm:mt-5 3xl:mt-7 3xl:gap-3"
                 aria-label="Visuels du hero"
               >
                 {slides.map((slide, index) => (
@@ -292,7 +288,7 @@ export function Hero({ slides }: { slides: readonly HeroSlide[] }) {
 
         {/* Mobile : réassurance en ruban premium défilant */}
         <div
-          className="hero-service-marquee relative z-20 -mx-4 overflow-hidden pb-0.5 sm:hidden"
+          className="hero-service-marquee relative z-20 -mx-4 shrink-0 overflow-hidden pb-0.5 sm:hidden"
           aria-label="Services disponibles : click and collect, livraison, sur place et grillades au charbon"
         >
           <div className="hero-service-track" aria-hidden="true">
@@ -306,6 +302,28 @@ export function Hero({ slides }: { slides: readonly HeroSlide[] }) {
             )}
           </div>
         </div>
+
+        <nav
+          aria-label="Actions principales"
+          className="grid shrink-0 grid-cols-3 gap-2 pb-0.5 sm:hidden"
+        >
+          {[
+            { href: "/commander", label: "Commander", Icon: ShoppingBag },
+            { href: "/reservation", label: "Réserver", Icon: CalendarCheck },
+            { href: "/menu", label: "Voir le menu", Icon: UtensilsCrossed },
+          ].map(({ href, label, Icon }) => (
+            <Link
+              key={href}
+              href={href}
+              className="flex min-h-[4.65rem] min-w-0 flex-col items-center justify-center gap-1.5 rounded-[18px] border border-gold/80 bg-[linear-gradient(135deg,rgba(5,5,5,0.98)_0%,rgba(28,21,12,0.98)_55%,rgba(96,61,8,0.96)_100%)] px-1.5 py-2 text-center text-[0.78rem] font-black leading-tight text-white shadow-[inset_0_1px_0_rgba(255,224,156,0.2),0_10px_24px_-10px_rgba(216,154,28,0.85),0_0_16px_-8px_rgba(245,158,11,0.95)] transition hover:border-gold hover:brightness-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 focus-visible:ring-offset-black active:scale-[0.98] active:brightness-95"
+            >
+              <span className="grid h-8 w-8 place-items-center rounded-full border border-gold bg-gold text-[#090704] shadow-[0_0_14px_-4px_rgba(245,158,11,0.95)]">
+                <Icon className="h-4 w-4" aria-hidden />
+              </span>
+              <span>{label}</span>
+            </Link>
+          ))}
+        </nav>
 
         <motion.div
           aria-label="Services disponibles"
