@@ -22,9 +22,10 @@ import { getSiteConfig } from "@/lib/site-settings";
 import { remainingStock, stockToday } from "@/lib/stock";
 import { recordDemoLead } from "@/lib/demo-leads";
 import {
-  isOnlineOrderingEnabled,
+  getOrderingMode,
   ONLINE_ORDERING_DISABLED_MESSAGE,
 } from "@/lib/online-ordering";
+import { canCreateOnlineOrder } from "@/lib/online-ordering-rules";
 
 interface CreateOrderInput {
   customer: Order["customer"];
@@ -203,8 +204,14 @@ export async function createOrder({
   tip = 0,
   scheduledAt,
 }: CreateOrderInput): Promise<Order> {
-  if (!(await isOnlineOrderingEnabled())) {
+  const orderingMode = await getOrderingMode();
+  if (!canCreateOnlineOrder(orderingMode)) {
     throw new OrderCreationError(ONLINE_ORDERING_DISABLED_MESSAGE);
+  }
+  if (orderingMode === "paiement_sur_place" && fulfillment === "livraison") {
+    throw new OrderCreationError(
+      "En mode paiement sur place, choisissez sur place ou à emporter.",
+    );
   }
   const restaurant = await getDefaultRestaurant();
   const normalizedItems = await normalizeOrderItems(items);

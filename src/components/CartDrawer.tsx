@@ -233,7 +233,7 @@ export function CartDrawer() {
                     </span>
                   </div>
                   {/* Fidélité : 1 point par euro (cf. lib/loyalty.ts). */}
-                  {siteConfig.onlineOrderingEnabled &&
+                  {siteConfig.orderingMode !== "vitrine" &&
                     Math.floor(totalPrice) > 0 && (
                       <p className="mb-3 flex items-center gap-1.5 rounded-lg bg-gold/10 px-3 py-2 text-xs font-medium text-gold">
                         <Sparkles className="h-3.5 w-3.5" />
@@ -241,7 +241,7 @@ export function CartDrawer() {
                         {Math.floor(totalPrice) > 1 ? "s" : ""} de fidélité
                       </p>
                     )}
-                  {siteConfig.onlineOrderingEnabled ? (
+                  {siteConfig.orderingMode !== "vitrine" ? (
                     <>
                       <a
                         href="/commander"
@@ -251,7 +251,10 @@ export function CartDrawer() {
                         Passer la commande
                       </a>
                       <p className="mt-2 flex items-center justify-center gap-1.5 text-xs text-muted">
-                        <Lock className="h-3 w-3" /> Paiement 100 % sécurisé
+                        <Lock className="h-3 w-3" />{" "}
+                        {siteConfig.orderingMode === "paiement_en_ligne"
+                          ? "Paiement 100 % sécurisé"
+                          : "Paiement directement au restaurant"}
                       </p>
                     </>
                   ) : (

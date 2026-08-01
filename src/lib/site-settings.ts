@@ -7,7 +7,7 @@ import {
   whatsappUrl,
   type SiteConfig,
 } from "@/lib/config";
-import { resolveOnlineOrderingEnabled } from "@/lib/online-ordering-rules";
+import { resolveOrderingMode } from "@/lib/online-ordering-rules";
 
 /** Renvoie `value` si non vide, sinon `fallback`. */
 function pick(value: string | null | undefined, fallback: string): string {
@@ -132,14 +132,12 @@ export const getSiteConfig = cache(async (): Promise<SiteConfig> => {
     prisma.orderingSetting
       .findUnique({
         where: { id: "default" },
-        select: { onlineOrderingEnabled: true },
+        select: { orderingMode: true },
       })
       .catch(() => null),
   ]);
   return {
     ...mergeSiteConfig(defaultSiteConfig, row),
-    onlineOrderingEnabled: resolveOnlineOrderingEnabled(
-      ordering?.onlineOrderingEnabled,
-    ),
+    orderingMode: resolveOrderingMode(ordering?.orderingMode),
   };
 });

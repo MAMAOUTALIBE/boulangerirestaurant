@@ -1,14 +1,26 @@
 import { describe, expect, it } from "vitest";
-import { resolveOnlineOrderingEnabled } from "./online-ordering-rules";
+import {
+  canCreateOnlineOrder,
+  canPayOnline,
+  resolveOrderingMode,
+} from "./online-ordering-rules";
 
-describe("resolveOnlineOrderingEnabled", () => {
-  it("reste désactivé sans réglage explicite", () => {
-    expect(resolveOnlineOrderingEnabled(undefined)).toBe(false);
-    expect(resolveOnlineOrderingEnabled(null)).toBe(false);
-    expect(resolveOnlineOrderingEnabled(false)).toBe(false);
+describe("règles des modes de commande", () => {
+  it("retombe en mode vitrine sans valeur explicitement valide", () => {
+    expect(resolveOrderingMode(undefined)).toBe("vitrine");
+    expect(resolveOrderingMode(null)).toBe("vitrine");
+    expect(resolveOrderingMode("inconnu")).toBe("vitrine");
   });
 
-  it("n'autorise les commandes que pour la valeur vraie explicite", () => {
-    expect(resolveOnlineOrderingEnabled(true)).toBe(true);
+  it("autorise la création sans autoriser le paiement en mode sur place", () => {
+    expect(canCreateOnlineOrder("paiement_sur_place")).toBe(true);
+    expect(canPayOnline("paiement_sur_place")).toBe(false);
+  });
+
+  it("réserve le paiement en ligne au mode complet", () => {
+    expect(canCreateOnlineOrder("vitrine")).toBe(false);
+    expect(canPayOnline("vitrine")).toBe(false);
+    expect(canCreateOnlineOrder("paiement_en_ligne")).toBe(true);
+    expect(canPayOnline("paiement_en_ligne")).toBe(true);
   });
 });

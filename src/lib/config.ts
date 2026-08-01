@@ -12,9 +12,11 @@
  * aussi bien côté client que serveur.
  */
 
+import type { OrderingMode } from "@/lib/online-ordering-rules";
+
 export interface SiteConfig {
-  /** État public de la prise de commande, fermé par défaut côté serveur. */
-  onlineOrderingEnabled: boolean;
+  /** Mode public de commande, toujours résolu en vitrine en cas d'inconnu. */
+  orderingMode: OrderingMode;
   name: string;
   shortName: string;
   description: string;
@@ -92,7 +94,7 @@ export function telegramUrl(username: string): string {
 
 /** Valeurs par défaut du template (fallback quand la base est vide). */
 export const defaultSiteConfig: SiteConfig = {
-  onlineOrderingEnabled: false,
+  orderingMode: "vitrine",
   name: "Lauuale Simbo",
   shortName: "Lauuale Simbo",
   description:

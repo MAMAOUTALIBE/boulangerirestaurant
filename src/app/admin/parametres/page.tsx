@@ -1,4 +1,4 @@
-import { Palette, ShieldCheck, Store } from "lucide-react";
+import { CreditCard, Eye, Palette, ShieldCheck, Store } from "lucide-react";
 import { adminEmails } from "@/lib/auth";
 import { defaultSiteConfig } from "@/lib/config";
 import { prisma } from "@/lib/prisma";
@@ -641,25 +641,63 @@ export default async function AdminParametresPage() {
           action={adminUpdateOrderingSettings}
           className="mt-3 space-y-5 text-sm"
         >
-          <div className="rounded-xl border border-gold/25 bg-gold/5 p-4">
-            <label className="flex cursor-pointer items-start gap-3">
-              <input
-                type="checkbox"
-                name="onlineOrderingEnabled"
-                defaultChecked={setting?.onlineOrderingEnabled ?? false}
-                className="mt-1 h-4 w-4 accent-gold"
-              />
-              <span>
-                <span className="block font-semibold text-cream">
-                  Autoriser la commande en ligne
-                </span>
-                <span className="mt-1 block leading-5 text-cream/65">
-                  Désactivé : les clients peuvent remplir leur panier, mais ne
-                  peuvent ni envoyer une commande ni payer en ligne ou par
-                  messagerie.
-                </span>
-              </span>
-            </label>
+          <div>
+            <fieldset>
+              <legend className="font-semibold text-cream">
+                Mode de prise de commande
+              </legend>
+              <p className="mt-1 text-cream/65">
+                Un seul mode peut être actif. Le mode vitrine est appliqué par
+                défaut pour empêcher toute commande involontaire.
+              </p>
+              <div className="mt-3 grid gap-3 lg:grid-cols-3">
+                {[
+                  {
+                    value: "vitrine",
+                    title: "Mode vitrine",
+                    description:
+                      "Menu et panier consultables, sans envoi de commande ni paiement.",
+                    Icon: Eye,
+                  },
+                  {
+                    value: "paiement_sur_place",
+                    title: "Paiement sur place",
+                    description:
+                      "La commande est transmise, puis réglée directement au restaurant.",
+                    Icon: Store,
+                  },
+                  {
+                    value: "paiement_en_ligne",
+                    title: "Paiement en ligne",
+                    description:
+                      "Flux complet avec commande et paiement sécurisé en ligne.",
+                    Icon: CreditCard,
+                  },
+                ].map(({ value, title, description, Icon }) => (
+                  <label
+                    key={value}
+                    className="cursor-pointer rounded-xl border border-white/15 bg-white/[0.03] p-4 transition has-[:checked]:border-gold has-[:checked]:bg-gold/10"
+                  >
+                    <span className="flex items-center gap-3">
+                      <input
+                        type="radio"
+                        name="orderingMode"
+                        value={value}
+                        defaultChecked={
+                          (setting?.orderingMode ?? "vitrine") === value
+                        }
+                        className="h-4 w-4 accent-gold"
+                      />
+                      <Icon className="h-5 w-5 text-gold" />
+                      <span className="font-semibold text-cream">{title}</span>
+                    </span>
+                    <span className="mt-2 block pl-7 leading-5 text-cream/65">
+                      {description}
+                    </span>
+                  </label>
+                ))}
+              </div>
+            </fieldset>
           </div>
           <div className="flex flex-wrap items-end gap-3">
             <label className="text-cream/80">

@@ -219,12 +219,12 @@ export default function CommanderPage() {
           Retour au menu
         </Link>
         <h1 className="mt-5 font-display text-[1.75rem] font-bold leading-tight text-cream sm:mt-6 sm:text-4xl">
-          {siteConfig.onlineOrderingEnabled
+          {siteConfig.orderingMode !== "vitrine"
             ? "Finaliser ma commande"
             : "Votre sélection"}
         </h1>
 
-        {!siteConfig.onlineOrderingEnabled && (
+        {siteConfig.orderingMode === "vitrine" && (
           <section className="mx-auto mt-8 max-w-2xl rounded-2xl border border-gold/30 bg-ink-soft p-6 text-center sm:p-8">
             <Lock className="mx-auto h-9 w-9 text-gold" />
             <h2 className="mt-4 font-display text-2xl font-semibold text-cream">
@@ -254,11 +254,11 @@ export default function CommanderPage() {
           </section>
         )}
 
-        {siteConfig.onlineOrderingEnabled && items.length > 0 && (
+        {siteConfig.orderingMode !== "vitrine" && items.length > 0 && (
           <StepIndicator current={choice ? 2 : 1} />
         )}
 
-        {!siteConfig.onlineOrderingEnabled ? null : items.length === 0 ? (
+        {siteConfig.orderingMode === "vitrine" ? null : items.length === 0 ? (
           <EmptyCartState />
         ) : !choice ? (
           /* ÉTAPE 1 — mode + calendrier (entrée de commande) */
@@ -266,6 +266,7 @@ export default function CommanderPage() {
             <section className="min-w-0 rounded-2xl border border-white/10 bg-ink-soft p-4 sm:p-6">
               <OrderStarter
                 subtotal={totalPrice}
+                allowDelivery={siteConfig.orderingMode === "paiement_en_ligne"}
                 onConfirmed={() =>
                   window.scrollTo({ top: 0, behavior: "auto" })
                 }
@@ -410,36 +411,38 @@ export default function CommanderPage() {
                   )}
                 </div>
 
-                <div className="mt-4 hidden rounded-2xl border border-white/10 bg-ink-soft p-5 sm:block">
-                  <p className="text-sm font-semibold text-cream">
-                    Commander par messagerie
-                  </p>
-                  <p className="mt-1 text-xs leading-5 text-muted">
-                    Le message reprend le panier, le créneau et le total estimé.
-                    Vous confirmez ensuite vos coordonnées dans
-                    l&apos;application.
-                  </p>
-                  <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                    <a
-                      href={whatsappOrderUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center justify-center gap-2 rounded-xl border border-green-400/30 bg-green-500/10 px-4 py-3 text-sm font-semibold text-green-200 transition hover:border-green-300 hover:bg-green-500/15"
-                    >
-                      <MessageCircle className="h-4 w-4" />
-                      WhatsApp
-                    </a>
-                    <a
-                      href={telegramOrderUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center justify-center gap-2 rounded-xl border border-sky-400/30 bg-sky-500/10 px-4 py-3 text-sm font-semibold text-sky-200 transition hover:border-sky-300 hover:bg-sky-500/15"
-                    >
-                      <Send className="h-4 w-4" />
-                      Telegram
-                    </a>
+                {siteConfig.orderingMode === "paiement_en_ligne" && (
+                  <div className="mt-4 hidden rounded-2xl border border-white/10 bg-ink-soft p-5 sm:block">
+                    <p className="text-sm font-semibold text-cream">
+                      Commander par messagerie
+                    </p>
+                    <p className="mt-1 text-xs leading-5 text-muted">
+                      Le message reprend le panier, le créneau et le total
+                      estimé. Vous confirmez ensuite vos coordonnées dans
+                      l&apos;application.
+                    </p>
+                    <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                      <a
+                        href={whatsappOrderUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center justify-center gap-2 rounded-xl border border-green-400/30 bg-green-500/10 px-4 py-3 text-sm font-semibold text-green-200 transition hover:border-green-300 hover:bg-green-500/15"
+                      >
+                        <MessageCircle className="h-4 w-4" />
+                        WhatsApp
+                      </a>
+                      <a
+                        href={telegramOrderUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center justify-center gap-2 rounded-xl border border-sky-400/30 bg-sky-500/10 px-4 py-3 text-sm font-semibold text-sky-200 transition hover:border-sky-300 hover:bg-sky-500/15"
+                      >
+                        <Send className="h-4 w-4" />
+                        Telegram
+                      </a>
+                    </div>
                   </div>
-                </div>
+                )}
               </section>
 
               {/* Coordonnées */}
@@ -501,11 +504,15 @@ export default function CommanderPage() {
                     >
                       {submitting
                         ? "Validation…"
-                        : `Valider — ${formatPrice(total)}`}
+                        : siteConfig.orderingMode === "paiement_sur_place"
+                          ? `Envoyer la commande — ${formatPrice(total)}`
+                          : `Valider — ${formatPrice(total)}`}
                     </button>
                     <p className="mt-2 flex items-center justify-center gap-1.5 text-center text-xs text-muted">
                       <Lock className="h-3 w-3" />
-                      Paiement sécurisé à l&apos;étape suivante.
+                      {siteConfig.orderingMode === "paiement_sur_place"
+                        ? "Aucun paiement en ligne : vous réglerez directement au restaurant."
+                        : "Paiement sécurisé à l’étape suivante."}
                     </p>
                   </div>
                 </form>

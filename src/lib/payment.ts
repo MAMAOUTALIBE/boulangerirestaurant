@@ -3,6 +3,8 @@ import type { Order } from "@/types";
 import { getSiteConfig } from "@/lib/site-settings";
 import { getRestaurantConnectTransferData } from "@/lib/stripe-connect";
 import { amountInCents } from "@/lib/payment-integrity";
+import { getOrderingMode } from "@/lib/online-ordering";
+import { canPayOnline } from "@/lib/online-ordering-rules";
 
 export class PaymentConfigurationError extends Error {
   constructor() {
@@ -26,6 +28,9 @@ export interface CheckoutResult {
  * - Sinon : mode simulation (retourne `simulated: true`, à confirmer côté app).
  */
 export async function startCheckout(order: Order): Promise<CheckoutResult> {
+  if (!canPayOnline(await getOrderingMode())) {
+    throw new PaymentConfigurationError();
+  }
   const secret = process.env.STRIPE_SECRET_KEY;
   if (!secret) {
     if (process.env.NODE_ENV === "production") {

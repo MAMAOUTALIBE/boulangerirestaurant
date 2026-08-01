@@ -10,7 +10,7 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { OrderStatusNotifier } from "@/components/OrderStatusNotifier";
 import type { OrderStatus } from "@/types";
-import { isOnlineOrderingEnabled } from "@/lib/online-ordering";
+import { getOrderingMode } from "@/lib/online-ordering";
 
 export const dynamic = "force-dynamic";
 
@@ -38,9 +38,9 @@ export default async function OrderPage({ params, searchParams }: PageProps) {
     params,
     searchParams,
   ]);
-  const [order, onlineOrderingEnabled] = await Promise.all([
+  const [order, orderingMode] = await Promise.all([
     getOrderByReference(reference),
-    isOnlineOrderingEnabled(),
+    getOrderingMode(),
   ]);
   if (!order) notFound();
 
@@ -217,25 +217,27 @@ export default async function OrderPage({ params, searchParams }: PageProps) {
               </div>
             </div>
 
-            {!isPaid && !paymentPending && onlineOrderingEnabled && (
-              <form
-                action={payOrder.bind(null, order.reference)}
-                className="mt-8"
-              >
-                <button type="submit" className="btn-primary w-full">
-                  Payer maintenant — {formatPrice(order.total)}
-                </button>
-                <p className="mt-2 text-center text-xs text-muted">
-                  Paiement sécurisé via Stripe. (Mode démo si aucune clé
-                  configurée.)
-                </p>
-              </form>
-            )}
-            {!isPaid && !onlineOrderingEnabled && (
+            {!isPaid &&
+              !paymentPending &&
+              orderingMode === "paiement_en_ligne" && (
+                <form
+                  action={payOrder.bind(null, order.reference)}
+                  className="mt-8"
+                >
+                  <button type="submit" className="btn-primary w-full">
+                    Payer maintenant — {formatPrice(order.total)}
+                  </button>
+                  <p className="mt-2 text-center text-xs text-muted">
+                    Paiement sécurisé via Stripe. (Mode démo si aucune clé
+                    configurée.)
+                  </p>
+                </form>
+              )}
+            {!isPaid && orderingMode !== "paiement_en_ligne" && (
               <p className="mt-8 rounded-xl border border-gold/30 bg-gold/5 p-4 text-center text-sm leading-6 text-cream/75">
-                Le paiement en ligne est temporairement désactivé. Cette
-                commande reste consultable, mais aucun paiement ne peut être
-                lancé.
+                {orderingMode === "paiement_sur_place"
+                  ? "Commande bien transmise. Vous paierez directement au restaurant, sur place ou au retrait."
+                  : "Le paiement en ligne est temporairement désactivé. Cette commande historique reste consultable, mais aucun paiement ne peut être lancé."}
               </p>
             )}
           </div>

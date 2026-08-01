@@ -767,8 +767,9 @@ export async function getReorderItems(reference: string): Promise<
  * - Sinon → simulation : la commande passe en « payée ».
  */
 export async function payOrder(reference: string): Promise<void> {
-  const { isOnlineOrderingEnabled } = await import("@/lib/online-ordering");
-  if (!(await isOnlineOrderingEnabled())) {
+  const { getOrderingMode } = await import("@/lib/online-ordering");
+  const { canPayOnline } = await import("@/lib/online-ordering-rules");
+  if (!canPayOnline(await getOrderingMode())) {
     redirect(`/commande/${reference}?payment=disabled`);
   }
   // Anti-abus : borne le déclenchement de paiement (spam checkout / simulation).
@@ -1598,7 +1599,10 @@ export async function adminUpdateOrderingSettings(
 ): Promise<void> {
   if (!(await isAdminSession())) redirect("/compte");
   const data = {
-    onlineOrderingEnabled: formData.get("onlineOrderingEnabled") === "on",
+    orderingMode: z
+      .enum(["vitrine", "paiement_sur_place", "paiement_en_ligne"])
+      .catch("vitrine")
+      .parse(formData.get("orderingMode")),
     slotIntervalMin: Number(formData.get("slotIntervalMin") ?? 15),
     leadTimeMin: Number(formData.get("leadTimeMin") ?? 20),
     capacityPerSlot: Number(formData.get("capacityPerSlot") ?? 8),

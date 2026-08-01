@@ -38,15 +38,22 @@ function dayLabel(d: Date) {
 export function OrderStarter({
   subtotal,
   onConfirmed,
+  allowDelivery = true,
 }: {
   subtotal: number;
   onConfirmed?: () => void;
+  allowDelivery?: boolean;
 }) {
   const { choice, setChoice } = useOrderChoice();
   const siteConfig = useSiteConfig();
-  const [mode, setMode] = useState<Fulfillment>(
-    choice?.fulfillment ?? "emporter",
-  );
+  const initialMode =
+    !allowDelivery && choice?.fulfillment === "livraison"
+      ? "emporter"
+      : (choice?.fulfillment ?? "emporter");
+  const [mode, setMode] = useState<Fulfillment>(initialMode);
+  const availableModes = allowDelivery
+    ? MODES
+    : MODES.filter(({ value }) => value !== "livraison");
   const [postal, setPostal] = useState(choice?.postalCode ?? "");
   const [street, setStreet] = useState(choice?.deliveryStreet ?? "");
   const [city, setCity] = useState(choice?.deliveryCity ?? "");
@@ -94,7 +101,7 @@ export function OrderStarter({
       label = `${dayLabel(d)} ${d.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" })}`;
       scheduledAt = slotIso;
     }
-    const modeLabel = MODES.find((m) => m.value === mode)!.label;
+    const modeLabel = availableModes.find((m) => m.value === mode)!.label;
     const normalizedPostal = postal.trim();
     const normalizedStreet = street.trim();
     const normalizedCity = city.trim();
@@ -138,8 +145,10 @@ export function OrderStarter({
         <h3 className="font-display text-lg font-semibold leading-tight text-cream">
           Comment ça se passe ?
         </h3>
-        <div className="mt-3 grid min-w-0 grid-cols-3 gap-2">
-          {MODES.map(({ value, label, Icon }) => (
+        <div
+          className={`mt-3 grid min-w-0 gap-2 ${allowDelivery ? "grid-cols-3" : "grid-cols-2"}`}
+        >
+          {availableModes.map(({ value, label, Icon }) => (
             <button
               key={value}
               type="button"
