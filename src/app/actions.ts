@@ -767,6 +767,10 @@ export async function getReorderItems(reference: string): Promise<
  * - Sinon → simulation : la commande passe en « payée ».
  */
 export async function payOrder(reference: string): Promise<void> {
+  const { isOnlineOrderingEnabled } = await import("@/lib/online-ordering");
+  if (!(await isOnlineOrderingEnabled())) {
+    redirect(`/commande/${reference}?payment=disabled`);
+  }
   // Anti-abus : borne le déclenchement de paiement (spam checkout / simulation).
   if (!(await rateLimit(`pay:${await clientIp()}`, 10, 60_000))) {
     redirect(`/commande/${reference}?error=throttle`);
@@ -1594,6 +1598,7 @@ export async function adminUpdateOrderingSettings(
 ): Promise<void> {
   if (!(await isAdminSession())) redirect("/compte");
   const data = {
+    onlineOrderingEnabled: formData.get("onlineOrderingEnabled") === "on",
     slotIntervalMin: Number(formData.get("slotIntervalMin") ?? 15),
     leadTimeMin: Number(formData.get("leadTimeMin") ?? 20),
     capacityPerSlot: Number(formData.get("capacityPerSlot") ?? 8),
@@ -1607,6 +1612,9 @@ export async function adminUpdateOrderingSettings(
     create: { id: "default", ...data },
   });
   revalidatePath("/admin/parametres");
+  revalidatePath("/", "layout");
+  revalidatePath("/commander");
+  revalidatePath("/commande/[reference]", "page");
   redirect("/admin/parametres");
 }
 

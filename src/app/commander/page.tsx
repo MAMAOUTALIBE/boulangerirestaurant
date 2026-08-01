@@ -219,12 +219,46 @@ export default function CommanderPage() {
           Retour au menu
         </Link>
         <h1 className="mt-5 font-display text-[1.75rem] font-bold leading-tight text-cream sm:mt-6 sm:text-4xl">
-          Finaliser ma commande
+          {siteConfig.onlineOrderingEnabled
+            ? "Finaliser ma commande"
+            : "Votre sélection"}
         </h1>
 
-        {items.length > 0 && <StepIndicator current={choice ? 2 : 1} />}
+        {!siteConfig.onlineOrderingEnabled && (
+          <section className="mx-auto mt-8 max-w-2xl rounded-2xl border border-gold/30 bg-ink-soft p-6 text-center sm:p-8">
+            <Lock className="mx-auto h-9 w-9 text-gold" />
+            <h2 className="mt-4 font-display text-2xl font-semibold text-cream">
+              Commande en ligne bientôt disponible
+            </h2>
+            <p className="mt-3 leading-7 text-cream/70">
+              Vous pouvez préparer votre sélection, puis venir commander et
+              payer directement au restaurant. À déguster sur place ou à
+              emporter.
+            </p>
+            {items.length > 0 && (
+              <p className="mt-4 font-semibold text-gold">
+                Total estimé : {formatPrice(totalPrice)}
+              </p>
+            )}
+            <div className="mt-6 grid gap-3 sm:grid-cols-2">
+              <Link href="/#contact" className="btn-primary">
+                Voir l’adresse et les horaires
+              </Link>
+              <Link
+                href="/menu"
+                className="rounded-xl border border-white/15 px-5 py-3 font-semibold text-cream transition hover:border-gold/50"
+              >
+                Continuer à découvrir le menu
+              </Link>
+            </div>
+          </section>
+        )}
 
-        {items.length === 0 ? (
+        {siteConfig.onlineOrderingEnabled && items.length > 0 && (
+          <StepIndicator current={choice ? 2 : 1} />
+        )}
+
+        {!siteConfig.onlineOrderingEnabled ? null : items.length === 0 ? (
           <EmptyCartState />
         ) : !choice ? (
           /* ÉTAPE 1 — mode + calendrier (entrée de commande) */

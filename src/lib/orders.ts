@@ -21,6 +21,10 @@ import { getDefaultRestaurant } from "@/lib/restaurants";
 import { getSiteConfig } from "@/lib/site-settings";
 import { remainingStock, stockToday } from "@/lib/stock";
 import { recordDemoLead } from "@/lib/demo-leads";
+import {
+  isOnlineOrderingEnabled,
+  ONLINE_ORDERING_DISABLED_MESSAGE,
+} from "@/lib/online-ordering";
 
 interface CreateOrderInput {
   customer: Order["customer"];
@@ -199,6 +203,9 @@ export async function createOrder({
   tip = 0,
   scheduledAt,
 }: CreateOrderInput): Promise<Order> {
+  if (!(await isOnlineOrderingEnabled())) {
+    throw new OrderCreationError(ONLINE_ORDERING_DISABLED_MESSAGE);
+  }
   const restaurant = await getDefaultRestaurant();
   const normalizedItems = await normalizeOrderItems(items);
   const subtotal = roundCurrency(

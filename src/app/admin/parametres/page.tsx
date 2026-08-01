@@ -639,65 +639,87 @@ export default async function AdminParametresPage() {
         </h3>
         <form
           action={adminUpdateOrderingSettings}
-          className="mt-3 flex flex-wrap items-end gap-3 text-sm"
+          className="mt-3 space-y-5 text-sm"
         >
-          <label className="text-cream/80">
-            Intervalle (min)
-            <input
-              name="slotIntervalMin"
-              type="number"
-              defaultValue={setting?.slotIntervalMin ?? 15}
-              className="mt-1 block w-24 rounded-lg border border-white/10 bg-ink px-3 py-2 text-cream focus:border-gold/60 focus:outline-none"
-            />
-          </label>
-          <label className="text-cream/80">
-            Délai prépa (min)
-            <input
-              name="leadTimeMin"
-              type="number"
-              defaultValue={setting?.leadTimeMin ?? 20}
-              className="mt-1 block w-24 rounded-lg border border-white/10 bg-ink px-3 py-2 text-cream focus:border-gold/60 focus:outline-none"
-            />
-          </label>
-          <label className="text-cream/80">
-            Capacité / créneau
-            <input
-              name="capacityPerSlot"
-              type="number"
-              defaultValue={setting?.capacityPerSlot ?? 8}
-              className="mt-1 block w-24 rounded-lg border border-white/10 bg-ink px-3 py-2 text-cream focus:border-gold/60 focus:outline-none"
-            />
-          </label>
-          <label className="text-cream/80">
-            Alerte imminent (min)
-            <input
-              name="imminentMin"
-              type="number"
-              defaultValue={setting?.imminentMin ?? 5}
-              className="mt-1 block w-24 rounded-lg border border-white/10 bg-ink px-3 py-2 text-cream focus:border-gold/60 focus:outline-none"
-            />
-          </label>
-          <label className="text-cream/80">
-            Max préparation (min)
-            <input
-              name="prepMaxMin"
-              type="number"
-              defaultValue={setting?.prepMaxMin ?? 10}
-              className="mt-1 block w-24 rounded-lg border border-white/10 bg-ink px-3 py-2 text-cream focus:border-gold/60 focus:outline-none"
-            />
-          </label>
-          <label className="text-cream/80">
-            Max autres colonnes (min)
-            <input
-              name="stageMaxMin"
-              type="number"
-              defaultValue={setting?.stageMaxMin ?? 5}
-              className="mt-1 block w-24 rounded-lg border border-white/10 bg-ink px-3 py-2 text-cream focus:border-gold/60 focus:outline-none"
-            />
-          </label>
-          <button className="rounded-lg bg-gold px-4 py-2 text-sm font-semibold text-ink transition hover:bg-gold-400">
-            Enregistrer
-          </button>
+          <div className="rounded-xl border border-gold/25 bg-gold/5 p-4">
+            <label className="flex cursor-pointer items-start gap-3">
+              <input
+                type="checkbox"
+                name="onlineOrderingEnabled"
+                defaultChecked={setting?.onlineOrderingEnabled ?? false}
+                className="mt-1 h-4 w-4 accent-gold"
+              />
+              <span>
+                <span className="block font-semibold text-cream">
+                  Autoriser la commande en ligne
+                </span>
+                <span className="mt-1 block leading-5 text-cream/65">
+                  Désactivé : les clients peuvent remplir leur panier, mais ne
+                  peuvent ni envoyer une commande ni payer en ligne ou par
+                  messagerie.
+                </span>
+              </span>
+            </label>
+          </div>
+          <div className="flex flex-wrap items-end gap-3">
+            <label className="text-cream/80">
+              Intervalle (min)
+              <input
+                name="slotIntervalMin"
+                type="number"
+                defaultValue={setting?.slotIntervalMin ?? 15}
+                className="mt-1 block w-24 rounded-lg border border-white/10 bg-ink px-3 py-2 text-cream focus:border-gold/60 focus:outline-none"
+              />
+            </label>
+            <label className="text-cream/80">
+              Délai prépa (min)
+              <input
+                name="leadTimeMin"
+                type="number"
+                defaultValue={setting?.leadTimeMin ?? 20}
+                className="mt-1 block w-24 rounded-lg border border-white/10 bg-ink px-3 py-2 text-cream focus:border-gold/60 focus:outline-none"
+              />
+            </label>
+            <label className="text-cream/80">
+              Capacité / créneau
+              <input
+                name="capacityPerSlot"
+                type="number"
+                defaultValue={setting?.capacityPerSlot ?? 8}
+                className="mt-1 block w-24 rounded-lg border border-white/10 bg-ink px-3 py-2 text-cream focus:border-gold/60 focus:outline-none"
+              />
+            </label>
+            <label className="text-cream/80">
+              Alerte imminent (min)
+              <input
+                name="imminentMin"
+                type="number"
+                defaultValue={setting?.imminentMin ?? 5}
+                className="mt-1 block w-24 rounded-lg border border-white/10 bg-ink px-3 py-2 text-cream focus:border-gold/60 focus:outline-none"
+              />
+            </label>
+            <label className="text-cream/80">
+              Max préparation (min)
+              <input
+                name="prepMaxMin"
+                type="number"
+                defaultValue={setting?.prepMaxMin ?? 10}
+                className="mt-1 block w-24 rounded-lg border border-white/10 bg-ink px-3 py-2 text-cream focus:border-gold/60 focus:outline-none"
+              />
+            </label>
+            <label className="text-cream/80">
+              Max autres colonnes (min)
+              <input
+                name="stageMaxMin"
+                type="number"
+                defaultValue={setting?.stageMaxMin ?? 5}
+                className="mt-1 block w-24 rounded-lg border border-white/10 bg-ink px-3 py-2 text-cream focus:border-gold/60 focus:outline-none"
+              />
+            </label>
+            <button className="rounded-lg bg-gold px-4 py-2 text-sm font-semibold text-ink transition hover:bg-gold-400">
+              Enregistrer
+            </button>
+          </div>
         </form>
       </section>
 

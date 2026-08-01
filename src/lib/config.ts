@@ -13,6 +13,8 @@
  */
 
 export interface SiteConfig {
+  /** État public de la prise de commande, fermé par défaut côté serveur. */
+  onlineOrderingEnabled: boolean;
   name: string;
   shortName: string;
   description: string;
@@ -90,6 +92,7 @@ export function telegramUrl(username: string): string {
 
 /** Valeurs par défaut du template (fallback quand la base est vide). */
 export const defaultSiteConfig: SiteConfig = {
+  onlineOrderingEnabled: false,
   name: "Lauuale Simbo",
   shortName: "Lauuale Simbo",
   description:

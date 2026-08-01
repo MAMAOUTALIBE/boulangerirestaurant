@@ -14,6 +14,8 @@ import {
 } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { formatPrice } from "@/lib/utils";
+import Link from "next/link";
+import { useSiteConfig } from "@/context/SiteConfigContext";
 
 interface Suggestion {
   dishId: string;
@@ -24,6 +26,7 @@ interface Suggestion {
 
 /** Tiroir latéral affichant le contenu du panier. */
 export function CartDrawer() {
+  const siteConfig = useSiteConfig();
   const {
     items,
     open,
@@ -230,24 +233,54 @@ export function CartDrawer() {
                     </span>
                   </div>
                   {/* Fidélité : 1 point par euro (cf. lib/loyalty.ts). */}
-                  {Math.floor(totalPrice) > 0 && (
-                    <p className="mb-3 flex items-center gap-1.5 rounded-lg bg-gold/10 px-3 py-2 text-xs font-medium text-gold">
-                      <Sparkles className="h-3.5 w-3.5" />
-                      Vous gagnerez {Math.floor(totalPrice)} point
-                      {Math.floor(totalPrice) > 1 ? "s" : ""} de fidélité
-                    </p>
+                  {siteConfig.onlineOrderingEnabled &&
+                    Math.floor(totalPrice) > 0 && (
+                      <p className="mb-3 flex items-center gap-1.5 rounded-lg bg-gold/10 px-3 py-2 text-xs font-medium text-gold">
+                        <Sparkles className="h-3.5 w-3.5" />
+                        Vous gagnerez {Math.floor(totalPrice)} point
+                        {Math.floor(totalPrice) > 1 ? "s" : ""} de fidélité
+                      </p>
+                    )}
+                  {siteConfig.onlineOrderingEnabled ? (
+                    <>
+                      <a
+                        href="/commander"
+                        onClick={() => setOpen(false)}
+                        className="btn-primary w-full"
+                      >
+                        Passer la commande
+                      </a>
+                      <p className="mt-2 flex items-center justify-center gap-1.5 text-xs text-muted">
+                        <Lock className="h-3 w-3" /> Paiement 100 % sécurisé
+                      </p>
+                    </>
+                  ) : (
+                    <div className="rounded-xl border border-gold/30 bg-gold/5 p-4 text-center">
+                      <p className="font-semibold text-cream">
+                        Commande en ligne bientôt disponible
+                      </p>
+                      <p className="mt-2 text-sm leading-5 text-cream/70">
+                        Préparez votre sélection, puis venez commander et payer
+                        au restaurant, sur place ou à emporter.
+                      </p>
+                      <div className="mt-4 grid gap-2">
+                        <Link
+                          href="/#contact"
+                          onClick={() => setOpen(false)}
+                          className="btn-primary w-full"
+                        >
+                          Voir l’adresse et les horaires
+                        </Link>
+                        <Link
+                          href="/menu"
+                          onClick={() => setOpen(false)}
+                          className="rounded-xl border border-white/15 px-4 py-3 text-sm font-semibold text-cream transition hover:border-gold/50"
+                        >
+                          Continuer à découvrir le menu
+                        </Link>
+                      </div>
+                    </div>
                   )}
-                  <a
-                    href="/commander"
-                    onClick={() => setOpen(false)}
-                    className="btn-primary w-full"
-                  >
-                    Passer la commande
-                  </a>
-                  <p className="mt-2 flex items-center justify-center gap-1.5 text-xs text-muted">
-                    <Lock className="h-3 w-3" />
-                    Paiement 100 % sécurisé
-                  </p>
                   <button
                     onClick={clear}
                     className="mt-2 w-full text-center text-sm text-muted transition hover:text-cream"

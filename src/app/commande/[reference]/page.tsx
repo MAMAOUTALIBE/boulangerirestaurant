@@ -10,6 +10,7 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { OrderStatusNotifier } from "@/components/OrderStatusNotifier";
 import type { OrderStatus } from "@/types";
+import { isOnlineOrderingEnabled } from "@/lib/online-ordering";
 
 export const dynamic = "force-dynamic";
 
@@ -37,7 +38,10 @@ export default async function OrderPage({ params, searchParams }: PageProps) {
     params,
     searchParams,
   ]);
-  const order = await getOrderByReference(reference);
+  const [order, onlineOrderingEnabled] = await Promise.all([
+    getOrderByReference(reference),
+    isOnlineOrderingEnabled(),
+  ]);
   if (!order) notFound();
 
   // Un utilisateur connecté ne peut consulter que sa propre commande (ou admin) ;
@@ -213,7 +217,7 @@ export default async function OrderPage({ params, searchParams }: PageProps) {
               </div>
             </div>
 
-            {!isPaid && !paymentPending && (
+            {!isPaid && !paymentPending && onlineOrderingEnabled && (
               <form
                 action={payOrder.bind(null, order.reference)}
                 className="mt-8"
@@ -226,6 +230,13 @@ export default async function OrderPage({ params, searchParams }: PageProps) {
                   configurée.)
                 </p>
               </form>
+            )}
+            {!isPaid && !onlineOrderingEnabled && (
+              <p className="mt-8 rounded-xl border border-gold/30 bg-gold/5 p-4 text-center text-sm leading-6 text-cream/75">
+                Le paiement en ligne est temporairement désactivé. Cette
+                commande reste consultable, mais aucun paiement ne peut être
+                lancé.
+              </p>
             )}
           </div>
         </div>

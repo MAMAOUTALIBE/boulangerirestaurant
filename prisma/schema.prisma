@@ -266,6 +266,9 @@ model OpeningHour {
 /// Réglages de prise de commande (singleton, id = "default").
 model OrderingSetting {
   id              String @id @default("default")
+  /// Autorise la création et le paiement de commandes depuis le site public.
+  /// Désactivé par défaut : le site démarre en mode vitrine.
+  onlineOrderingEnabled Boolean @default(false)
   /// Palette d'accent publique : ambre | terracotta | emeraude.
   colorPalette    String @default("ambre")
   slotIntervalMin Int    @default(15)
