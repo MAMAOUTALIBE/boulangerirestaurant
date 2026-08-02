@@ -2,6 +2,11 @@ import type { MetadataRoute } from "next";
 import { getSiteConfig } from "@/lib/site-settings";
 import { getDishes } from "@/lib/dishes";
 
+// Rendu dynamique : le plan de site liste un lien par plat, lu en base. Généré
+// au build (base injoignable dans Docker), il retombait sur une liste vide et
+// Google ne découvrait aucune fiche plat.
+export const dynamic = "force-dynamic";
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const siteConfig = await getSiteConfig();
   const base = siteConfig.url;

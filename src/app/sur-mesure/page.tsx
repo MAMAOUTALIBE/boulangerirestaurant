@@ -5,6 +5,11 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { CustomQuoteForm } from "@/components/CustomQuoteForm";
 
+// Rendu dynamique : l'en-tête et le pied de page affichent l'identité lue en
+// base. Un prérendu au build figerait les valeurs par défaut du template,
+// la base n'étant pas joignable pendant le build Docker.
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Plateaux & menus de groupe",
   description:

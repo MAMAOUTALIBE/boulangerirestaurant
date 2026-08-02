@@ -2,6 +2,12 @@ import type { Metadata } from "next";
 import { Header } from "@/components/Header";
 import { ContactSection } from "@/components/ContactSection";
 
+// Rendu dynamique : la page affiche l'identité du restaurant (coordonnées,
+// horaires) lue en base. Sans cela elle serait figée au build — or la base
+// n'est pas joignable pendant le build Docker, ce qui gèlerait les valeurs
+// par défaut du template et rendrait le CRM sans effet sur cette page.
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Contact",
   description:
