@@ -1707,6 +1707,11 @@ export async function adminUpdateSiteIdentity(
     faviconUrl: optionalMedia(formData.get("faviconUrl")),
     ogImageUrl: optionalMedia(formData.get("ogImageUrl")),
     tagline: optionalText(formData.get("tagline")),
+    heroTitle: optionalText(formData.get("heroTitle")),
+    heroDescription: optionalText(formData.get("heroDescription")),
+    heroTitleVisible: formData.get("heroTitleVisible") === "on",
+    heroDescriptionVisible:
+      formData.get("heroDescriptionVisible") === "on",
 
     metaTitle: optionalText(formData.get("metaTitle")),
     metaDescription: optionalText(formData.get("metaDescription")),

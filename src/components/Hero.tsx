@@ -195,14 +195,43 @@ export function Hero({ slides }: { slides: readonly HeroSlide[] }) {
               </video>
             ) : null}
             {slide.type !== "video" ? (
-              <Image
-                src={slide.src}
-                alt={index === activeSlide ? slide.alt : ""}
-                fill
-                priority={index === 0}
-                sizes="100vw"
-                className="origin-center object-cover object-center brightness-[1.04] contrast-[1.04] saturate-[1.06] sm:object-contain"
-              />
+              <>
+                {slide.mobileSrc ? (
+                  <div className="absolute inset-0 overflow-hidden sm:hidden">
+                    <Image
+                      src={slide.mobileSrc}
+                      alt={index === activeSlide ? slide.alt : ""}
+                      fill
+                      priority={index === 0}
+                      sizes="100vw"
+                      className="origin-center object-cover object-center"
+                    />
+                  </div>
+                ) : (
+                  <div className="absolute inset-x-0 top-[68px] aspect-video overflow-hidden sm:hidden">
+                    <Image
+                      src={slide.src}
+                      alt={index === activeSlide ? slide.alt : ""}
+                      fill
+                      priority={index === 0}
+                      sizes="100vw"
+                      className="origin-center object-cover object-center brightness-[1.04] contrast-[1.04] saturate-[1.06]"
+                    />
+                    <div
+                      className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-b from-transparent to-[#050505]"
+                      aria-hidden
+                    />
+                  </div>
+                )}
+                <Image
+                  src={slide.src}
+                  alt={index === activeSlide ? slide.alt : ""}
+                  fill
+                  priority={index === 0}
+                  sizes="100vw"
+                  className="hidden origin-center object-cover object-center brightness-[1.04] contrast-[1.04] saturate-[1.06] sm:block"
+                />
+              </>
             ) : null}
           </motion.div>
         ))}
@@ -226,13 +255,19 @@ export function Hero({ slides }: { slides: readonly HeroSlide[] }) {
             />
 
             <div className="relative z-20">
-              <h1 className="font-display text-[clamp(2.2rem,12vw,3rem)] font-bold leading-[0.98] text-[#F8F3EA] drop-shadow-[0_3px_8px_rgba(0,0,0,0.96)] sm:text-6xl lg:text-[4.15rem] xl:text-[4.8rem] 3xl:text-[5.8rem] 4xl:text-[6.5rem]">
-                <span className="block text-gold">{siteConfig.name}</span>
-              </h1>
+              {siteConfig.hero.titleVisible ? (
+                <h1 className="font-display text-[clamp(2.2rem,12vw,3rem)] font-bold leading-[0.98] text-[#F8F3EA] drop-shadow-[0_3px_8px_rgba(0,0,0,0.96)] sm:text-6xl lg:text-[4.15rem] xl:text-[4.8rem] 3xl:text-[5.8rem] 4xl:text-[6.5rem]">
+                  <span className="block text-gold">
+                    {siteConfig.hero.title}
+                  </span>
+                </h1>
+              ) : null}
 
-              <p className="text-[#F8F3EA]/88 mt-2 max-w-[18rem] text-sm font-semibold leading-5 drop-shadow-[0_2px_5px_rgba(0,0,0,0.98)] sm:mt-5 sm:max-w-xl sm:text-xl sm:leading-8 3xl:max-w-3xl 3xl:text-2xl 3xl:leading-10">
-                Grillades au charbon. Commandez maintenant.
-              </p>
+              {siteConfig.hero.descriptionVisible ? (
+                <p className="text-[#F8F3EA]/88 mt-2 max-w-[18rem] text-sm font-semibold leading-5 drop-shadow-[0_2px_5px_rgba(0,0,0,0.98)] sm:mt-5 sm:max-w-xl sm:text-xl sm:leading-8 3xl:max-w-3xl 3xl:text-2xl 3xl:leading-10">
+                  {siteConfig.hero.description}
+                </p>
+              ) : null}
 
               <div className="mt-5 hidden flex-col gap-3 sm:mt-6 sm:flex sm:flex-row sm:flex-wrap 3xl:gap-4">
                 <Link
@@ -264,7 +299,7 @@ export function Hero({ slides }: { slides: readonly HeroSlide[] }) {
               </div>
 
               <div
-                className="mt-3 flex items-center gap-2 sm:mt-5 3xl:mt-7 3xl:gap-3"
+                className="mt-3 flex max-w-full items-center gap-1 sm:mt-5 sm:gap-1.5 3xl:mt-7"
                 aria-label="Visuels du hero"
               >
                 {slides.map((slide, index) => (
@@ -274,10 +309,10 @@ export function Hero({ slides }: { slides: readonly HeroSlide[] }) {
                     aria-label={`Afficher ${slide.label}`}
                     aria-current={index === activeSlide ? "true" : undefined}
                     onClick={() => setActiveSlide(index)}
-                    className={`h-2 rounded-full transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70 3xl:h-2.5 ${
+                    className={`h-1.5 rounded-full transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70 sm:h-2 ${
                       index === activeSlide
-                        ? "w-8 bg-gold 3xl:w-10"
-                        : "w-2 bg-white/45 hover:bg-white/75 3xl:w-2.5"
+                        ? "w-5 bg-gold sm:w-7"
+                        : "w-1.5 bg-white/45 hover:bg-white/75 sm:w-2"
                     }`}
                   />
                 ))}
@@ -305,22 +340,24 @@ export function Hero({ slides }: { slides: readonly HeroSlide[] }) {
 
         <nav
           aria-label="Actions principales"
-          className="grid shrink-0 grid-cols-3 gap-2 pb-0.5 sm:hidden"
+          className="grid shrink-0 grid-cols-3 overflow-hidden rounded-full border border-gold/70 bg-black/85 p-1 shadow-[0_12px_32px_-18px_rgba(52,211,153,0.9)] backdrop-blur-xl sm:hidden"
         >
           {[
             { href: "/commander", label: "Commander", Icon: ShoppingBag },
             { href: "/reservation", label: "Réserver", Icon: CalendarCheck },
             { href: "/menu", label: "Voir le menu", Icon: UtensilsCrossed },
-          ].map(({ href, label, Icon }) => (
+          ].map(({ href, label, Icon }, index) => (
             <Link
               key={href}
               href={href}
-              className="flex min-h-[4.65rem] min-w-0 flex-col items-center justify-center gap-1.5 rounded-[18px] border border-gold/80 bg-[linear-gradient(135deg,rgba(5,5,5,0.98)_0%,rgba(28,21,12,0.98)_55%,rgba(96,61,8,0.96)_100%)] px-1.5 py-2 text-center text-[0.78rem] font-black leading-tight text-white shadow-[inset_0_1px_0_rgba(255,224,156,0.2),0_10px_24px_-10px_rgba(216,154,28,0.85),0_0_16px_-8px_rgba(245,158,11,0.95)] transition hover:border-gold hover:brightness-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 focus-visible:ring-offset-black active:scale-[0.98] active:brightness-95"
+              className={`flex min-h-12 min-w-0 items-center justify-center gap-1.5 px-1.5 text-center text-[0.69rem] font-black leading-none transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-gold active:brightness-90 ${
+                index === 0
+                  ? "rounded-full bg-gold text-ink shadow-[0_8px_22px_-12px_rgba(52,211,153,0.95)]"
+                  : "border-l border-white/15 bg-transparent text-white hover:bg-white/[0.06]"
+              }`}
             >
-              <span className="grid h-8 w-8 place-items-center rounded-full border border-gold bg-gold text-[#090704] shadow-[0_0_14px_-4px_rgba(245,158,11,0.95)]">
-                <Icon className="h-4 w-4" aria-hidden />
-              </span>
-              <span>{label}</span>
+              <Icon className="h-4 w-4 shrink-0" aria-hidden />
+              <span className="whitespace-nowrap">{label}</span>
             </Link>
           ))}
         </nav>

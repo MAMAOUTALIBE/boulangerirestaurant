@@ -313,6 +313,14 @@ model SiteSetting {
   ogImageUrl        String?
   /// Accroche courte affichée sous le nom.
   tagline           String?
+  /// Titre affiché dans le hero d'accueil (vide → nom du restaurant).
+  heroTitle         String?
+  /// Description affichée sous le titre du hero.
+  heroDescription   String?
+  /// Permet à l'administrateur de masquer le titre sans le supprimer.
+  heroTitleVisible  Boolean  @default(true)
+  /// Permet à l'administrateur de masquer la description sans la supprimer.
+  heroDescriptionVisible Boolean @default(true)
 
   // ── Référencement ──────────────────────────────────────────────────────────
   /// Titre de la page d'accueil (défaut : « <nom> | <description> »).

@@ -8,6 +8,7 @@ import {
   resolveIconName,
   resolveSection,
   resolveSingle,
+  toHeroSlides,
 } from "./content-blocks";
 
 describe("DEFAULT_CONTENT_BLOCKS", () => {
@@ -56,11 +57,27 @@ describe("DEFAULT_CONTENT_BLOCKS", () => {
   });
 
   it("fournit bien le contenu d'origine des sections migrées", () => {
-    expect(resolveSection("hero")).toHaveLength(7);
+    expect(resolveSection("hero")).toHaveLength(24);
     expect(resolveSection("galerie")).toHaveLength(11);
     expect(resolveSection("menu-hero")).toHaveLength(4);
     expect(resolveSection("etapes")).toHaveLength(3);
     expect(resolveSection("raccourcis")).toHaveLength(3);
+  });
+
+  it("fournit une image portrait dédiée à toutes les slides mobiles", () => {
+    const slides = toHeroSlides(resolveSection("hero"));
+    expect(slides).toHaveLength(24);
+    expect(
+      slides.every((slide) => slide.type !== "image" || Boolean(slide.mobileSrc)),
+    ).toBe(true);
+
+    const [slide] = slides;
+    expect(slide?.type).toBe("image");
+    if (slide?.type === "image") {
+      expect(slide.mobileSrc).toBe(
+        "/images/hero-slides/mobile/hero-menu-mafe-complet-mobile.webp",
+      );
+    }
   });
 });
 

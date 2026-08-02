@@ -103,13 +103,13 @@ export function Header() {
     >
       <div
         className={cn(
-          "mx-auto grid h-[68px] w-full max-w-[1800px] grid-cols-[auto_auto] items-center justify-between gap-3 border-x-0 border-b border-t-0 border-gold/35 bg-[linear-gradient(110deg,rgba(5,5,5,0.94)_0%,rgba(19,16,12,0.92)_45%,rgba(77,50,9,0.55)_100%)] px-3 shadow-[0_22px_70px_-45px_rgba(0,0,0,0.95)] backdrop-blur-xl sm:h-[78px] sm:gap-4 sm:rounded-[28px] sm:border sm:px-5 lg:h-[90px] lg:grid-cols-[auto_auto_auto] lg:gap-5 lg:px-6 xl:grid-cols-[auto_auto_minmax(300px,1fr)_auto] xl:gap-6 2xl:h-[96px] 2xl:max-w-[1880px] 2xl:grid-cols-[auto_auto_minmax(420px,1fr)_auto] 2xl:gap-7 2xl:px-8 3xl:h-[104px] 3xl:max-w-[2200px] 3xl:gap-10 4xl:max-w-[2460px]",
+          "mx-auto grid h-16 w-full max-w-[1800px] grid-cols-[minmax(0,1fr)_auto] items-center justify-between gap-2 border-x-0 border-b border-t-0 border-gold/35 bg-[linear-gradient(110deg,rgba(5,5,5,0.96)_0%,rgba(19,16,12,0.94)_45%,rgba(77,50,9,0.55)_100%)] px-3 shadow-[0_22px_70px_-45px_rgba(0,0,0,0.95)] backdrop-blur-xl sm:h-[78px] sm:grid-cols-[auto_auto] sm:gap-4 sm:rounded-[28px] sm:border sm:px-5 lg:h-[90px] lg:grid-cols-[auto_auto_auto] lg:gap-5 lg:px-6 xl:grid-cols-[auto_auto_minmax(300px,1fr)_auto] xl:gap-6 2xl:h-[96px] 2xl:max-w-[1880px] 2xl:grid-cols-[auto_auto_minmax(420px,1fr)_auto] 2xl:gap-7 2xl:px-8 3xl:h-[104px] 3xl:max-w-[2200px] 3xl:gap-10 4xl:max-w-[2460px]",
           scrolled &&
-            "h-[64px] border-gold/45 bg-[linear-gradient(110deg,rgba(5,5,5,0.96)_0%,rgba(19,16,12,0.94)_45%,rgba(77,50,9,0.62)_100%)] shadow-[0_18px_55px_-42px_rgba(216,154,28,0.5)] sm:h-[72px] lg:h-[82px] 2xl:h-[86px] 3xl:h-[92px]",
+            "border-gold/45 bg-[linear-gradient(110deg,rgba(5,5,5,0.97)_0%,rgba(19,16,12,0.95)_45%,rgba(77,50,9,0.62)_100%)] shadow-[0_18px_55px_-42px_rgba(216,154,28,0.5)] sm:h-[72px] lg:h-[82px] 2xl:h-[86px] 3xl:h-[92px]",
         )}
       >
         <div className="flex min-w-0 items-center gap-3 sm:gap-5 2xl:gap-6">
-          <Logo className="shrink-0" />
+          <Logo className="min-w-0 shrink" subtitle="Cuisine africaine" />
           <span className="hidden h-12 w-px bg-gold/25 lg:block" aria-hidden />
         </div>
 
@@ -192,6 +192,29 @@ export function Header() {
         </form>
 
         <div className="flex items-center gap-2 sm:gap-3 lg:gap-3 2xl:gap-4">
+          <div className="flex h-11 items-center rounded-full border border-white/20 bg-black/35 p-1 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] sm:hidden">
+            <button
+              aria-label={`Voir le panier (${cartCount} article${cartCount > 1 ? "s" : ""})`}
+              onClick={() => setCartOpen(true)}
+              className="relative grid h-9 w-10 place-items-center rounded-full text-cream transition hover:bg-white/[0.06] hover:text-gold"
+            >
+              <ShoppingBag className="h-[1.125rem] w-[1.125rem]" />
+              {cartCount > 0 && (
+                <span className="absolute -right-0.5 -top-1 grid h-[1.15rem] min-w-[1.15rem] place-items-center rounded-full bg-gold px-1 text-[0.62rem] font-black text-ink">
+                  {cartCount}
+                </span>
+              )}
+            </button>
+            <span className="mx-1 h-6 w-px bg-white/15" aria-hidden />
+            <button
+              aria-label="Ouvrir le menu"
+              onClick={() => setOpen(true)}
+              className="grid h-9 w-10 place-items-center rounded-full text-cream transition hover:bg-white/[0.06] hover:text-gold"
+            >
+              <Menu className="h-5 w-5" />
+            </button>
+          </div>
+
           <a
             href={phoneHref}
             className="bg-black/28 hidden min-h-[3rem] items-center justify-center gap-2 rounded-full border border-white/15 px-4 py-2 text-sm font-bold text-cream transition hover:-translate-y-0.5 hover:border-gold/70 hover:text-gold 2xl:inline-flex 3xl:min-h-[3.5rem] 3xl:px-5 3xl:text-base"
@@ -203,7 +226,7 @@ export function Header() {
           <button
             aria-label={`Voir le panier (${cartCount} article${cartCount > 1 ? "s" : ""})`}
             onClick={() => setCartOpen(true)}
-            className="relative grid h-11 w-11 place-items-center rounded-full border border-white/15 bg-white/[0.03] text-cream transition hover:-translate-y-0.5 hover:border-gold/70 hover:text-gold sm:h-12 sm:w-12 lg:h-[3.25rem] lg:w-[3.25rem] 2xl:h-14 2xl:w-14 3xl:h-16 3xl:w-16"
+            className="relative hidden h-11 w-11 place-items-center rounded-full border border-white/15 bg-white/[0.03] text-cream transition hover:-translate-y-0.5 hover:border-gold/70 hover:text-gold sm:grid sm:h-12 sm:w-12 lg:h-[3.25rem] lg:w-[3.25rem] 2xl:h-14 2xl:w-14 3xl:h-16 3xl:w-16"
           >
             <ShoppingBag className="h-5 w-5 2xl:h-6 2xl:w-6" />
             {cartCount > 0 && (
@@ -224,7 +247,7 @@ export function Header() {
           <button
             aria-label="Ouvrir le menu"
             onClick={() => setOpen(true)}
-            className="grid h-11 w-11 place-items-center rounded-full border border-white/15 bg-white/[0.03] text-cream transition hover:border-gold/70 hover:text-gold sm:h-12 sm:w-12 lg:hidden"
+            className="hidden h-11 w-11 place-items-center rounded-full border border-white/15 bg-white/[0.03] text-cream transition hover:border-gold/70 hover:text-gold sm:grid sm:h-12 sm:w-12 lg:hidden"
           >
             <Menu className="h-5 w-5" />
           </button>

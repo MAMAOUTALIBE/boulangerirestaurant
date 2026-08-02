@@ -55,6 +55,13 @@ export interface SiteConfig {
     ogImageUrl: string;
     tagline: string;
   };
+  /** Texte superposé au hero d'accueil, contrôlé depuis le CRM. */
+  hero: {
+    title: string;
+    description: string;
+    titleVisible: boolean;
+    descriptionVisible: boolean;
+  };
   /** Référencement de la page d'accueil. */
   seo: {
     metaTitle: string;
@@ -131,6 +138,12 @@ export const defaultSiteConfig: SiteConfig = {
     faviconUrl: "",
     ogImageUrl: "/images/africain/thiep-poisson.webp",
     tagline: "",
+  },
+  hero: {
+    title: "Lauuale Simbo",
+    description: "Grillades au charbon. Commandez maintenant.",
+    titleVisible: true,
+    descriptionVisible: true,
   },
   seo: {
     metaTitle: "",

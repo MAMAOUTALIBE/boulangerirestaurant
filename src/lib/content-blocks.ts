@@ -207,6 +207,18 @@ export function blockText(
   return typeof valeur === "string" && valeur.trim() ? valeur : undefined;
 }
 
+function mobileHeroMediaUrl(bloc: ContentBlockData) {
+  const explicitMobileUrl = blockText(bloc, "mobileMediaUrl");
+  if (explicitMobileUrl) return explicitMobileUrl;
+
+  const match = bloc.mediaUrl?.match(
+    /^\/images\/hero-slides\/(hero-[^/]+)\.webp$/,
+  );
+  return match
+    ? `/images/hero-slides/mobile/${match[1]}-mobile.webp`
+    : undefined;
+}
+
 /** Élément de galerie tel qu'attendu par `GallerySection`. */
 export type GalleryEntry =
   | { type: "image"; src: string; alt: string; tag: string }
@@ -246,6 +258,7 @@ export type HeroSlide =
       src: string;
       label: string;
       alt: string;
+      mobileSrc?: string;
       durationMs?: number;
     }
   | {
@@ -290,7 +303,12 @@ export function toHeroSlides(blocs: ContentBlockData[]): HeroSlide[] {
         ...commun,
       });
     } else {
-      diapos.push({ type: "image", src: bloc.mediaUrl, ...commun });
+      diapos.push({
+        type: "image",
+        src: bloc.mediaUrl,
+        mobileSrc: mobileHeroMediaUrl(bloc),
+        ...commun,
+      });
     }
   }
   return diapos;
@@ -314,39 +332,128 @@ function bloc(
 export const DEFAULT_CONTENT_BLOCKS: ContentBlockData[] = [
   // ── Accueil : bandeau principal ────────────────────────────────────────────
   bloc("hero", "saveurs", 1, {
-    title: "Poisson, tubercules & sauce",
-    mediaUrl: "/images/africain/01_poisson_tubercules_sauce.webp",
-    alt: "Poisson frit, tubercules dorés, oignons et sauce tomate",
+    title: "Menu mafé complet",
+    mediaUrl: "/images/hero-slides/hero-menu-mafe-complet.webp",
+    alt: "Menu mafé complet avec riz blanc, alloco et boissons maison",
+    data: {
+      mobileMediaUrl:
+        "/images/hero-slides/mobile/hero-menu-mafe-complet-mobile.webp",
+    },
   }),
   bloc("hero", "thieb-poisson", 2, {
-    title: "Haricots au poulet",
-    mediaUrl: "/images/africain/02_haricots_au_poulet.webp",
-    alt: "Haricots mijotés servis avec poulet, légumes et sauce maison",
+    title: "Mafé & riz blanc",
+    mediaUrl: "/images/hero-slides/hero-sauce-mafe-riz.webp",
+    alt: "Sauce mafé onctueuse accompagnée de riz blanc",
   }),
   bloc("hero", "yassa", 3, {
-    title: "Mafé au poulet",
-    mediaUrl: "/images/africain/03_mafe_au_poulet.webp",
-    alt: "Mafé au poulet, sauce onctueuse à l'arachide et riz blanc",
+    title: "Demi-capitaine grillé",
+    mediaUrl: "/images/hero-slides/hero-demi-capitaine.webp",
+    alt: "Demi-capitaine grillé servi avec son accompagnement",
   }),
   bloc("hero", "mafe", 4, {
-    title: "Poisson & alloko",
-    mediaUrl: "/images/africain/04_poisson_alloko.webp",
-    alt: "Poisson frit accompagné de bananes plantain alloko et sauce maison",
+    title: "Patates douces",
+    mediaUrl: "/images/hero-slides/hero-patate-douce.webp",
+    alt: "Patates douces dorées préparées maison",
   }),
   bloc("hero", "attieke", 5, {
-    title: "Poisson grillé & crudités",
-    mediaUrl: "/images/africain/05_poisson_grille_crudites.webp",
-    alt: "Poisson grillé servi avec crudités fraîches et sauce maison",
+    title: "Haricots au poulet",
+    mediaUrl: "/images/hero-slides/hero-haricots-poulet-legumes.webp",
+    alt: "Haricots mijotés avec poulet et légumes",
   }),
   bloc("hero", "boissons", 6, {
-    title: "Poisson aux oignons",
-    mediaUrl: "/images/africain/06_poisson_aux_oignons.webp",
-    alt: "Poisson entier frit garni d'oignons marinés et de piment",
+    title: "Thiéb au poulet",
+    mediaUrl: "/images/hero-slides/hero-thieb-poulet-legumes.webp",
+    alt: "Thiéb au poulet accompagné de riz et de légumes",
   }),
   bloc("hero", "riz-rouge-poulet", 7, {
+    title: "Poisson, igname & sauce",
+    mediaUrl: "/images/hero-slides/hero-poisson-igname-sauce.webp",
+    alt: "Poisson servi avec igname et sauce maison",
+  }),
+  bloc("hero", "riz-rouge-poulet-hero", 8, {
     title: "Riz rouge au poulet",
-    mediaUrl: "/images/africain/07_riz_rouge_poulet.webp",
-    alt: "Riz rouge parfumé servi avec poulet et légumes mijotés",
+    mediaUrl: "/images/hero-slides/hero-riz-rouge-poulet.webp",
+    alt: "Riz rouge parfumé accompagné de poulet",
+  }),
+  bloc("hero", "bananes-plantain", 9, {
+    title: "Bananes plantain",
+    mediaUrl: "/images/hero-slides/hero-bananes-plantain.webp",
+    alt: "Bananes plantain dorées préparées maison",
+  }),
+  bloc("hero", "riz-poulet-legumes", 10, {
+    title: "Riz, poulet & légumes",
+    mediaUrl: "/images/hero-slides/hero-riz-poulet-legumes.webp",
+    alt: "Riz au poulet accompagné de légumes mijotés",
+  }),
+  bloc("hero", "sauce-epinards-riz", 11, {
+    title: "Sauce épinards & riz",
+    mediaUrl: "/images/hero-slides/hero-sauce-epinards-riz.webp",
+    alt: "Sauce aux épinards servie avec du riz blanc",
+  }),
+  bloc("hero", "brochettes-boeuf-poulet", 12, {
+    title: "Brochettes bœuf & poulet",
+    mediaUrl: "/images/hero-slides/hero-brochettes-boeuf-poulet.webp",
+    alt: "Brochettes grillées de bœuf et de poulet",
+  }),
+  bloc("hero", "sauce-tomate-riz", 13, {
+    title: "Sauce tomate & riz",
+    mediaUrl: "/images/hero-slides/hero-sauce-tomate-riz.webp",
+    alt: "Sauce tomate maison accompagnée de riz blanc",
+  }),
+  bloc("hero", "menu-alloco-poisson", 14, {
+    title: "Menu alloco poisson",
+    mediaUrl: "/images/hero-slides/hero-menu-alloco-poisson.webp",
+    alt: "Menu poisson avec alloco et accompagnements maison",
+  }),
+  bloc("hero", "cuisse-poulet", 15, {
+    title: "Cuisse de poulet grillée",
+    mediaUrl: "/images/hero-slides/hero-cuisse-poulet.webp",
+    alt: "Cuisse de poulet grillée et généreusement assaisonnée",
+  }),
+  bloc("hero", "pastels", 16, {
+    title: "Pastels maison",
+    mediaUrl: "/images/hero-slides/hero-pastels.webp",
+    alt: "Pastels africains croustillants préparés maison",
+  }),
+  bloc("hero", "menu-riz-gras-rouge", 17, {
+    title: "Menu riz gras rouge",
+    mediaUrl: "/images/hero-slides/hero-menu-riz-gras-rouge.webp",
+    alt: "Menu complet autour du riz gras rouge",
+  }),
+  bloc("hero", "tilapia", 18, {
+    title: "Tilapia grillé",
+    mediaUrl: "/images/hero-slides/hero-tilapia.webp",
+    alt: "Tilapia entier grillé servi avec son accompagnement",
+  }),
+  bloc("hero", "sauce-yassa-riz", 19, {
+    title: "Sauce yassa & riz",
+    mediaUrl: "/images/hero-slides/hero-sauce-yassa-riz.webp",
+    alt: "Sauce yassa aux oignons accompagnée de riz blanc",
+  }),
+  bloc("hero", "attieke-legumes", 20, {
+    title: "Attiéké aux légumes",
+    mediaUrl: "/images/hero-slides/hero-attieke-legumes.webp",
+    alt: "Attiéké servi avec des légumes frais et une sauce maison",
+  }),
+  bloc("hero", "djouka-fonio", 21, {
+    title: "Djouka au fonio",
+    mediaUrl: "/images/hero-slides/hero-djouka-fonio.webp",
+    alt: "Djouka traditionnel préparé avec du fonio",
+  }),
+  bloc("hero", "soupe-boeuf-mijotee", 22, {
+    title: "Soupe de bœuf mijotée",
+    mediaUrl: "/images/hero-slides/hero-soupe-boeuf-mijotee.webp",
+    alt: "Soupe généreuse au bœuf longuement mijoté",
+  }),
+  bloc("hero", "capitaine-entier", 23, {
+    title: "Capitaine entier",
+    mediaUrl: "/images/hero-slides/hero-capitaine-entier.webp",
+    alt: "Poisson capitaine entier grillé et accompagné de légumes",
+  }),
+  bloc("hero", "boeuf-grille", 24, {
+    title: "Bœuf grillé",
+    mediaUrl: "/images/hero-slides/hero-boeuf-grille.webp",
+    alt: "Pièces de bœuf grillées et assaisonnées maison",
   }),
 
   // ── Carte : bandeau ────────────────────────────────────────────────────────
@@ -356,8 +463,7 @@ export const DEFAULT_CONTENT_BLOCKS: ContentBlockData[] = [
     alt: "Menu riz rouge au poulet avec alloko, dégué et bissap",
   }),
   bloc("menu-hero", "yassa", 2, {
-    mediaUrl:
-      "/images/africain/09_menu_alloko_poisson_degue_jus_orange.webp",
+    mediaUrl: "/images/africain/09_menu_alloko_poisson_degue_jus_orange.webp",
     alt: "Menu poisson aux oignons avec alloko, dégué et jus d'orange",
   }),
   bloc("menu-hero", "mafe", 3, {
@@ -411,8 +517,7 @@ export const DEFAULT_CONTENT_BLOCKS: ContentBlockData[] = [
     data: { tag: "Menu poisson & alloko" },
   }),
   bloc("galerie", "menu-poisson-alloko", 9, {
-    mediaUrl:
-      "/images/africain/09_menu_alloko_poisson_degue_jus_orange.webp",
+    mediaUrl: "/images/africain/09_menu_alloko_poisson_degue_jus_orange.webp",
     alt: "Menu poisson aux oignons avec alloko, dégué et jus d'orange",
     data: { tag: "Menu poisson complet" },
   }),

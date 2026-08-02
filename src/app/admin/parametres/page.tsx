@@ -147,6 +147,50 @@ export default async function AdminParametresPage() {
             placeholder={defaultSiteConfig.description}
             textarea
           />
+          <div className="rounded-xl border border-gold/20 bg-black/20 p-4">
+            <h3 className="font-display text-base font-semibold text-cream">
+              Texte du hero d&apos;accueil
+            </h3>
+            <p className="mt-1 text-xs text-muted">
+              Modifiez ou masquez séparément le nom et la description affichés
+              au-dessus des images du carrousel.
+            </p>
+            <div className="mt-4 grid gap-4 sm:grid-cols-2">
+              <IdentityField
+                name="heroTitle"
+                label="Titre du hero"
+                defaultValue={identity?.heroTitle ?? ""}
+                placeholder={identity?.name ?? defaultSiteConfig.name}
+              />
+              <IdentityField
+                name="heroDescription"
+                label="Description du hero"
+                defaultValue={identity?.heroDescription ?? ""}
+                placeholder={defaultSiteConfig.hero.description}
+                textarea
+              />
+            </div>
+            <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:gap-8">
+              <label className="flex cursor-pointer items-center gap-3 text-sm text-cream/90">
+                <input
+                  type="checkbox"
+                  name="heroTitleVisible"
+                  defaultChecked={identity?.heroTitleVisible ?? true}
+                  className="h-4 w-4 accent-gold"
+                />
+                Afficher le titre
+              </label>
+              <label className="flex cursor-pointer items-center gap-3 text-sm text-cream/90">
+                <input
+                  type="checkbox"
+                  name="heroDescriptionVisible"
+                  defaultChecked={identity?.heroDescriptionVisible ?? true}
+                  className="h-4 w-4 accent-gold"
+                />
+                Afficher la description
+              </label>
+            </div>
+          </div>
           <div className="grid gap-4 sm:grid-cols-2">
             <IdentityField
               name="phone"

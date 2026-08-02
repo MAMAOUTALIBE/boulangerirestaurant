@@ -9,10 +9,12 @@ interface LogoProps {
   className?: string;
   /** Variante claire pour fonds sombres (défaut) ou sombre. */
   tone?: "light" | "dark";
+  /** Sous-titre optionnel, utilisé par le header mobile compact. */
+  subtitle?: string;
 }
 
 /** Logo du restaurant. */
-export function Logo({ className, tone = "light" }: LogoProps) {
+export function Logo({ className, tone = "light", subtitle }: LogoProps) {
   const siteConfig = useSiteConfig();
   return (
     <Link
@@ -43,7 +45,7 @@ export function Logo({ className, tone = "light" }: LogoProps) {
           priority
         />
       </span>
-      <span className="leading-none">
+      <span className="min-w-0 leading-none">
         <span
           className={cn(
             "block font-display text-xl font-bold tracking-tight sm:text-2xl 3xl:text-3xl",
@@ -52,6 +54,16 @@ export function Logo({ className, tone = "light" }: LogoProps) {
         >
           {siteConfig.name}
         </span>
+        {subtitle ? (
+          <span
+            className={cn(
+              "mt-1 block truncate text-[0.68rem] font-medium leading-tight sm:hidden",
+              tone === "light" ? "text-cream/65" : "text-ink/65",
+            )}
+          >
+            {subtitle}
+          </span>
+        ) : null}
       </span>
     </Link>
   );
