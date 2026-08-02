@@ -285,64 +285,66 @@ model OrderingSetting {
 /// Tous les champs sont optionnels : vide → on retombe sur `defaultSiteConfig`
 /// (src/lib/config.ts). Permet de rebrander le site sans toucher au code.
 model SiteSetting {
-  id                String   @id @default("default")
-  name              String?
-  shortName         String?
-  description       String?
-  phone             String?
-  email             String?
-  address           String?
-  /// Ville affichée (zone de livraison, retrait, SEO local). Ex. « Juvisy-sur-Orge ».
-  city              String?
-  facebook          String?
-  instagram         String?
-  tiktok            String?
+  id               String  @id @default("default")
+  name             String?
+  shortName        String?
+  description      String?
+  phone            String?
+  email            String?
+  address          String?
+  /// Ville affichée (zone de livraison, retrait, SEO local). Ex. « Bagnolet ».
+  city             String?
+  facebook         String?
+  instagram        String?
+  tiktok           String?
   /// Numéro WhatsApp des commandes (aussi utilisé pour le lien wa.me).
-  whatsappNumber    String?
+  whatsappNumber   String?
   /// Pseudo Telegram des commandes (aussi utilisé pour le lien t.me).
-  telegramUsername  String?
+  telegramUsername String?
   /// Résumé des horaires affiché (ex. « Lun – Dim : 11h30 – 23h00 »).
-  hoursSummary      String?
+  hoursSummary     String?
 
   // ── Image de marque (choisie dans la médiathèque) ──────────────────────────
   /// Logo affiché dans l'en-tête et le pied de page.
-  logoUrl           String?
+  logoUrl                String?
   /// Favicon (onglet du navigateur).
-  faviconUrl        String?
+  faviconUrl             String?
   /// Image de partage sur les réseaux (Open Graph / Twitter).
-  ogImageUrl        String?
+  ogImageUrl             String?
   /// Accroche courte affichée sous le nom.
-  tagline           String?
+  tagline                String?
   /// Titre affiché dans le hero d'accueil (vide → nom du restaurant).
-  heroTitle         String?
+  heroTitle              String?
   /// Description affichée sous le titre du hero.
-  heroDescription   String?
+  heroDescription        String?
   /// Permet à l'administrateur de masquer le titre sans le supprimer.
-  heroTitleVisible  Boolean  @default(true)
+  heroTitleVisible       Boolean @default(true)
   /// Permet à l'administrateur de masquer la description sans la supprimer.
   heroDescriptionVisible Boolean @default(true)
 
   // ── Référencement ──────────────────────────────────────────────────────────
   /// Titre de la page d'accueil (défaut : « <nom> | <description> »).
-  metaTitle         String?
+  metaTitle       String?
   /// Description pour les moteurs de recherche et les partages.
-  metaDescription   String?
+  metaDescription String?
   /// Mots-clés séparés par des virgules.
-  keywords          String?
+  keywords        String?
 
   // ── Mentions légales ───────────────────────────────────────────────────────
-  legalCompany      String?
-  legalStatus       String?
-  legalCapital      String?
-  legalSiret        String?
-  legalVat          String?
-  legalDirector     String?
-  legalHost         String?
+  legalCompany  String?
+  legalStatus   String?
+  legalCapital  String?
+  legalSiren    String?
+  legalSiret    String?
+  legalApe      String?
+  legalVat      String?
+  legalDirector String?
+  legalHost     String?
 
   /// Couleur d'accent personnalisée (hex), utilisée si la palette vaut « perso ».
-  accentColor       String?
+  accentColor String?
 
-  updatedAt         DateTime @updatedAt @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
 }
 
 /// Zone de livraison : frais et minimum de commande par code postal.
@@ -627,7 +629,7 @@ model ContentBlock {
   icon      String?
   /// Champs spécifiques à une section (durée d'une diapositive, tag…).
   data      Json?
-  updatedAt DateTime @updatedAt @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
 
   @@unique([section, key])
   @@index([section])
@@ -659,7 +661,7 @@ model Media {
   /// "upload" | "template"
   source    String   @default("upload")
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
 
   @@index([source])
   @@index([folder])

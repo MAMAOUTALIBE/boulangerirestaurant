@@ -5,7 +5,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import {
-  CalendarCheck,
   Flame,
   MapPin,
   MessageCircle,
@@ -14,7 +13,15 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { useSiteConfig } from "@/context/SiteConfigContext";
-import type { HeroSlide } from "@/lib/content-blocks";
+import { MobileContactAction } from "@/components/MobileContactAction";
+import { ContentIcon } from "@/components/ui/ContentIcon";
+import { buildContactLinks } from "@/lib/config";
+import {
+  SHORTCUT_CONTACT,
+  SHORTCUT_DIRECTIONS,
+  type ContentBlockData,
+  type HeroSlide,
+} from "@/lib/content-blocks";
 
 function buildServiceHighlights(city: string): {
   title: string;
@@ -47,8 +54,17 @@ function buildServiceHighlights(city: string): {
 
 const HERO_SLIDE_INTERVAL_MS = 5600;
 
+/** Raccourci du bandeau mobile : destination obligatoire (bloc `href` rempli). */
+type HeroRaccourci = ContentBlockData & { href: string };
+
 /** Hero premium : promesse forte, image immersive et réassurance immédiate. */
-export function Hero({ slides }: { slides: readonly HeroSlide[] }) {
+export function Hero({
+  slides,
+  raccourcis,
+}: {
+  slides: readonly HeroSlide[];
+  raccourcis: readonly HeroRaccourci[];
+}) {
   const [activeSlide, setActiveSlide] = useState(0);
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
   const [readyVideoSrcs, setReadyVideoSrcs] = useState<Record<string, boolean>>(
@@ -56,6 +72,7 @@ export function Hero({ slides }: { slides: readonly HeroSlide[] }) {
   );
   const videoRefs = useRef<Record<string, HTMLVideoElement | null>>({});
   const siteConfig = useSiteConfig();
+  const { directionsHref } = buildContactLinks(siteConfig);
   const serviceHighlights = buildServiceHighlights(siteConfig.contact.city);
 
   useEffect(() => {
@@ -340,26 +357,47 @@ export function Hero({ slides }: { slides: readonly HeroSlide[] }) {
 
         <nav
           aria-label="Actions principales"
-          className="grid shrink-0 grid-cols-3 overflow-hidden rounded-full border border-gold/70 bg-black/85 p-1 shadow-[0_12px_32px_-18px_rgba(52,211,153,0.9)] backdrop-blur-xl sm:hidden"
+          className="grid shrink-0 grid-cols-4 overflow-hidden rounded-2xl border border-gold/70 bg-black/85 p-1 shadow-[0_12px_32px_-18px_rgba(52,211,153,0.9)] backdrop-blur-xl sm:hidden"
         >
-          {[
-            { href: "/commander", label: "Commander", Icon: ShoppingBag },
-            { href: "/reservation", label: "Réserver", Icon: CalendarCheck },
-            { href: "/menu", label: "Voir le menu", Icon: UtensilsCrossed },
-          ].map(({ href, label, Icon }, index) => (
-            <Link
-              key={href}
-              href={href}
-              className={`flex min-h-12 min-w-0 items-center justify-center gap-1.5 px-1.5 text-center text-[0.69rem] font-black leading-none transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-gold active:brightness-90 ${
-                index === 0
-                  ? "rounded-full bg-gold text-ink shadow-[0_8px_22px_-12px_rgba(52,211,153,0.95)]"
-                  : "border-l border-white/15 bg-transparent text-white hover:bg-white/[0.06]"
-              }`}
-            >
-              <Icon className="h-4 w-4 shrink-0" aria-hidden />
-              <span className="whitespace-nowrap">{label}</span>
-            </Link>
-          ))}
+          {raccourcis.map(({ key, title, href, icon }, index) => {
+            const className = `flex min-h-14 min-w-0 flex-col items-center justify-center gap-1 px-0.5 text-center text-[0.62rem] font-black leading-none transition min-[390px]:text-[0.68rem] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-gold active:brightness-90 ${
+              index === 0
+                ? "rounded-xl bg-gold text-ink shadow-[0_8px_22px_-12px_rgba(52,211,153,0.95)]"
+                : "border-l border-white/15 bg-transparent text-white hover:bg-white/[0.06]"
+            }`;
+            const contenu = (
+              <>
+                <ContentIcon
+                  name={icon}
+                  fallback={ShoppingBag}
+                  className="h-4 w-4 shrink-0"
+                />
+                <span className="whitespace-nowrap">{title}</span>
+              </>
+            );
+
+            // « contact » n'est pas une URL : il ouvre la feuille de contact.
+            if (href === SHORTCUT_CONTACT) {
+              return (
+                <MobileContactAction key={key} className={className}>
+                  {contenu}
+                </MobileContactAction>
+              );
+            }
+
+            const destination =
+              href === SHORTCUT_DIRECTIONS ? directionsHref : href;
+
+            return destination.startsWith("/") ? (
+              <Link key={key} href={destination} className={className}>
+                {contenu}
+              </Link>
+            ) : (
+              <a key={key} href={destination} className={className}>
+                {contenu}
+              </a>
+            );
+          })}
         </nav>
 
         <motion.div

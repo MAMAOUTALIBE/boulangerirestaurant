@@ -52,6 +52,18 @@ export default async function MentionsLegalesPage() {
               SIRET : {siteConfig.legal.siret}
             </>
           )}
+          {siteConfig.legal.siren && (
+            <>
+              <br />
+              SIREN : {siteConfig.legal.siren}
+            </>
+          )}
+          {siteConfig.legal.ape && (
+            <>
+              <br />
+              Code APE : {siteConfig.legal.ape}
+            </>
+          )}
           {siteConfig.legal.vat && (
             <>
               <br />

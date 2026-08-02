@@ -1,8 +1,4 @@
-import {
-  telegramUrl,
-  whatsappUrl,
-  type SiteConfig,
-} from "@/lib/config";
+import { telegramUrl, whatsappUrl, type SiteConfig } from "@/lib/config";
 
 function pick(value: string | null | undefined, fallback: string): string {
   const trimmed = value?.trim();
@@ -37,7 +33,9 @@ export type SiteSettingRow = {
   legalCompany?: string | null;
   legalStatus?: string | null;
   legalCapital?: string | null;
+  legalSiren?: string | null;
   legalSiret?: string | null;
+  legalApe?: string | null;
   legalVat?: string | null;
   legalDirector?: string | null;
   legalHost?: string | null;
@@ -113,7 +111,9 @@ export function mergeSiteConfig(
       company: pick(row.legalCompany, defaults.legal.company),
       status: pick(row.legalStatus, defaults.legal.status),
       capital: pick(row.legalCapital, defaults.legal.capital),
+      siren: pick(row.legalSiren, defaults.legal.siren),
       siret: pick(row.legalSiret, defaults.legal.siret),
+      ape: pick(row.legalApe, defaults.legal.ape),
       vat: pick(row.legalVat, defaults.legal.vat),
       director: pick(row.legalDirector, defaults.legal.director),
       host: pick(row.legalHost, defaults.legal.host),

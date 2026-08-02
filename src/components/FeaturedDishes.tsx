@@ -97,7 +97,7 @@ export async function FeaturedDishes() {
           <div className="max-w-4xl">
             <p className="hidden text-sm leading-7 text-ink/70 sm:block sm:text-base 3xl:text-lg 3xl:leading-8">
               Thiéboudiène, poulet yassa et attiéké poisson-alloco : trois
-              signatures généreuses de Lauuale Simbo à savourer sur place ou à
+              signatures généreuses de Lawale Simbo à savourer sur place ou à
               emporter.
             </p>
           </div>

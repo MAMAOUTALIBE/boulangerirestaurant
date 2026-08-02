@@ -1,5 +1,5 @@
 /**
- * Profil de démonstration de Lauuale Simbo.
+ * Profil de démonstration de Lawale Simbo.
  *
  * Ce profil conserve le slug technique historique `anatolia-grill` pour ne pas
  * casser le déploiement existant. Il reste destructif et réservé au développement.
@@ -8,7 +8,7 @@ import { seedDishes } from "../../src/data/dishes";
 import type { SeedProfile } from "./types";
 
 const lauualeSimbo: SeedProfile = {
-  restaurant: { slug: "anatolia-grill", name: "Lauuale Simbo" },
+  restaurant: { slug: "anatolia-grill", name: "Lawale Simbo" },
   resetStrategy: "demo",
   ordering: { slotIntervalMin: 15, leadTimeMin: 25, capacityPerSlot: 8 },
   categories: [

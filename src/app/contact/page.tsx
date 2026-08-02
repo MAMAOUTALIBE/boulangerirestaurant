@@ -5,7 +5,7 @@ import { ContactSection } from "@/components/ContactSection";
 export const metadata: Metadata = {
   title: "Contact",
   description:
-    "Contactez Lauuale Simbo pour une question, une commande ou une demande d'information.",
+    "Contactez Lawale Simbo pour une question, une commande ou une demande d'information.",
 };
 
 export default function ContactPage() {

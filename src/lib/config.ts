@@ -73,7 +73,9 @@ export interface SiteConfig {
     company: string;
     status: string;
     capital: string;
+    siren: string;
     siret: string;
+    ape: string;
     vat: string;
     director: string;
     host: string;
@@ -83,9 +85,12 @@ export interface SiteConfig {
 }
 
 const whatsappOrderNumber =
-  process.env.NEXT_PUBLIC_WHATSAPP_ORDER_NUMBER ?? "+33775787825";
+  process.env.NEXT_PUBLIC_WHATSAPP_ORDER_NUMBER ?? "+33666207958";
+// Vide par défaut : aucun compte Telegram n'est ouvert pour le restaurant.
+// Un pseudo renseigné (ici ou dans /admin/parametres) réaffiche le canal ;
+// tant qu'il est vide, tous les rendus le masquent (filtre sur lien non vide).
 const telegramOrderUsername =
-  process.env.NEXT_PUBLIC_TELEGRAM_ORDER_USERNAME ?? "lauualesimbo";
+  process.env.NEXT_PUBLIC_TELEGRAM_ORDER_USERNAME ?? "";
 
 /** Construit un lien wa.me à partir d'un numéro (garde seulement les chiffres). */
 export function whatsappUrl(number: string): string {
@@ -102,17 +107,17 @@ export function telegramUrl(username: string): string {
 /** Valeurs par défaut du template (fallback quand la base est vide). */
 export const defaultSiteConfig: SiteConfig = {
   orderingMode: "vitrine",
-  name: "Lauuale Simbo",
-  shortName: "Lauuale Simbo",
+  name: "Lawale Simbo",
+  shortName: "Lawale Simbo",
   description:
-    "Lauuale Simbo, restaurant de spécialités africaines : thiéboudiène, yassa, mafé, attiéké, alloco et boissons maison. Sur place, à emporter ou en livraison.",
+    "Lawale Simbo, restaurant et traiteur de spécialités africaines. Sur place, à emporter ou en livraison.",
   url: process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000",
   locale: "fr_FR",
   contact: {
-    phone: "07 75 78 78 25",
+    phone: "06 66 20 79 58",
     email: "contact@lodene.org",
-    address: "5 Rue Jules Vallès, 91260 Juvisy-sur-Orge",
-    city: "Juvisy-sur-Orge",
+    address: "181 rue Robespierre, 93170 Bagnolet",
+    city: "Bagnolet",
   },
   hours: {
     summary: "Lun – Dim : 11h30 – 23h00",
@@ -140,7 +145,7 @@ export const defaultSiteConfig: SiteConfig = {
     tagline: "",
   },
   hero: {
-    title: "Lauuale Simbo",
+    title: "Lawale Simbo",
     description: "Grillades au charbon. Commandez maintenant.",
     titleVisible: true,
     descriptionVisible: true,
@@ -163,10 +168,12 @@ export const defaultSiteConfig: SiteConfig = {
   // Vides par défaut : les mentions légales sont propres à chaque exploitant et
   // se saisissent dans /admin/parametres.
   legal: {
-    company: "",
-    status: "",
-    capital: "",
-    siret: "",
+    company: "LAWALE SIMBO",
+    status: "EURL (SARL à associé unique)",
+    capital: "1 000 €",
+    siren: "913 420 048",
+    siret: "913 420 048 00021",
+    ape: "5610C — Restauration de type rapide",
     vat: "",
     director: "",
     host: "",
@@ -179,12 +186,14 @@ export function buildContactLinks(config: SiteConfig): {
   phoneHref: string;
   emailHref: string;
   mapsHref: string;
+  directionsHref: string;
 } {
+  const encodedAddress = encodeURIComponent(config.contact.address);
+
   return {
     phoneHref: `tel:${config.contact.phone.replace(/\s/g, "")}`,
     emailHref: `mailto:${config.contact.email}`,
-    mapsHref: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-      config.contact.address,
-    )}`,
+    mapsHref: `https://www.google.com/maps/search/?api=1&query=${encodedAddress}`,
+    directionsHref: `https://www.google.com/maps/dir/?api=1&destination=${encodedAddress}`,
   };
 }

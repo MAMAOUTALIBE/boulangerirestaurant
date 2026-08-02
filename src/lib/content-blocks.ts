@@ -61,12 +61,27 @@ export const SECTIONS_MARKDOWN: ContentSection[] = [
 ];
 
 /**
+ * Destinations symboliques d'un raccourci, résolues au rendu contre l'identité
+ * éditable du restaurant (`/admin/parametres`).
+ *
+ * Elles existent pour que le numéro de téléphone et l'adresse ne soient JAMAIS
+ * recopiés en dur dans un contenu par défaut : un changement de coordonnées
+ * dans le CRM doit suffire. `SHORTCUT_CONTACT` ouvre la feuille « comment nous
+ * joindre » (appel, WhatsApp, Telegram, e-mail), `SHORTCUT_DIRECTIONS` ouvre
+ * l'itinéraire Google Maps vers l'adresse enregistrée.
+ */
+export const SHORTCUT_CONTACT = "contact";
+export const SHORTCUT_DIRECTIONS = "itineraire";
+
+/**
  * Icônes utilisables dans un bloc. Liste blanche : le nom vient de la base,
  * donc d'une saisie — on ne fait jamais de résolution dynamique arbitraire.
  */
 export const ICON_WHITELIST = [
   "ShoppingBag",
   "CalendarCheck",
+  "Phone",
+  "Navigation",
   "UtensilsCrossed",
   "ChefHat",
   "UsersRound",
@@ -543,7 +558,7 @@ export const DEFAULT_CONTENT_BLOCKS: ContentBlockData[] = [
   }),
   bloc("a-propos", "photo-1", 2, {
     mediaUrl: "/images/africain/thiep-poulet.webp",
-    alt: "Thiéboudiène au poulet Lauuale Simbo",
+    alt: "Thiéboudiène au poulet Lawale Simbo",
   }),
   bloc("a-propos", "photo-2", 3, {
     mediaUrl: "/images/africain/yassa-poulet.webp",
@@ -631,15 +646,20 @@ export const DEFAULT_CONTENT_BLOCKS: ContentBlockData[] = [
     href: "/commander",
     icon: "ShoppingBag",
   }),
-  bloc("raccourcis", "reserver", 2, {
-    title: "Réserver",
-    href: "/reservation",
-    icon: "CalendarCheck",
+  bloc("raccourcis", "contact", 2, {
+    title: "Contact",
+    href: SHORTCUT_CONTACT,
+    icon: "Phone",
   }),
   bloc("raccourcis", "menu", 3, {
-    title: "Voir le menu",
+    title: "Menus",
     href: "/menu",
     icon: "UtensilsCrossed",
+  }),
+  bloc("raccourcis", "itineraire", 4, {
+    title: "Itinéraire",
+    href: SHORTCUT_DIRECTIONS,
+    icon: "Navigation",
   }),
 
   // ── Pied de page : mises en avant ──────────────────────────────────────────

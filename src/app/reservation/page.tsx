@@ -7,7 +7,7 @@ import { ReservationForm } from "@/components/ReservationForm";
 
 export const metadata: Metadata = {
   title: "Réserver une table",
-  description: "Réservez votre table chez Lauuale Simbo en quelques clics.",
+  description: "Réservez votre table chez Lawale Simbo en quelques clics.",
 };
 
 const atoutsMobile = ["Confirmé", "Rapide", "Sans CB"];
@@ -84,7 +84,7 @@ export default async function ReservationPage({
               <div className="relative min-h-[28rem]">
                 <Image
                   src="/images/africain/thiep-poisson.webp"
-                  alt="Thiéboudiène servi chez Lauuale Simbo"
+                  alt="Thiéboudiène servi chez Lawale Simbo"
                   fill
                   sizes="(max-width: 1024px) 100vw, 42vw"
                   className="object-cover"

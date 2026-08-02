@@ -296,7 +296,7 @@ export default async function AdminParametresPage() {
               name="legalCompany"
               label="Raison sociale"
               defaultValue={identity?.legalCompany ?? ""}
-              placeholder="Lauuale Simbo SARL"
+              placeholder="LAWALE SIMBO"
             />
             <IdentityField
               name="legalStatus"
@@ -311,10 +311,22 @@ export default async function AdminParametresPage() {
               placeholder="10 000 €"
             />
             <IdentityField
+              name="legalSiren"
+              label="SIREN"
+              defaultValue={identity?.legalSiren ?? ""}
+              placeholder="913 420 048"
+            />
+            <IdentityField
               name="legalSiret"
               label="SIRET"
               defaultValue={identity?.legalSiret ?? ""}
               placeholder="123 456 789 00012"
+            />
+            <IdentityField
+              name="legalApe"
+              label="Code APE / activité"
+              defaultValue={identity?.legalApe ?? ""}
+              placeholder="5610C — Restauration de type rapide"
             />
             <IdentityField
               name="legalVat"

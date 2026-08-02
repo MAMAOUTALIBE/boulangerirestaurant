@@ -1710,8 +1710,7 @@ export async function adminUpdateSiteIdentity(
     heroTitle: optionalText(formData.get("heroTitle")),
     heroDescription: optionalText(formData.get("heroDescription")),
     heroTitleVisible: formData.get("heroTitleVisible") === "on",
-    heroDescriptionVisible:
-      formData.get("heroDescriptionVisible") === "on",
+    heroDescriptionVisible: formData.get("heroDescriptionVisible") === "on",
 
     metaTitle: optionalText(formData.get("metaTitle")),
     metaDescription: optionalText(formData.get("metaDescription")),
@@ -1720,7 +1719,9 @@ export async function adminUpdateSiteIdentity(
     legalCompany: optionalText(formData.get("legalCompany")),
     legalStatus: optionalText(formData.get("legalStatus")),
     legalCapital: optionalText(formData.get("legalCapital")),
+    legalSiren: optionalText(formData.get("legalSiren")),
     legalSiret: optionalText(formData.get("legalSiret")),
+    legalApe: optionalText(formData.get("legalApe")),
     legalVat: optionalText(formData.get("legalVat")),
     legalDirector: optionalText(formData.get("legalDirector")),
     legalHost: optionalText(formData.get("legalHost")),

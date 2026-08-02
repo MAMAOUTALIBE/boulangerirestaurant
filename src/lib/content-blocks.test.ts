@@ -61,14 +61,16 @@ describe("DEFAULT_CONTENT_BLOCKS", () => {
     expect(resolveSection("galerie")).toHaveLength(11);
     expect(resolveSection("menu-hero")).toHaveLength(4);
     expect(resolveSection("etapes")).toHaveLength(3);
-    expect(resolveSection("raccourcis")).toHaveLength(3);
+    expect(resolveSection("raccourcis")).toHaveLength(4);
   });
 
   it("fournit une image portrait dédiée à toutes les slides mobiles", () => {
     const slides = toHeroSlides(resolveSection("hero"));
     expect(slides).toHaveLength(24);
     expect(
-      slides.every((slide) => slide.type !== "image" || Boolean(slide.mobileSrc)),
+      slides.every(
+        (slide) => slide.type !== "image" || Boolean(slide.mobileSrc),
+      ),
     ).toBe(true);
 
     const [slide] = slides;

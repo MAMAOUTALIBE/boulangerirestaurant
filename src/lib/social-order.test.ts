@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { defaultSiteConfig } from "@/lib/config";
 import {
   buildTelegramOrderUrl,
   buildWhatsAppOrderUrl,
@@ -56,8 +57,14 @@ describe("social order helpers", () => {
   it("génère des URLs WhatsApp et Telegram encodées", () => {
     const message = "Bonjour Restaurant\nCommande test";
 
+    // Le numéro est propre à l'exploitant : on le dérive de la configuration
+    // plutôt que de le figer, sinon un changement de coordonnées casse le test.
+    const digits = defaultSiteConfig.messaging.whatsappOrderNumber.replace(
+      /\D/g,
+      "",
+    );
     expect(buildWhatsAppOrderUrl(message)).toMatch(
-      /^https:\/\/wa\.me\/33775787825\?text=/,
+      new RegExp(`^https://wa\\.me/${digits}\\?text=`),
     );
     expect(buildWhatsAppOrderUrl(message)).toContain("Commande%20test");
     expect(buildTelegramOrderUrl(message)).toMatch(

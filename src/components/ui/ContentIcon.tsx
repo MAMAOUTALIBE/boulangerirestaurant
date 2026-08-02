@@ -8,6 +8,8 @@ import {
   Gift,
   Images,
   Leaf,
+  Navigation,
+  Phone,
   Recycle,
   ShieldCheck,
   ShoppingBag,
@@ -29,6 +31,8 @@ import { resolveIconName } from "@/lib/content-blocks";
 const ICONES: Record<string, LucideIcon> = {
   ShoppingBag,
   CalendarCheck,
+  Phone,
+  Navigation,
   UtensilsCrossed,
   ChefHat,
   UsersRound,

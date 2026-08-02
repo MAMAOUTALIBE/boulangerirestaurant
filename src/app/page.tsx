@@ -4,8 +4,8 @@ import { HomeShortcuts } from "@/components/HomeShortcuts";
 import { FeaturedDishes } from "@/components/FeaturedDishes";
 import { PremiumEngagementSection } from "@/components/PremiumEngagementSection";
 import { Footer } from "@/components/Footer";
-import { getContentSection } from "@/lib/content";
-import { toHeroSlides } from "@/lib/content-blocks";
+import { getContentSections } from "@/lib/content";
+import { toHeroSlides, type ContentBlockData } from "@/lib/content-blocks";
 
 // Rendu dynamique : la page lit la base (produits, avis, contenus éditoriaux)
 // → pas de prérendu au build.
@@ -13,14 +13,18 @@ export const dynamic = "force-dynamic";
 
 export default async function Home() {
   // Le bandeau est un composant client (carrousel) : il reçoit ses diapositives
-  // en props depuis ici plutôt que de lire la base lui-même.
-  const diapos = toHeroSlides(await getContentSection("hero"));
+  // et ses raccourcis en props depuis ici plutôt que de lire la base lui-même.
+  const sections = await getContentSections(["hero", "raccourcis"]);
+  const diapos = toHeroSlides(sections.hero);
+  const raccourcis = sections.raccourcis.filter(
+    (bloc): bloc is ContentBlockData & { href: string } => Boolean(bloc.href),
+  );
 
   return (
     <div className="home-page-mobile-viewport">
       <Header />
       <main className="home-page-main">
-        <Hero slides={diapos} />
+        <Hero slides={diapos} raccourcis={raccourcis} />
         <div className="home-page-sections">
           <HomeShortcuts />
           <FeaturedDishes />

@@ -67,7 +67,7 @@ export async function ContactSection() {
             <div className="relative hidden min-h-0 flex-1 overflow-hidden rounded-[22px] border border-white/10 lg:block">
               <Image
                 src="/images/africain/attieke-poisson-alloco.webp"
-                alt="Assiette d'attiéké, poisson et alloco Lauuale Simbo"
+                alt="Assiette d'attiéké, poisson et alloco Lawale Simbo"
                 fill
                 sizes="36vw"
                 className="object-cover"
