@@ -27,6 +27,8 @@ export type SiteSettingRow = {
   heroDescription?: string | null;
   heroTitleVisible?: boolean;
   heroDescriptionVisible?: boolean;
+  heroMobileContentVisible?: boolean;
+  heroMobileContentPosition?: string | null;
   metaTitle?: string | null;
   metaDescription?: string | null;
   keywords?: string | null;
@@ -96,6 +98,14 @@ export function mergeSiteConfig(
       titleVisible: row.heroTitleVisible ?? defaults.hero.titleVisible,
       descriptionVisible:
         row.heroDescriptionVisible ?? defaults.hero.descriptionVisible,
+      mobileContentVisible:
+        row.heroMobileContentVisible ?? defaults.hero.mobileContentVisible,
+      mobileContentPosition:
+        row.heroMobileContentPosition === "haut" ||
+        row.heroMobileContentPosition === "milieu" ||
+        row.heroMobileContentPosition === "bas"
+          ? row.heroMobileContentPosition
+          : defaults.hero.mobileContentPosition,
     },
     seo: {
       metaTitle: pick(row.metaTitle, defaults.seo.metaTitle),

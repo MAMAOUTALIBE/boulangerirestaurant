@@ -269,6 +269,11 @@ aside {
     will-change: transform;
   }
 
+  .hero-service-marquee:hover .hero-service-track,
+  .hero-service-marquee:focus-within .hero-service-track {
+    animation-play-state: paused;
+  }
+
   .hero-service-chip {
     position: relative;
     isolation: isolate;
@@ -292,6 +297,13 @@ aside {
       inset 0 1px 0 rgba(255, 255, 255, 0.08),
       0 14px 34px -26px rgba(245, 158, 11, 0.9);
     backdrop-filter: blur(4px);
+    transition:
+      border-color 180ms ease,
+      background-color 180ms ease;
+  }
+
+  .hero-service-chip:hover {
+    border-color: rgba(245, 158, 11, 0.72);
   }
 
   .hero-service-chip::before {
@@ -446,6 +458,17 @@ input[type="date"]::-webkit-calendar-picker-indicator,
 input[type="time"]::-webkit-calendar-picker-indicator {
   opacity: 0.75;
   cursor: pointer;
+}
+
+/* Safari mobile donne au sélecteur de date une largeur intrinsèque trop grande. */
+.reservation-date-input {
+  -webkit-appearance: none;
+  appearance: none;
+  box-sizing: border-box;
+  width: 100% !important;
+  inline-size: 100%;
+  min-inline-size: 0;
+  max-inline-size: 100%;
 }
 
 /* Scrollbar premium */

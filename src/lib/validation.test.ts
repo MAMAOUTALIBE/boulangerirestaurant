@@ -7,7 +7,38 @@ import {
   customQuoteSchema,
   newsletterSchema,
   orderSchema,
+  reservationSchema,
 } from "@/lib/validation";
+
+describe("reservationSchema", () => {
+  const valid = {
+    firstName: "Mariam",
+    lastName: "Diallo",
+    email: "mariam@example.com",
+    phone: "0612345678",
+    date: "2099-08-03",
+    time: "20:00",
+    guests: 2,
+    notes: "Table au calme",
+    reminderRequested: true,
+  };
+
+  it("accepte une réservation complète", () => {
+    expect(reservationSchema.safeParse(valid).success).toBe(true);
+  });
+
+  it("refuse les coordonnées, dates et nombres de convives invalides", () => {
+    expect(
+      reservationSchema.safeParse({
+        ...valid,
+        firstName: "M",
+        email: "invalide",
+        date: "2020-01-01",
+        guests: 0,
+      }).success,
+    ).toBe(false);
+  });
+});
 
 describe("newsletterSchema", () => {
   it("accepte un email valide", () => {

@@ -190,6 +190,71 @@ export default async function AdminParametresPage() {
                 Afficher la description
               </label>
             </div>
+            <label className="mt-4 flex cursor-pointer items-start gap-3 rounded-lg border border-white/10 bg-white/[0.03] p-3 text-sm text-cream/90">
+              <input
+                type="checkbox"
+                name="heroMobileContentVisible"
+                defaultChecked={identity?.heroMobileContentVisible ?? true}
+                className="mt-0.5 h-4 w-4 shrink-0 accent-gold"
+              />
+              <span>
+                <span className="block font-semibold">
+                  Afficher le titre et la description sur mobile
+                </span>
+                <span className="mt-0.5 block text-xs text-muted">
+                  Décochez pour masquer ces textes uniquement sur téléphone. Le
+                  contenu reste visible sur tablette et ordinateur.
+                </span>
+              </span>
+            </label>
+            <fieldset className="mt-4">
+              <legend className="text-sm font-semibold text-cream/90">
+                Position du contenu sur mobile
+              </legend>
+              <div className="mt-2 grid gap-2 sm:grid-cols-3">
+                {[
+                  {
+                    value: "haut",
+                    label: "Au-dessus du plat",
+                    detail: "En haut du slide",
+                  },
+                  {
+                    value: "milieu",
+                    label: "Au milieu du plat",
+                    detail: "Centré sur le slide",
+                  },
+                  {
+                    value: "bas",
+                    label: "Au-dessous du plat",
+                    detail: "En bas du slide",
+                  },
+                ].map((option) => (
+                  <label
+                    key={option.value}
+                    className="flex cursor-pointer items-start gap-2 rounded-lg border border-white/10 bg-white/[0.03] p-3 transition hover:border-gold/40"
+                  >
+                    <input
+                      type="radio"
+                      name="heroMobileContentPosition"
+                      value={option.value}
+                      defaultChecked={
+                        (identity?.heroMobileContentPosition ?? "milieu") ===
+                        option.value
+                      }
+                      className="mt-0.5 h-4 w-4 shrink-0 accent-gold"
+                    />
+                    <span>
+                      <span className="block text-sm font-medium text-cream">
+                        {option.label}
+                      </span>
+                      <span className="mt-0.5 block text-xs text-muted">
+                        {option.detail}
+                      </span>
+                    </span>
+                  </label>
+                ))}
+              </div>
+            </fieldset>
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
             <IdentityField

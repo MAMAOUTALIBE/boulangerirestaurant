@@ -26,27 +26,32 @@ import {
 function buildServiceHighlights(city: string): {
   title: string;
   detail: string;
+  href: string;
   Icon: LucideIcon;
 }[] {
   return [
     {
       title: "Click & collect",
       detail: "Prêt au créneau choisi",
+      href: "/commander",
       Icon: ShoppingBag,
     },
     {
       title: "Livraison",
       detail: `${city} et alentours`,
+      href: "/commander",
       Icon: MapPin,
     },
     {
       title: "Sur place",
       detail: "Salle conviviale",
+      href: "/reservation",
       Icon: UtensilsCrossed,
     },
     {
       title: "Cuisine africaine",
       detail: "Préparée maison",
+      href: "/menu",
       Icon: Flame,
     },
   ];
@@ -74,6 +79,11 @@ export function Hero({
   const siteConfig = useSiteConfig();
   const { directionsHref } = buildContactLinks(siteConfig);
   const serviceHighlights = buildServiceHighlights(siteConfig.contact.city);
+  const mobileContentPositionClass = {
+    haut: "items-start pt-6 sm:pt-0",
+    milieu: "items-center",
+    bas: "items-end pb-6",
+  }[siteConfig.hero.mobileContentPosition];
 
   useEffect(() => {
     const prefersReducedMotion = window.matchMedia(
@@ -259,7 +269,9 @@ export function Hero({
       </div>
 
       <div className="relative z-30 mx-auto flex min-h-0 w-full max-w-[1680px] flex-1 flex-col gap-2 sm:gap-6 lg:gap-7 3xl:max-w-[2100px] 4xl:max-w-[2360px]">
-        <div className="flex min-h-0 flex-1 items-center pb-1 sm:min-h-[560px] sm:pb-2 md:min-h-[600px] lg:min-h-[560px] 2xl:min-h-[630px] 3xl:min-h-[720px] 4xl:min-h-[820px]">
+        <div
+          className={`flex min-h-0 flex-1 pb-1 sm:min-h-[560px] sm:items-center sm:pb-2 md:min-h-[600px] lg:min-h-[560px] 2xl:min-h-[630px] 3xl:min-h-[720px] 4xl:min-h-[820px] ${mobileContentPositionClass}`}
+        >
           <motion.div
             className="relative isolate z-20 max-w-[620px] py-2 sm:-mt-[5.25rem] sm:max-w-[650px] sm:py-4 lg:-mt-[6rem] lg:pl-2 xl:-mt-[6.75rem] xl:pl-4 3xl:-mt-32 3xl:max-w-[780px]"
             initial={false}
@@ -273,7 +285,13 @@ export function Hero({
 
             <div className="relative z-20">
               {siteConfig.hero.titleVisible ? (
-                <h1 className="font-display text-[clamp(2.2rem,12vw,3rem)] font-bold leading-[0.98] text-[#F8F3EA] drop-shadow-[0_3px_8px_rgba(0,0,0,0.96)] sm:text-6xl lg:text-[4.15rem] xl:text-[4.8rem] 3xl:text-[5.8rem] 4xl:text-[6.5rem]">
+                <h1
+                  className={`font-display text-[clamp(2.2rem,12vw,3rem)] font-bold leading-[0.98] text-[#F8F3EA] drop-shadow-[0_3px_8px_rgba(0,0,0,0.96)] sm:text-6xl lg:text-[4.15rem] xl:text-[4.8rem] 3xl:text-[5.8rem] 4xl:text-[6.5rem] ${
+                    siteConfig.hero.mobileContentVisible
+                      ? ""
+                      : "hidden sm:block"
+                  }`}
+                >
                   <span className="block text-gold">
                     {siteConfig.hero.title}
                   </span>
@@ -281,7 +299,13 @@ export function Hero({
               ) : null}
 
               {siteConfig.hero.descriptionVisible ? (
-                <p className="text-[#F8F3EA]/88 mt-2 max-w-[18rem] text-sm font-semibold leading-5 drop-shadow-[0_2px_5px_rgba(0,0,0,0.98)] sm:mt-5 sm:max-w-xl sm:text-xl sm:leading-8 3xl:max-w-3xl 3xl:text-2xl 3xl:leading-10">
+                <p
+                  className={`text-[#F8F3EA]/88 mt-2 max-w-[18rem] text-sm font-semibold leading-5 drop-shadow-[0_2px_5px_rgba(0,0,0,0.98)] sm:mt-5 sm:max-w-xl sm:text-xl sm:leading-8 3xl:max-w-3xl 3xl:text-2xl 3xl:leading-10 ${
+                    siteConfig.hero.mobileContentVisible
+                      ? ""
+                      : "hidden sm:block"
+                  }`}
+                >
                   {siteConfig.hero.description}
                 </p>
               ) : null}
@@ -314,26 +338,6 @@ export function Hero({
                   </Link>
                 </div>
               </div>
-
-              <div
-                className="mt-3 flex max-w-full items-center gap-1 sm:mt-5 sm:gap-1.5 3xl:mt-7"
-                aria-label="Visuels du hero"
-              >
-                {slides.map((slide, index) => (
-                  <button
-                    key={slide.src}
-                    type="button"
-                    aria-label={`Afficher ${slide.label}`}
-                    aria-current={index === activeSlide ? "true" : undefined}
-                    onClick={() => setActiveSlide(index)}
-                    className={`h-1.5 rounded-full transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70 sm:h-2 ${
-                      index === activeSlide
-                        ? "w-5 bg-gold sm:w-7"
-                        : "w-1.5 bg-white/45 hover:bg-white/75 sm:w-2"
-                    }`}
-                  />
-                ))}
-              </div>
             </div>
           </motion.div>
         </div>
@@ -343,13 +347,18 @@ export function Hero({
           className="hero-service-marquee relative z-20 -mx-4 shrink-0 overflow-hidden pb-0.5 sm:hidden"
           aria-label="Services disponibles : click and collect, livraison, sur place et grillades au charbon"
         >
-          <div className="hero-service-track" aria-hidden="true">
+          <div className="hero-service-track">
             {[...serviceHighlights, ...serviceHighlights].map(
-              ({ title, Icon }, index) => (
-                <span key={`${title}-${index}`} className="hero-service-chip">
+              ({ title, href, Icon }, index) => (
+                <Link
+                  key={`${title}-${index}`}
+                  href={href}
+                  className="hero-service-chip focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
+                  aria-label={`${title} — accéder au service`}
+                >
                   <Icon className="h-4 w-4 shrink-0 text-gold" />
                   <span>{title}</span>
-                </span>
+                </Link>
               ),
             )}
           </div>
@@ -408,12 +417,14 @@ export function Hero({
           transition={{ duration: 0.65, delay: 0.2 }}
         >
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
-            {serviceHighlights.map(({ title, detail, Icon }) => (
-              <div
+            {serviceHighlights.map(({ title, detail, href, Icon }) => (
+              <Link
                 key={title}
-                className="flex items-center gap-4 border-t border-white/10 px-5 py-4 first:border-t-0 sm:px-6 lg:border-l lg:border-t-0 lg:px-7 lg:first:border-l-0 3xl:gap-5 3xl:px-9 3xl:py-6"
+                href={href}
+                className="group flex items-center gap-4 border-t border-white/10 px-5 py-4 transition first:border-t-0 hover:bg-white/[0.06] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-gold sm:px-6 lg:border-l lg:border-t-0 lg:px-7 lg:first:border-l-0 3xl:gap-5 3xl:px-9 3xl:py-6"
+                aria-label={`${title} — ${detail}`}
               >
-                <span className="bg-black/28 flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-gold/60 text-gold sm:h-14 sm:w-14 3xl:h-16 3xl:w-16">
+                <span className="bg-black/28 flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-gold/60 text-gold transition group-hover:bg-gold group-hover:text-ink sm:h-14 sm:w-14 3xl:h-16 3xl:w-16">
                   <Icon className="h-5 w-5 3xl:h-6 3xl:w-6" />
                 </span>
                 <span className="min-w-0">
@@ -424,7 +435,7 @@ export function Hero({
                     {detail}
                   </span>
                 </span>
-              </div>
+              </Link>
             ))}
           </div>
         </motion.div>

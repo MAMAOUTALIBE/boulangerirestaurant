@@ -102,8 +102,8 @@ export function CartDrawer() {
                 </button>
               </div>
             ) : (
-              <>
-                <ul className="flex-1 divide-y divide-white/10 overflow-y-auto p-5">
+              <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
+                <ul className="divide-y divide-white/10 p-5">
                   {items.map((item) => (
                     <li
                       key={item.lineId}
@@ -291,7 +291,7 @@ export function CartDrawer() {
                     Vider le panier
                   </button>
                 </div>
-              </>
+              </div>
             )}
           </motion.aside>
         </>

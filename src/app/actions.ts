@@ -68,6 +68,23 @@ export interface ActionState {
   errors?: Record<string, string>;
 }
 
+export interface ReservationActionState extends ActionState {
+  reservation?: {
+    reference: string;
+    manageToken: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    phone: string;
+    date: string;
+    time: string;
+    guests: number;
+    notes: string;
+    reminderRequested: boolean;
+    status: string;
+  };
+}
+
 /** Détecte un bot via le champ honeypot (doit rester vide). */
 function isBot(formData: FormData): boolean {
   return Boolean(formData.get("company"));
@@ -217,21 +234,23 @@ export async function adminDeleteReview(formData: FormData): Promise<void> {
 
 /** Réservation de table. */
 export async function createReservation(
-  _prev: ActionState | null,
+  _prev: ReservationActionState | null,
   formData: FormData,
-): Promise<ActionState> {
+): Promise<ReservationActionState> {
   if (isBot(formData)) return { ok: true, message: "Demande envoyée !" };
   if (!(await rateLimit(`reservation:${await clientIp()}`, 5, 60_000)))
     return TOO_MANY;
 
   const parsed = reservationSchema.safeParse({
-    name: formData.get("name"),
+    firstName: formData.get("firstName"),
+    lastName: formData.get("lastName"),
     email: formData.get("email"),
     phone: formData.get("phone"),
     date: formData.get("date"),
     time: formData.get("time"),
     guests: formData.get("guests"),
     notes: formData.get("notes") || undefined,
+    reminderRequested: formData.get("reminderRequested") === "on",
   });
   if (!parsed.success) {
     return {
@@ -241,36 +260,138 @@ export async function createReservation(
     };
   }
 
-  const ref = `RV-${Date.now().toString(36).toUpperCase()}`;
-  const reservation = await prisma.reservation.create({
-    data: { reference: ref, ...parsed.data },
-  });
+  const requestedReference = String(
+    formData.get("reservationReference") ?? "",
+  ).trim();
+  const requestedToken = String(formData.get("manageToken") ?? "").trim();
+  const name = `${parsed.data.firstName} ${parsed.data.lastName}`;
+  let reservation: Prisma.ReservationGetPayload<object>;
+  let updated = false;
+
+  if (requestedReference || requestedToken) {
+    if (!requestedReference || !requestedToken) {
+      return { ok: false, message: "Lien de gestion incomplet." };
+    }
+
+    const existing = await prisma.reservation.findFirst({
+      where: {
+        reference: requestedReference,
+        manageToken: requestedToken,
+        status: { not: "annulée" },
+      },
+    });
+    if (!existing) {
+      return {
+        ok: false,
+        message: "Cette réservation ne peut plus être modifiée.",
+      };
+    }
+
+    reservation = await prisma.reservation.update({
+      where: { id: existing.id },
+      data: { ...parsed.data, name, status: "confirmée" },
+    });
+    updated = true;
+  } else {
+    reservation = await prisma.reservation.create({
+      data: {
+        reference: `RV-${crypto.randomBytes(6).toString("hex").toUpperCase()}`,
+        manageToken: crypto.randomBytes(24).toString("hex"),
+        ...parsed.data,
+        name,
+        status: "confirmée",
+      },
+    });
+  }
+
+  const ref = reservation.reference;
   await recordDemoLead({
     source: "réservation",
     sourceId: reservation.reference,
-    name: parsed.data.name,
+    name,
     email: parsed.data.email,
     phone: parsed.data.phone,
     message: `${parsed.data.guests} personne(s) le ${parsed.data.date} à ${parsed.data.time}`,
   });
   await upsertCustomer(parsed.data.email, {
-    name: parsed.data.name,
+    name,
     phone: parsed.data.phone,
   });
 
+  const siteConfig = await getSiteConfig();
+  const manageUrl = `${siteConfig.url.replace(/\/$/, "")}/reservation?reference=${encodeURIComponent(ref)}&token=${encodeURIComponent(reservation.manageToken ?? requestedToken)}`;
   await sendEmail({
     to: parsed.data.email,
-    subject: `Votre demande de réservation ${ref}`,
-    html: safeHtml`<h1>Merci ${parsed.data.name} !</h1>
-      <p>Votre demande de réservation pour ${parsed.data.guests} personne(s)
-      le ${parsed.data.date} à ${parsed.data.time} a bien été reçue
-      (réf. ${ref}). Nous la confirmons sous peu.</p>`,
+    subject: `${updated ? "Réservation modifiée" : "Réservation confirmée"} — ${ref}`,
+    html: safeHtml`<h1>${updated ? "Votre réservation a été modifiée" : "Votre réservation est confirmée"}</h1>
+      <p>Bonjour ${parsed.data.firstName},</p>
+      <p>Votre table pour ${parsed.data.guests} personne(s) est réservée
+      le ${parsed.data.date} à ${parsed.data.time} (réf. ${ref}).</p>
+      <p>${parsed.data.reminderRequested ? "Votre demande de rappel 2 h avant a bien été enregistrée." : "Aucun rappel n’a été demandé."}</p>
+      <p>Pour modifier ou annuler : ${manageUrl}</p>`,
   });
+
+  revalidatePath("/admin/reservations");
 
   return {
     ok: true,
-    message: `Demande envoyée (réf. ${ref}) ! Vous recevrez une confirmation par email.`,
+    message: updated
+      ? "Votre réservation a été mise à jour."
+      : "Votre réservation est confirmée.",
+    reservation: {
+      reference: reservation.reference,
+      manageToken: reservation.manageToken ?? requestedToken,
+      firstName: reservation.firstName,
+      lastName: reservation.lastName,
+      email: reservation.email,
+      phone: reservation.phone,
+      date: reservation.date,
+      time: reservation.time,
+      guests: reservation.guests,
+      notes: reservation.notes ?? "",
+      reminderRequested: reservation.reminderRequested,
+      status: reservation.status,
+    },
   };
+}
+
+/** Annulation publique protégée par le jeton remis lors de la réservation. */
+export async function cancelReservation(
+  formData: FormData,
+): Promise<ActionState> {
+  if (!(await rateLimit(`reservation-cancel:${await clientIp()}`, 5, 60_000)))
+    return TOO_MANY;
+
+  const reference = String(formData.get("reference") ?? "").trim();
+  const manageToken = String(formData.get("manageToken") ?? "").trim();
+  if (!reference || manageToken.length < 32) {
+    return { ok: false, message: "Lien d’annulation invalide." };
+  }
+
+  const reservation = await prisma.reservation.findFirst({
+    where: { reference, manageToken },
+  });
+  if (!reservation) {
+    return { ok: false, message: "Réservation introuvable." };
+  }
+  if (reservation.status === "annulée") {
+    return { ok: true, message: "Cette réservation est déjà annulée." };
+  }
+
+  await prisma.reservation.update({
+    where: { id: reservation.id },
+    data: { status: "annulée" },
+  });
+  await sendEmail({
+    to: reservation.email,
+    subject: `Réservation annulée — ${reference}`,
+    html: safeHtml`<h1>Réservation annulée</h1>
+      <p>Bonjour ${reservation.firstName || reservation.name},</p>
+      <p>Votre réservation ${reference} du ${reservation.date} à ${reservation.time} a bien été annulée.</p>`,
+  });
+  revalidatePath("/admin/reservations");
+
+  return { ok: true, message: "Votre réservation a bien été annulée." };
 }
 
 /** Demande de devis traiteur. */
@@ -1711,6 +1832,11 @@ export async function adminUpdateSiteIdentity(
     heroDescription: optionalText(formData.get("heroDescription")),
     heroTitleVisible: formData.get("heroTitleVisible") === "on",
     heroDescriptionVisible: formData.get("heroDescriptionVisible") === "on",
+    heroMobileContentVisible: formData.get("heroMobileContentVisible") === "on",
+    heroMobileContentPosition: z
+      .enum(["haut", "milieu", "bas"])
+      .catch("milieu")
+      .parse(formData.get("heroMobileContentPosition")),
 
     metaTitle: optionalText(formData.get("metaTitle")),
     metaDescription: optionalText(formData.get("metaDescription")),

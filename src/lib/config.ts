@@ -61,6 +61,10 @@ export interface SiteConfig {
     description: string;
     titleVisible: boolean;
     descriptionVisible: boolean;
+    /** Masque uniquement les textes du hero sur les écrans mobiles. */
+    mobileContentVisible: boolean;
+    /** Position verticale des textes sur mobile uniquement. */
+    mobileContentPosition: "haut" | "milieu" | "bas";
   };
   /** Référencement de la page d'accueil. */
   seo: {
@@ -149,6 +153,8 @@ export const defaultSiteConfig: SiteConfig = {
     description: "Grillades au charbon. Commandez maintenant.",
     titleVisible: true,
     descriptionVisible: true,
+    mobileContentVisible: true,
+    mobileContentPosition: "milieu",
   },
   seo: {
     metaTitle: "",

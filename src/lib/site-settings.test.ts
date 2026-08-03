@@ -33,6 +33,8 @@ describe("mergeSiteConfig — texte du hero", () => {
       heroDescription: "Découvrez nos plats du jour.",
       heroTitleVisible: false,
       heroDescriptionVisible: true,
+      heroMobileContentVisible: false,
+      heroMobileContentPosition: "bas",
     });
 
     expect(config.hero).toEqual({
@@ -40,6 +42,8 @@ describe("mergeSiteConfig — texte du hero", () => {
       description: "Découvrez nos plats du jour.",
       titleVisible: false,
       descriptionVisible: true,
+      mobileContentVisible: false,
+      mobileContentPosition: "bas",
     });
   });
 

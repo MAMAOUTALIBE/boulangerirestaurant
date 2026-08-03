@@ -103,15 +103,42 @@ export const orderSchema = z
   });
 
 /** Validation d'une réservation de table. */
-export const reservationSchema = z.object({
-  name: z.string().min(2, "Nom trop court.").max(120, "Nom trop long."),
-  email: z.string().email("Adresse email invalide.").max(320),
-  phone: z.string().min(6, "Numéro de téléphone invalide.").max(40),
-  date: z.string().min(1, "Date requise.").max(40),
-  time: z.string().min(1, "Créneau requis.").max(40),
-  guests: z.coerce.number().int().min(1, "Au moins 1 convive.").max(50),
-  notes: z.string().max(2000).optional(),
-});
+export const reservationSchema = z
+  .object({
+    firstName: z
+      .string()
+      .trim()
+      .min(2, "Prénom trop court.")
+      .max(80, "Prénom trop long."),
+    lastName: z
+      .string()
+      .trim()
+      .min(2, "Nom trop court.")
+      .max(80, "Nom trop long."),
+    email: z.string().trim().email("Adresse email invalide.").max(320),
+    phone: z.string().trim().min(6, "Numéro de téléphone invalide.").max(40),
+    date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Date invalide."),
+    time: z.string().regex(/^\d{2}:\d{2}$/, "Créneau invalide."),
+    guests: z.coerce.number().int().min(1, "Au moins 1 convive.").max(50),
+    notes: z.string().trim().max(2000, "Demande trop longue.").optional(),
+    reminderRequested: z.boolean().default(false),
+  })
+  .superRefine((data, ctx) => {
+    const today = new Intl.DateTimeFormat("en-CA", {
+      timeZone: "Europe/Paris",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    }).format(new Date());
+
+    if (data.date < today) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["date"],
+        message: "Choisissez une date à venir.",
+      });
+    }
+  });
 
 /** Validation d'une demande de devis traiteur. */
 export const cateringSchema = z.object({

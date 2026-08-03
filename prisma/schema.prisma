@@ -306,21 +306,25 @@ model SiteSetting {
 
   // ── Image de marque (choisie dans la médiathèque) ──────────────────────────
   /// Logo affiché dans l'en-tête et le pied de page.
-  logoUrl                String?
+  logoUrl                   String?
   /// Favicon (onglet du navigateur).
-  faviconUrl             String?
+  faviconUrl                String?
   /// Image de partage sur les réseaux (Open Graph / Twitter).
-  ogImageUrl             String?
+  ogImageUrl                String?
   /// Accroche courte affichée sous le nom.
-  tagline                String?
+  tagline                   String?
   /// Titre affiché dans le hero d'accueil (vide → nom du restaurant).
-  heroTitle              String?
+  heroTitle                 String?
   /// Description affichée sous le titre du hero.
-  heroDescription        String?
+  heroDescription           String?
   /// Permet à l'administrateur de masquer le titre sans le supprimer.
-  heroTitleVisible       Boolean @default(true)
+  heroTitleVisible          Boolean @default(true)
   /// Permet à l'administrateur de masquer la description sans la supprimer.
-  heroDescriptionVisible Boolean @default(true)
+  heroDescriptionVisible    Boolean @default(true)
+  /// Affiche le titre et la description du hero sur mobile (sans effet sur desktop).
+  heroMobileContentVisible  Boolean @default(true)
+  /// Position verticale du contenu mobile : haut | milieu | bas.
+  heroMobileContentPosition String  @default("milieu")
 
   // ── Référencement ──────────────────────────────────────────────────────────
   /// Titre de la page d'accueil (défaut : « <nom> | <description> »).
@@ -430,18 +434,23 @@ model MarketingDispatch {
 
 /// Réservation de table.
 model Reservation {
-  id        String   @id @default(cuid())
-  reference String   @unique
-  createdAt DateTime @default(now())
-  status    String   @default("en attente") // en attente | confirmée | annulée
+  id          String   @id @default(cuid())
+  reference   String   @unique
+  manageToken String?  @unique
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now()) @updatedAt
+  status      String   @default("en attente") // en attente | confirmée | annulée
 
-  name   String
-  email  String
-  phone  String
-  date   String // jour souhaité (AAAA-MM-JJ)
-  time   String // créneau souhaité (HH:MM)
-  guests Int
-  notes  String?
+  name              String
+  firstName         String  @default("")
+  lastName          String  @default("")
+  email             String
+  phone             String
+  date              String // jour souhaité (AAAA-MM-JJ)
+  time              String // créneau souhaité (HH:MM)
+  guests            Int
+  notes             String?
+  reminderRequested Boolean @default(false)
 
   @@index([email])
 }
